@@ -4,8 +4,7 @@ import de.htw_berlin.ris.ricochet.common.net.message.NetMsg;
 
 public interface NetMsgHandler<T extends NetMsg> {
 
-    T getType();
+    Class<T> getType();
 
     void handle(T message);
-
 }

@@ -1,14 +1,14 @@
 package de.htw_berlin.ris.ricochet.common.net;
 
 import de.htw_berlin.ris.ricochet.common.net.handler.NetMsgHandler;
-import de.htw_berlin.ris.ricochet.common.net.message.NetMsg;
-import sun.nio.ch.ThreadPool;
+import de.htw_berlin.ris.ricochet.common.net.message.*;
 
 import java.io.*;
+import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.HashMap;
-import java.util.concurrent.ThreadPoolExecutor;
+import java.util.Map;
 
 public class NetManager {
 
@@ -20,12 +20,12 @@ public class NetManager {
     }
 
     public void register(NetMsgHandler<? extends NetMsg> netMsgHandler) {
-        messageHandlerHolder.put(netMsgHandler.getType().getClass(), netMsgHandler);
+        messageHandlerHolder.put(netMsgHandler.getType(), netMsgHandler);
     }
 
     public static void send(NetMsg netMsg) {
         try {
-            Socket socket = new Socket("http://localhost", 8080);
+            Socket socket = new Socket(InetAddress.getLocalHost(), 8080);
 
             ObjectOutputStream out = new ObjectOutputStream(socket.getOutputStream());
             out.writeObject(netMsg);
@@ -44,9 +44,19 @@ public class NetManager {
                 while (isRunning) {
                     Socket clientSocket = serverSocket.accept();
 
-//                BufferedReader in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
                     ObjectInputStream in = new ObjectInputStream(clientSocket.getInputStream());
+
+
                     Object obj = in.readObject();
+
+                    if (obj instanceof ExampleMsg) {
+                        ExampleMsg msg = (ExampleMsg) obj;
+
+//                        messageHandlerHolder.get(ExampleMsg.class).handle(msg);
+                    }
+//                    for (Map.Entry<Class<? extends NetMsg>, NetMsgHandler<? extends NetMsg>> messageHandler : messageHandlerHolder.entrySet() ) {
+//
+//                    }
                 }
             } catch (IOException | ClassNotFoundException e) {
                 e.printStackTrace();
