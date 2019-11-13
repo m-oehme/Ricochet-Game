@@ -12,9 +12,8 @@ import java.util.concurrent.LinkedBlockingQueue;
 
 public class NetManager {
 
-    private final InetAddress sendAddress;
-    private final int sendPort;
-    private final int receivePort;
+    private final Socket clientSocket;
+    private final ServerSocket serverSocket;
 
     private NetworkReceiver networkReceiver = new NetworkReceiver();
 
@@ -22,10 +21,9 @@ public class NetManager {
     private LinkedBlockingQueue<NetMessage> receivedMessageQueue = new LinkedBlockingQueue<>();
     private ReceivedMessageQuery receivedMessageQuery = new ReceivedMessageQuery();
 
-    public NetManager(InetAddress sendAddress, int sendPort, int receivePort) {
-        this.sendAddress = sendAddress;
-        this.sendPort = sendPort;
-        this.receivePort = receivePort;
+    public NetManager(Socket clientSocket, ServerSocket serverSocket) {
+        this.clientSocket = clientSocket;
+        this.serverSocket = serverSocket;
     }
 
     public void startServer() {
@@ -44,11 +42,8 @@ public class NetManager {
 
     public void send(NetMessage netMessage) {
         try {
-            Socket socket = new Socket(sendAddress, sendPort);
-
-            ObjectOutputStream out = new ObjectOutputStream(socket.getOutputStream());
+            ObjectOutputStream out = new ObjectOutputStream(clientSocket.getOutputStream());
             out.writeObject(netMessage);
-
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -59,18 +54,22 @@ public class NetManager {
 
         @Override
         public void run() {
-            try(ServerSocket serverSocket = new ServerSocket(receivePort)) {
+            try {
                 while (isRunning) {
-                    Socket clientSocket = serverSocket.accept();
-
-                    ObjectInputStream in = new ObjectInputStream(clientSocket.getInputStream());
-                    NetMessage message = (NetMessage) in.readObject();
-
-                    receivedMessageQueue.offer(message);
+                    waitForMessage();
                 }
             } catch (IOException | ClassNotFoundException e) {
                 e.printStackTrace();
             }
+        }
+
+        private void waitForMessage() throws IOException, ClassNotFoundException {
+            Socket clientSocket = serverSocket.accept();
+
+            ObjectInputStream in = new ObjectInputStream(clientSocket.getInputStream());
+            NetMessage message = (NetMessage) in.readObject();
+
+            receivedMessageQueue.offer(message);
         }
 
         public boolean isRunning() {
