@@ -1,4 +1,4 @@
-package de.htw_berlin.ris.ricochet.server.net;
+package de.htw_berlin.ris.ricochet.server.net.handler;
 
 import de.htw_berlin.ris.ricochet.common.net.handler.NetMsgHandler;
 import de.htw_berlin.ris.ricochet.common.net.message.SimpleTextMessage;
