@@ -1,13 +1,8 @@
 package de.htw_berlin.ris.ricochet.server.net.handler;
 
-import de.htw_berlin.ris.ricochet.common.net.NetManager;
-import de.htw_berlin.ris.ricochet.common.net.handler.NetMsgHandler;
-import de.htw_berlin.ris.ricochet.common.net.message.LoginMessage;
-import de.htw_berlin.ris.ricochet.common.net.message.SimpleTextMessage;
+import de.htw_berlin.ris.ricochet.net.handler.NetMsgHandler;
+import de.htw_berlin.ris.ricochet.net.message.LoginMessage;
 import de.htw_berlin.ris.ricochet.server.net.ServerNetManager;
-
-import java.net.InetAddress;
-import java.util.HashMap;
 
 
 public class LoginMessageHandler implements NetMsgHandler<LoginMessage> {

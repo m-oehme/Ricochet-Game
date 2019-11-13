@@ -1,6 +1,6 @@
 package de.htw_berlin.ris.ricochet.server.net;
 
-import de.htw_berlin.ris.ricochet.common.net.NetManager;
+import de.htw_berlin.ris.ricochet.net.NetManager;
 import de.htw_berlin.ris.ricochet.server.net.handler.LoginMessageHandler;
 
 import java.io.IOException;

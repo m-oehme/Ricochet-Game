@@ -1,8 +1,7 @@
-package de.htw_berlin.ris.ricochet.client;
+package de.htw_berlin.ris.ricochet;
 
-import de.htw_berlin.ris.ricochet.common.net.NetManager;
-import de.htw_berlin.ris.ricochet.common.net.message.LoginMessage;
-import de.htw_berlin.ris.ricochet.common.net.message.SimpleTextMessage;
+import de.htw_berlin.ris.ricochet.net.NetManager;
+import de.htw_berlin.ris.ricochet.net.message.LoginMessage;
 
 import java.io.IOException;
 import java.net.*;

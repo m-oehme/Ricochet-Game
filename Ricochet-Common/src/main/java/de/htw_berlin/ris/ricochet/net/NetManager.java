@@ -1,11 +1,11 @@
-package de.htw_berlin.ris.ricochet.common.net;
+package de.htw_berlin.ris.ricochet.net;
 
-import de.htw_berlin.ris.ricochet.common.net.handler.NetMsgHandler;
-import de.htw_berlin.ris.ricochet.common.net.message.*;
+import de.htw_berlin.ris.ricochet.net.handler.NetMsgHandler;
+import de.htw_berlin.ris.ricochet.net.message.IpMessage;
+import de.htw_berlin.ris.ricochet.net.message.NetMessage;
 
 import java.io.*;
 import java.net.InetAddress;
-import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.HashMap;
 import java.util.concurrent.ExecutorService;

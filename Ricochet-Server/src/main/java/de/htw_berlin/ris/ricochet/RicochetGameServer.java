@@ -1,6 +1,6 @@
-package de.htw_berlin.ris.ricochet.server;
+package de.htw_berlin.ris.ricochet;
 
-import de.htw_berlin.ris.ricochet.server.net.ServerNetManager;
+import de.htw_berlin.ris.ricochet.net.ServerNetManager;
 
 public class RicochetGameServer {
 
