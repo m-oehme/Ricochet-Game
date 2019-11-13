@@ -1,4 +1,4 @@
-package de.htw_berlin.ris.ricochet.client.net;
+package de.htw_berlin.ris.ricochet.net;
 
 public class ClientNetManager {
 }

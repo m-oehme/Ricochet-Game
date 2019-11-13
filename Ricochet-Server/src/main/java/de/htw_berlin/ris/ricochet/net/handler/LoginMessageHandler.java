@@ -1,8 +1,7 @@
-package de.htw_berlin.ris.ricochet.server.net.handler;
+package de.htw_berlin.ris.ricochet.net.handler;
 
-import de.htw_berlin.ris.ricochet.net.handler.NetMsgHandler;
+import de.htw_berlin.ris.ricochet.net.ServerNetManager;
 import de.htw_berlin.ris.ricochet.net.message.LoginMessage;
-import de.htw_berlin.ris.ricochet.server.net.ServerNetManager;
 
 
 public class LoginMessageHandler implements NetMsgHandler<LoginMessage> {

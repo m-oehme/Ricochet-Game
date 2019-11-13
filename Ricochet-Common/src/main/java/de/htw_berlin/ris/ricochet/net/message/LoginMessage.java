@@ -1,6 +1,4 @@
-package de.htw_berlin.ris.ricochet.common.net.message;
-
-import java.net.InetAddress;
+package de.htw_berlin.ris.ricochet.net.message;
 
 public class LoginMessage extends IpMessage {
 }

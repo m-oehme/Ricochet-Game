@@ -1,4 +1,4 @@
-package de.htw_berlin.ris.ricochet.common.net.message;
+package de.htw_berlin.ris.ricochet.net.message;
 
 import java.net.InetAddress;
 
