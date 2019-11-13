@@ -8,27 +8,46 @@ import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.HashMap;
-import java.util.Map;
+import java.util.concurrent.LinkedBlockingQueue;
 
 public class NetManager {
 
-    private HashMap<Class<? extends NetMsg>, NetMsgHandler<? extends NetMsg>> messageHandlerHolder = new HashMap<>();
+    private final InetAddress sendAddress;
+    private final int sendPort;
+    private final int receivePort;
+
     private NetworkReceiver networkReceiver = new NetworkReceiver();
 
-    public NetManager() {
-        new Thread(networkReceiver).start();
+    private HashMap<Class<? extends NetMessage>, NetMsgHandler> messageHandlerHolder = new HashMap<>();
+    private LinkedBlockingQueue<NetMessage> receivedMessageQueue = new LinkedBlockingQueue<>();
+    private ReceivedMessageQuery receivedMessageQuery = new ReceivedMessageQuery();
+
+    public NetManager(InetAddress sendAddress, int sendPort, int receivePort) {
+        this.sendAddress = sendAddress;
+        this.sendPort = sendPort;
+        this.receivePort = receivePort;
     }
 
-    public void register(NetMsgHandler<? extends NetMsg> netMsgHandler) {
+    public void startServer() {
+        new Thread(networkReceiver).start();
+        new Thread(receivedMessageQuery).start();
+    }
+
+    public void stopServer() {
+        networkReceiver.setRunning(false);
+        receivedMessageQuery.setRunning(false);
+    }
+
+    public void register(NetMsgHandler<? extends NetMessage> netMsgHandler) {
         messageHandlerHolder.put(netMsgHandler.getType(), netMsgHandler);
     }
 
-    public static void send(NetMsg netMsg) {
+    public void send(NetMessage netMessage) {
         try {
-            Socket socket = new Socket(InetAddress.getLocalHost(), 8080);
+            Socket socket = new Socket(sendAddress, sendPort);
 
             ObjectOutputStream out = new ObjectOutputStream(socket.getOutputStream());
-            out.writeObject(netMsg);
+            out.writeObject(netMessage);
 
         } catch (IOException e) {
             e.printStackTrace();
@@ -40,28 +59,54 @@ public class NetManager {
 
         @Override
         public void run() {
-            try(ServerSocket serverSocket = new ServerSocket(8080)) {
+            try(ServerSocket serverSocket = new ServerSocket(receivePort)) {
                 while (isRunning) {
                     Socket clientSocket = serverSocket.accept();
 
                     ObjectInputStream in = new ObjectInputStream(clientSocket.getInputStream());
+                    NetMessage message = (NetMessage) in.readObject();
 
-
-                    Object obj = in.readObject();
-
-                    if (obj instanceof ExampleMsg) {
-                        ExampleMsg msg = (ExampleMsg) obj;
-
-//                        messageHandlerHolder.get(ExampleMsg.class).handle(msg);
-                    }
-//                    for (Map.Entry<Class<? extends NetMsg>, NetMsgHandler<? extends NetMsg>> messageHandler : messageHandlerHolder.entrySet() ) {
-//
-//                    }
+                    receivedMessageQueue.offer(message);
                 }
             } catch (IOException | ClassNotFoundException e) {
                 e.printStackTrace();
             }
         }
+
+        public boolean isRunning() {
+            return isRunning;
+        }
+
+        public void setRunning(boolean running) {
+            isRunning = running;
+        }
     }
 
+    class ReceivedMessageQuery implements Runnable {
+        private boolean isRunning = true;
+
+        @Override
+        public void run() {
+            try {
+                while (isRunning) {
+                    NetMessage message = receivedMessageQueue.take();
+
+                    NetMsgHandler handler = messageHandlerHolder.get(message.getClass());
+                    if (handler != null) {
+                        handler.handle(message);
+                    }
+                }
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
+
+        public boolean isRunning() {
+            return isRunning;
+        }
+
+        public void setRunning(boolean running) {
+            isRunning = running;
+        }
+    }
 }
