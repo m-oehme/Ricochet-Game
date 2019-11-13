@@ -8,12 +8,17 @@ import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.HashMap;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.concurrent.LinkedBlockingQueue;
 
-public class NetManager {
+public class NetManager implements Runnable {
 
-    private final Socket clientSocket;
-    private final ServerSocket serverSocket;
+    private Socket receiverSocket;
+    private final InetAddress clientInetAddress;
+    private final Integer clientPort;
+
+    private ExecutorService netManagerThreadPool = Executors.newFixedThreadPool(2);
 
     private NetworkReceiver networkReceiver = new NetworkReceiver();
 
@@ -21,18 +26,21 @@ public class NetManager {
     private LinkedBlockingQueue<NetMessage> receivedMessageQueue = new LinkedBlockingQueue<>();
     private ReceivedMessageQuery receivedMessageQuery = new ReceivedMessageQuery();
 
-    public NetManager(Socket clientSocket, ServerSocket serverSocket) {
-        this.clientSocket = clientSocket;
-        this.serverSocket = serverSocket;
+    public NetManager() {
+        this(null, null);
     }
 
-    public void startServer() {
-        new Thread(networkReceiver).start();
-        new Thread(receivedMessageQuery).start();
+    public NetManager(InetAddress clientInetAddress, Integer clientPort) {
+        this.clientInetAddress = clientInetAddress;
+        this.clientPort = clientPort;
+    }
+
+    @Override
+    public void run() {
+        netManagerThreadPool.execute(receivedMessageQuery);
     }
 
     public void stopServer() {
-        networkReceiver.setRunning(false);
         receivedMessageQuery.setRunning(false);
     }
 
@@ -42,6 +50,8 @@ public class NetManager {
 
     public void send(NetMessage netMessage) {
         try {
+            Socket clientSocket = new Socket(clientInetAddress, clientPort);
+
             ObjectOutputStream out = new ObjectOutputStream(clientSocket.getOutputStream());
             out.writeObject(netMessage);
         } catch (IOException e) {
@@ -49,35 +59,34 @@ public class NetManager {
         }
     }
 
+    public void setReceiverSocket(Socket receiverSocket) {
+        this.receiverSocket = receiverSocket;
+        netManagerThreadPool.execute(networkReceiver);
+    }
+
     class NetworkReceiver implements Runnable {
-        private boolean isRunning = true;
 
         @Override
         public void run() {
             try {
-                while (isRunning) {
-                    waitForMessage();
-                }
+                waitForMessage();
             } catch (IOException | ClassNotFoundException e) {
                 e.printStackTrace();
             }
         }
 
         private void waitForMessage() throws IOException, ClassNotFoundException {
-            Socket clientSocket = serverSocket.accept();
+            if (clientInetAddress == null || clientInetAddress == receiverSocket.getInetAddress()) {
+                ObjectInputStream in = new ObjectInputStream(receiverSocket.getInputStream());
+                NetMessage message = (NetMessage) in.readObject();
 
-            ObjectInputStream in = new ObjectInputStream(clientSocket.getInputStream());
-            NetMessage message = (NetMessage) in.readObject();
+                if (message instanceof IpMessage) {
+                    ((IpMessage) message).setInetAddress(receiverSocket.getInetAddress());
+                }
 
-            receivedMessageQueue.offer(message);
-        }
-
-        public boolean isRunning() {
-            return isRunning;
-        }
-
-        public void setRunning(boolean running) {
-            isRunning = running;
+                receivedMessageQueue.offer(message);
+            }
+            receiverSocket = null;
         }
     }
 
