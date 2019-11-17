@@ -1,10 +1,14 @@
 package de.htw_berlin.ris.ricochet.net;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
 
 class ServerSocketListener implements Runnable {
+    private static Logger log = LogManager.getLogger();
 
     private ServerNetManager serverNetManager;
     private boolean isRunning = true;
@@ -14,7 +18,10 @@ class ServerSocketListener implements Runnable {
         this.serverNetManager = serverNetManager;
         try {
             this.serverSocket = configureServerSocket(port);
+
+            log.info("Server listening to port: " + this.serverSocket.getLocalPort());
         } catch (IOException e) {
+            log.error("Cannot register Server Socket: " + e.getMessage());
             e.printStackTrace();
         }
     }
@@ -35,8 +42,8 @@ class ServerSocketListener implements Runnable {
     }
 
     private void waitForMessage() throws IOException {
-        System.out.println("Listen to: " + serverSocket.toString());
         Socket receiveSocket = serverSocket.accept();
+        log.info("Message Received from: " + receiveSocket.toString());
         serverNetManager.getLoginManager().setReceiverSocket(receiveSocket);
         serverNetManager.getClientsHolder().values().forEach(netManager -> {
             netManager.setReceiverSocket(receiveSocket);
