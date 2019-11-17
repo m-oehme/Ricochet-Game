@@ -84,7 +84,9 @@ public class NetManager implements Runnable {
                     ((IpMessage) message).setInetAddress(receiverSocket.getInetAddress());
                 }
 
-                receivedMessageQueue.offer(message);
+                if (messageHandlerHolder.containsKey(message.getClass())) {
+                    receivedMessageQueue.offer(message);
+                }
             }
             receiverSocket = null;
         }
