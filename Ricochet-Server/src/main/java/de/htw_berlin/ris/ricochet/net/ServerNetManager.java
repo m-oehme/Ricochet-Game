@@ -1,14 +1,18 @@
 package de.htw_berlin.ris.ricochet.net;
 
+import de.htw_berlin.ris.ricochet.ClientManager;
+import de.htw_berlin.ris.ricochet.ClientNetUpdate;
 import de.htw_berlin.ris.ricochet.net.handler.LoginMessageHandler;
+import de.htw_berlin.ris.ricochet.net.message.NetMessage;
 
 import java.net.InetAddress;
 import java.util.HashMap;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-public class ServerNetManager {
+public class ServerNetManager implements ClientNetUpdate {
 
+    private ClientManager clientManager;
     private final int serverPort;
     private final int clientPort;
 
@@ -18,9 +22,12 @@ public class ServerNetManager {
     private NetManager loginManager;
     private HashMap<ClientId, NetManager> clientsHolder = new HashMap<>();
 
-    public ServerNetManager(int serverPort, int clientPort) {
+    public ServerNetManager(ClientManager clientManager, int serverPort, int clientPort) {
+        this.clientManager = clientManager;
         this.serverPort = serverPort;
         this.clientPort = clientPort;
+
+        this.clientManager.setClientNetUpdate(this);
     }
 
     public void startServer() {
@@ -36,8 +43,16 @@ public class ServerNetManager {
     public void addClient(InetAddress clientInetAddress) {
         NetManager clientNetManager = new NetManager(clientInetAddress, clientPort);
 
-        clientsHolder.put(new ClientId(clientInetAddress), clientNetManager);
+        ClientId clientId = new ClientId(clientInetAddress);
+        clientsHolder.put(clientId, clientNetManager);
+        clientManager.addNewClient(clientId);
         netManagerThreadPool.execute(clientNetManager);
+    }
+
+    @Override
+    public void onNewMessageForClient(ClientId clientId, NetMessage message) {
+        message.setClientId(clientId);
+        clientsHolder.get(clientId).send(message);
     }
 
     public NetManager getLoginManager() {
@@ -46,4 +61,5 @@ public class ServerNetManager {
     public HashMap<ClientId, NetManager> getClientsHolder() {
         return clientsHolder;
     }
+
 }

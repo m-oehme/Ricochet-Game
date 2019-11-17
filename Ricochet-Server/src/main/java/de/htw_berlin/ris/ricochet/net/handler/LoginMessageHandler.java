@@ -2,10 +2,12 @@ package de.htw_berlin.ris.ricochet.net.handler;
 
 import de.htw_berlin.ris.ricochet.net.ServerNetManager;
 import de.htw_berlin.ris.ricochet.net.message.LoginMessage;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 
 public class LoginMessageHandler implements NetMsgHandler<LoginMessage> {
-
+    private static Logger log = LogManager.getLogger();
 
     private ServerNetManager serverNetManager;
 
@@ -20,7 +22,7 @@ public class LoginMessageHandler implements NetMsgHandler<LoginMessage> {
 
     @Override
     public synchronized void handle(LoginMessage message) {
+        log.info("New Client from: " + message.getInetAddress().toString());
         serverNetManager.addClient(message.getInetAddress());
-        System.out.println("Hello I am: " + message.getInetAddress().toString());
     }
 }

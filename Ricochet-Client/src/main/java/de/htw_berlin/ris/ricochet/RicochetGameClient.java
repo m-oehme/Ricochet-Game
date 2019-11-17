@@ -1,5 +1,6 @@
 package de.htw_berlin.ris.ricochet;
 
+import de.htw_berlin.ris.ricochet.net.ClientNetManager;
 import de.htw_berlin.ris.ricochet.net.NetManager;
 import de.htw_berlin.ris.ricochet.net.message.LoginMessage;
 
@@ -9,14 +10,11 @@ import java.net.*;
 public class RicochetGameClient {
 
     public static void main(String[] args) {
-        LoginMessage login = new LoginMessage();
-
-        NetManager manager = null;
         try {
-            ServerSocket serverSocket = new ServerSocket(8081);
+            ClientNetManager clientNetManager = new ClientNetManager(InetAddress.getLocalHost(), 8080, 8081);
+            clientNetManager.startMessageReceiver();
 
-            manager = new NetManager(InetAddress.getLocalHost(), 8080);
-            manager.send(login);
+            clientNetManager.sentLogin();
         } catch (IOException e) {
             e.printStackTrace();
         }

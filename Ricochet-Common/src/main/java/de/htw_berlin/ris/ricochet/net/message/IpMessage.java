@@ -1,8 +1,10 @@
 package de.htw_berlin.ris.ricochet.net.message;
 
+import de.htw_berlin.ris.ricochet.net.ClientId;
+
 import java.net.InetAddress;
 
-public class IpMessage implements NetMessage {
+public class IpMessage extends ClientIdMessage implements NetMessage {
     private InetAddress inetAddress;
 
     public InetAddress getInetAddress() {
@@ -12,4 +14,5 @@ public class IpMessage implements NetMessage {
     public void setInetAddress(InetAddress inetAddress) {
         this.inetAddress = inetAddress;
     }
+
 }

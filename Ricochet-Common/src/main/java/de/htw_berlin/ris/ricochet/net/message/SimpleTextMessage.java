@@ -1,6 +1,6 @@
 package de.htw_berlin.ris.ricochet.net.message;
 
-public class SimpleTextMessage implements NetMessage {
+public class SimpleTextMessage extends ClientIdMessage implements NetMessage {
     private String textMessage = "TEST.TEST";
 
     public String getTextMessage() {
@@ -10,4 +10,5 @@ public class SimpleTextMessage implements NetMessage {
     public void setTextMessage(String textMessage) {
         this.textMessage = textMessage;
     }
+
 }

@@ -1,9 +1,12 @@
 package de.htw_berlin.ris.ricochet.net.handler;
 
 import de.htw_berlin.ris.ricochet.net.message.SimpleTextMessage;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 
 public class SimpleTextMessageHandler implements NetMsgHandler<SimpleTextMessage> {
+    private static Logger log = LogManager.getLogger();
     @Override
     public Class<SimpleTextMessage> getType() {
         return SimpleTextMessage.class;
@@ -11,6 +14,7 @@ public class SimpleTextMessageHandler implements NetMsgHandler<SimpleTextMessage
 
     @Override
     public void handle(SimpleTextMessage message) {
+        log
         System.out.println(message.getTextMessage());
     }
 }

@@ -19,4 +19,8 @@ public class ClientId implements Comparable<ClientId>, Serializable {
         return clientId.compareTo(o.clientId);
     }
 
+    @Override
+    public String toString() {
+        return clientId;
+    }
 }

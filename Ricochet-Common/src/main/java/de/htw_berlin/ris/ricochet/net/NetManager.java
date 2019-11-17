@@ -3,6 +3,8 @@ package de.htw_berlin.ris.ricochet.net;
 import de.htw_berlin.ris.ricochet.net.handler.NetMsgHandler;
 import de.htw_berlin.ris.ricochet.net.message.IpMessage;
 import de.htw_berlin.ris.ricochet.net.message.NetMessage;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.io.*;
 import java.net.InetAddress;
@@ -13,10 +15,12 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.LinkedBlockingQueue;
 
 public class NetManager implements Runnable {
+    private static Logger log = LogManager.getLogger();
 
-    private Socket receiverSocket;
+    private Socket receiverSocket = null;
     private final InetAddress clientInetAddress;
     private final Integer clientPort;
+    private ClientId clientId;
 
     private ExecutorService netManagerThreadPool = Executors.newFixedThreadPool(2);
 
@@ -31,13 +35,19 @@ public class NetManager implements Runnable {
     }
 
     public NetManager(InetAddress clientInetAddress, Integer clientPort) {
+        this(clientInetAddress, clientPort, null);
+    }
+
+    public NetManager(InetAddress clientInetAddress, Integer clientPort, ClientId clientId) {
         this.clientInetAddress = clientInetAddress;
         this.clientPort = clientPort;
+        this.clientId = clientId;
     }
 
     @Override
     public void run() {
         netManagerThreadPool.execute(receivedMessageQuery);
+        netManagerThreadPool.execute(networkReceiver);
     }
 
     public void stopServer() {
@@ -55,40 +65,53 @@ public class NetManager implements Runnable {
             ObjectOutputStream out = new ObjectOutputStream(clientSocket.getOutputStream());
             out.writeObject(netMessage);
         } catch (IOException e) {
-            e.printStackTrace();
+            log.error("Cannot sent message: " + e.getMessage(), e);
         }
     }
 
-    public void setReceiverSocket(Socket receiverSocket) {
+    public void processSocket(Socket receiverSocket) {
         this.receiverSocket = receiverSocket;
-        netManagerThreadPool.execute(networkReceiver);
     }
 
     class NetworkReceiver implements Runnable {
+        private boolean isRunning = true;
 
         @Override
         public void run() {
             try {
-                waitForMessage();
+                while (isRunning) {
+                    waitForMessage();
+                }
             } catch (IOException | ClassNotFoundException e) {
                 e.printStackTrace();
             }
         }
 
         private void waitForMessage() throws IOException, ClassNotFoundException {
-            if (clientInetAddress == null || clientInetAddress == receiverSocket.getInetAddress()) {
+            if (receiverSocket != null) {
                 ObjectInputStream in = new ObjectInputStream(receiverSocket.getInputStream());
                 NetMessage message = (NetMessage) in.readObject();
 
-                if (message instanceof IpMessage) {
-                    ((IpMessage) message).setInetAddress(receiverSocket.getInetAddress());
-                }
+                if (clientId == null || clientId == message.getClientId()) {
 
-                if (messageHandlerHolder.containsKey(message.getClass())) {
-                    receivedMessageQueue.offer(message);
+                    if (message instanceof IpMessage) {
+                        ((IpMessage) message).setInetAddress(receiverSocket.getInetAddress());
+                    }
+
+                    if (messageHandlerHolder.containsKey(message.getClass())) {
+                        receivedMessageQueue.offer(message);
+                    }
                 }
+                receiverSocket = null;
             }
-            receiverSocket = null;
+        }
+
+        public boolean isRunning() {
+            return isRunning;
+        }
+
+        public void stop() {
+            isRunning = false;
         }
     }
 

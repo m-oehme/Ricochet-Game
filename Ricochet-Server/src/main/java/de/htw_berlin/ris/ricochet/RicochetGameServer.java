@@ -8,8 +8,8 @@ public class RicochetGameServer {
     private static Logger log = LogManager.getLogger();
 
     public static void main(String[] args) {
-        ServerNetManager serverNetManager = new ServerNetManager(8080,8081);
-
+        ClientManager clientManager = new ClientManager();
+        ServerNetManager serverNetManager = new ServerNetManager(clientManager,8080,8081);
         serverNetManager.startServer();
     }
 }
