@@ -8,6 +8,6 @@ public class RicochetGameServer {
     public static void main(String[] args) {
         ServerNetManager serverNetManager = new ServerNetManager(8080,8081);
 
-        serverNetManager.startNetManger();
+        serverNetManager.startServer();
     }
 }

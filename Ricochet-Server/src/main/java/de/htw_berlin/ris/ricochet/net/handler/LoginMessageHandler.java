@@ -20,7 +20,7 @@ public class LoginMessageHandler implements NetMsgHandler<LoginMessage> {
 
     @Override
     public synchronized void handle(LoginMessage message) {
-        serverNetManager.addNetManagerForClient(message.getInetAddress());
+        serverNetManager.addClient(message.getInetAddress());
         System.out.println("Hello I am: " + message.getInetAddress().toString());
     }
 }
