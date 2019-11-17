@@ -1,4 +1,4 @@
-package de.htw_berlin.ris.ricochet.net;
+package de.htw_berlin.ris.ricochet.net.manager;
 
 import java.io.Serializable;
 import java.net.InetAddress;

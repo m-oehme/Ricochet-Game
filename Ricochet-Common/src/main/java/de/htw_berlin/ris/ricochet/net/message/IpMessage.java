@@ -1,7 +1,5 @@
 package de.htw_berlin.ris.ricochet.net.message;
 
-import de.htw_berlin.ris.ricochet.net.ClientId;
-
 import java.net.InetAddress;
 
 public class IpMessage extends ClientIdMessage implements NetMessage {

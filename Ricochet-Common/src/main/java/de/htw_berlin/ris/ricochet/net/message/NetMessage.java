@@ -1,6 +1,6 @@
 package de.htw_berlin.ris.ricochet.net.message;
 
-import de.htw_berlin.ris.ricochet.net.ClientId;
+import de.htw_berlin.ris.ricochet.net.manager.ClientId;
 
 import java.io.Serializable;
 

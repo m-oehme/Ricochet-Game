@@ -1,6 +1,6 @@
 package de.htw_berlin.ris.ricochet;
 
-import de.htw_berlin.ris.ricochet.net.ClientId;
+import de.htw_berlin.ris.ricochet.net.manager.ClientId;
 import de.htw_berlin.ris.ricochet.net.message.SimpleTextMessage;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
