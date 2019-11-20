@@ -3,6 +3,7 @@ package de.htw_berlin.ris.ricochet.net.manager;
 import de.htw_berlin.ris.ricochet.ClientManager;
 import de.htw_berlin.ris.ricochet.ClientNetUpdate;
 import de.htw_berlin.ris.ricochet.net.handler.LoginMessageHandler;
+import de.htw_berlin.ris.ricochet.net.handler.LoginMessageObserver;
 import de.htw_berlin.ris.ricochet.net.message.NetMessage;
 
 import java.net.InetAddress;
@@ -10,7 +11,7 @@ import java.util.HashMap;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-public class ServerNetManager implements ClientNetUpdate {
+public class ServerNetManager implements ClientNetUpdate, LoginMessageObserver {
 
     private ClientManager clientManager;
     private final int serverPort;
@@ -35,7 +36,10 @@ public class ServerNetManager implements ClientNetUpdate {
         netManagerThreadPool.execute(serverSocketListener);
 
         loginManager = new NetManager();
-        loginManager.register(new LoginMessageHandler(this));
+
+        LoginMessageHandler loginMessageHandler = new LoginMessageHandler();
+        loginMessageHandler.registerObserver(this);
+        loginManager.register(loginMessageHandler);
 
         netManagerThreadPool.execute(loginManager);
     }
@@ -53,6 +57,11 @@ public class ServerNetManager implements ClientNetUpdate {
     public void onNewMessageForClient(ClientId clientId, NetMessage message) {
         message.setClientId(clientId);
         clientsHolder.get(clientId).send(message);
+    }
+
+    @Override
+    public void onNewInetAddress(InetAddress inetAddress) {
+        addClient(inetAddress);
     }
 
     public NetManager getLoginManager() {

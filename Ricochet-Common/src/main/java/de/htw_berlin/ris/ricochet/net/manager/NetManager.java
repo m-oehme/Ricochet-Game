@@ -1,5 +1,6 @@
 package de.htw_berlin.ris.ricochet.net.manager;
 
+import de.htw_berlin.ris.ricochet.net.handler.HandlerObserver;
 import de.htw_berlin.ris.ricochet.net.handler.NetMsgHandler;
 import de.htw_berlin.ris.ricochet.net.message.IpMessage;
 import de.htw_berlin.ris.ricochet.net.message.NetMessage;
@@ -54,8 +55,16 @@ public class NetManager implements Runnable {
         receivedMessageQuery.setRunning(false);
     }
 
-    public void register(NetMsgHandler<? extends NetMessage> netMsgHandler) {
-        messageHandlerHolder.put(netMsgHandler.getType(), netMsgHandler);
+    public NetMsgHandler register(NetMsgHandler<? extends NetMessage, ? extends HandlerObserver> netMsgHandler) {
+        return messageHandlerHolder.put(netMsgHandler.getType(), netMsgHandler);
+    }
+
+    public void unregister(NetMsgHandler<? extends NetMessage, ? extends HandlerObserver> netMsgHandler) {
+        messageHandlerHolder.remove(netMsgHandler.getType());
+    }
+
+    public NetMsgHandler getRegisteredHandler(Class<? extends NetMessage> netMessageClass) {
+        return messageHandlerHolder.get(netMessageClass);
     }
 
     public void send(NetMessage netMessage) {

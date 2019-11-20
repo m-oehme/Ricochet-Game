@@ -1,15 +1,19 @@
 package de.htw_berlin.ris.ricochet.net.manager;
 
-import de.htw_berlin.ris.ricochet.net.handler.ClientIdMessageHandler;
-import de.htw_berlin.ris.ricochet.net.handler.SimpleTextMessageHandler;
+import de.htw_berlin.ris.ricochet.net.handler.*;
 import de.htw_berlin.ris.ricochet.net.message.LoginMessage;
 import de.htw_berlin.ris.ricochet.net.message.NetMessage;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import sun.nio.ch.Net;
 
 import java.net.InetAddress;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-public class ClientNetManager {
+public class ClientNetManager implements ClientIdObserver {
+    private static Logger log = LogManager.getLogger();
+    private static ClientNetManager INSTANCE = null;
 
     private final int clientPort;
     private ClientId clientId;
@@ -18,13 +22,27 @@ public class ClientNetManager {
     private NetManager netManger;
     private ClientSocketListener clientSocketListener;
 
-    public ClientNetManager(InetAddress serverAddress, int serverPort, int clientPort) {
+    private ClientNetManager(InetAddress serverAddress, int serverPort, int clientPort) {
         this.clientPort = clientPort;
 
         netManger = new NetManager(serverAddress, serverPort);
-        netManger.register(new SimpleTextMessageHandler());
-        netManger.register(new ClientIdMessageHandler(this));
+
+        ClientIdMessageHandler clientIdMessageHandler = new ClientIdMessageHandler();
+        clientIdMessageHandler.registerObserver(this);
+
+        netManger.register(clientIdMessageHandler);
         netManagerThreadPool.execute(netManger);
+    }
+
+    public static ClientNetManager create(InetAddress serverAddress, int serverPort, int clientPort) {
+        if( INSTANCE == null ) {
+            INSTANCE = new ClientNetManager(serverAddress, serverPort, clientPort);
+        }
+        return INSTANCE;
+    }
+
+    public static ClientNetManager get() {
+        return INSTANCE;
     }
 
     public void sentLogin() {
@@ -43,6 +61,14 @@ public class ClientNetManager {
         netManger.send(message);
     }
 
+    public NetMsgHandler registerHandler(NetMsgHandler<? extends NetMessage, ? extends HandlerObserver> netMsgHandler) {
+        return netManger.register(netMsgHandler);
+    }
+
+    public <T extends NetMessage> void registerHandlerObserver(Class<T> netMessageClass, HandlerObserver handlerObserver) {
+        netManger.getRegisteredHandler(netMessageClass).registerObserver(handlerObserver);
+    }
+
     public NetManager getNetManger() {
         return netManger;
     }
@@ -51,7 +77,8 @@ public class ClientNetManager {
         return clientId;
     }
 
-    public void setClientId(ClientId clientId) {
+    @Override
+    public void onNewClientId(ClientId clientId) {
         this.clientId = clientId;
     }
 }

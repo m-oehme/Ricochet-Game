@@ -1,15 +1,12 @@
 package de.htw_berlin.ris.ricochet.net.handler;
 
-import de.htw_berlin.ris.ricochet.net.manager.ClientNetManager;
 import de.htw_berlin.ris.ricochet.net.message.ClientIdMessage;
 
-public class ClientIdMessageHandler implements NetMsgHandler<ClientIdMessage> {
+import java.util.HashMap;
 
-    private ClientNetManager clientNetManager;
+public class ClientIdMessageHandler implements NetMsgHandler<ClientIdMessage, ClientIdObserver> {
 
-    public ClientIdMessageHandler(ClientNetManager clientNetManager) {
-        this.clientNetManager = clientNetManager;
-    }
+    private HashMap<Class<? extends ClientIdObserver>, ClientIdObserver> clientIdObserverHolder = new HashMap<>();
 
     @Override
     public Class<ClientIdMessage> getType() {
@@ -18,6 +15,16 @@ public class ClientIdMessageHandler implements NetMsgHandler<ClientIdMessage> {
 
     @Override
     public void handle(ClientIdMessage message) {
-        clientNetManager.setClientId(message.getClientId());
+        clientIdObserverHolder.values().forEach(clientIdObserver -> {
+            clientIdObserver.onNewClientId(message.getClientId());
+        });
+    }
+
+    public void registerObserver(ClientIdObserver clientIdObserver) {
+        clientIdObserverHolder.put(clientIdObserver.getClass(), clientIdObserver);
+    }
+
+    public void unregisterObserver(ClientIdObserver clientIdObserver) {
+        clientIdObserverHolder.remove(clientIdObserver.getClass());
     }
 }

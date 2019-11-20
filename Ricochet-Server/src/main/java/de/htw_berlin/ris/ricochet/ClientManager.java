@@ -1,6 +1,7 @@
 package de.htw_berlin.ris.ricochet;
 
 import de.htw_berlin.ris.ricochet.net.manager.ClientId;
+import de.htw_berlin.ris.ricochet.net.message.ClientIdMessage;
 import de.htw_berlin.ris.ricochet.net.message.SimpleTextMessage;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -24,6 +25,6 @@ public class ClientManager {
 
         clientList.add(clientId);
 
-        clientNetUpdate.onNewMessageForClient(clientId, new SimpleTextMessage());
+        clientNetUpdate.onNewMessageForClient(clientId, new ClientIdMessage());
     }
 }
