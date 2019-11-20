@@ -44,6 +44,14 @@ public class ServerNetManager implements ClientNetUpdate, LoginMessageObserver {
         netManagerThreadPool.execute(loginManager);
     }
 
+    public void stopServer() {
+        serverSocketListener.stop();
+        loginManager.stopServer();
+        clientsHolder.values().forEach(NetManager::stopServer);
+
+        netManagerThreadPool.shutdown();
+    }
+
     public void addClient(InetAddress clientInetAddress) {
         NetManager clientNetManager = new NetManager(clientInetAddress, clientPort);
 

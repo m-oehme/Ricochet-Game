@@ -53,6 +53,8 @@ public class NetManager implements Runnable {
 
     public void stopServer() {
         receivedMessageQuery.setRunning(false);
+        networkReceiver.stop();
+        netManagerThreadPool.shutdown();
     }
 
     public NetMsgHandler register(NetMsgHandler<? extends NetMessage, ? extends HandlerObserver> netMsgHandler) {
