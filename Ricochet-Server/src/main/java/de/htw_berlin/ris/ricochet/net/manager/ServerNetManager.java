@@ -62,9 +62,8 @@ public class ServerNetManager implements ClientNetUpdate, LoginMessageObserver {
     }
 
     @Override
-    public void onNewMessageForClient(ClientId clientId, NetMessage message) {
-        message.setClientId(clientId);
-        clientsHolder.get(clientId).send(message);
+    public void onNewMessageForClient(ClientId receiverClientId, NetMessage message) {
+        clientsHolder.get(receiverClientId).send(message);
     }
 
     @Override

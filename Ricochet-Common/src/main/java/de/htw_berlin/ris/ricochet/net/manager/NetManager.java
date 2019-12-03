@@ -2,7 +2,7 @@ package de.htw_berlin.ris.ricochet.net.manager;
 
 import de.htw_berlin.ris.ricochet.net.handler.HandlerObserver;
 import de.htw_berlin.ris.ricochet.net.handler.NetMsgHandler;
-import de.htw_berlin.ris.ricochet.net.message.IpMessage;
+import de.htw_berlin.ris.ricochet.net.message.LoginMessage;
 import de.htw_berlin.ris.ricochet.net.message.NetMessage;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -105,8 +105,8 @@ public class NetManager implements Runnable {
 
                 if (clientId == null || clientId == message.getClientId()) {
 
-                    if (message instanceof IpMessage) {
-                        ((IpMessage) message).setInetAddress(receiverSocket.getInetAddress());
+                    if (message instanceof LoginMessage) {
+                        ((LoginMessage) message).setInetAddress(receiverSocket.getInetAddress());
                     }
 
                     if (messageHandlerHolder.containsKey(message.getClass())) {

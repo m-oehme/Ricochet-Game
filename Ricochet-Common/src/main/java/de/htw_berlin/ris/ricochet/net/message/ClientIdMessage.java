@@ -2,10 +2,13 @@ package de.htw_berlin.ris.ricochet.net.message;
 
 import de.htw_berlin.ris.ricochet.net.manager.ClientId;
 
-public class ClientIdMessage implements NetMessage {
-    protected ClientId clientId = null;
+public abstract class ClientIdMessage implements NetMessage {
+    protected ClientId clientId;
+    private MessageScope messageScope;
 
-    public ClientIdMessage() {
+    public ClientIdMessage(ClientId clientId, MessageScope messageScope) {
+        this.clientId = clientId;
+        this.messageScope = messageScope;
     }
 
     @Override
@@ -16,5 +19,9 @@ public class ClientIdMessage implements NetMessage {
     @Override
     public void setClientId(ClientId clientId) {
         this.clientId = clientId;
+    }
+
+    public MessageScope getMessageScope() {
+        return messageScope;
     }
 }
