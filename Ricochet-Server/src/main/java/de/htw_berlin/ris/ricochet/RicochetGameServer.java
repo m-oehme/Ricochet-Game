@@ -30,7 +30,8 @@ public class RicochetGameServer {
         }
 
         serverChatManager = new ServerChatManager(clientManager);
-        serverNetManager.registerHandlerForAll(new ChatMessageHandler(serverChatManager));
+
+        serverNetManager.registerHandlerForAll(ChatMessageHandler.get().registerObserver(serverChatManager));
     }
 
     static class ShutDownThread extends Thread {

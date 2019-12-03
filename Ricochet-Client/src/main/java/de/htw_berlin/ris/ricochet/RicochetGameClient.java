@@ -1,5 +1,6 @@
 package de.htw_berlin.ris.ricochet;
 
+import de.htw_berlin.ris.ricochet.net.handler.LoginMessageHandler;
 import de.htw_berlin.ris.ricochet.net.handler.LoginObserver;
 import de.htw_berlin.ris.ricochet.net.manager.ClientId;
 import de.htw_berlin.ris.ricochet.net.manager.ClientNetManager;
@@ -25,7 +26,9 @@ public class RicochetGameClient {
 
     private static void startNetwork(InetAddress serverAddress, int serverPort) {
         clientNetManager = ClientNetManager.create(serverAddress, serverPort);
-        clientNetManager.registerHandlerObserver(LoginMessage.class, loginObserver);
+
+        LoginMessageHandler.get().registerObserver(clientNetManager).registerObserver(loginObserver);
+        clientNetManager.registerHandler(LoginMessageHandler.get());
     }
 
     private static LoginObserver loginObserver = clientIdValue -> {

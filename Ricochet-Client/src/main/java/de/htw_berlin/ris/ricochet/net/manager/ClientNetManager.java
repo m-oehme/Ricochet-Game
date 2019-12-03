@@ -21,11 +21,6 @@ public class ClientNetManager implements LoginObserver {
     private ClientNetManager(InetAddress serverAddress, int serverPort) {
 
         netManger = new NetManager(serverAddress, serverPort);
-
-        LoginMessageHandler loginMessageHandler = new LoginMessageHandler();
-        loginMessageHandler.registerObserver(this);
-
-        netManger.register(loginMessageHandler);
         netManagerThreadPool.execute(netManger);
     }
 
@@ -45,16 +40,8 @@ public class ClientNetManager implements LoginObserver {
         netManger.send(message);
     }
 
-    public NetMsgHandler registerHandler(NetMsgHandler<? extends NetMessage, ? extends HandlerObserver> netMsgHandler) {
-        return netManger.register(netMsgHandler);
-    }
-
-    public <T extends NetMessage> void registerHandlerObserver(Class<T> netMessageClass, HandlerObserver handlerObserver) {
-        netManger.getRegisteredHandler(netMessageClass).registerObserver(handlerObserver);
-    }
-
-    public NetManager getNetManger() {
-        return netManger;
+    public void registerHandler(NetMessageHandler<? extends NetMessage, ? extends HandlerObserver> netMessageHandler) {
+        netManger.register(netMessageHandler);
     }
 
     public ClientId getClientId() {

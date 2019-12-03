@@ -2,11 +2,13 @@ package de.htw_berlin.ris.ricochet.net.handler;
 
 import de.htw_berlin.ris.ricochet.net.message.LoginMessage;
 
-import java.util.HashMap;
+public class LoginMessageHandler extends AbsMessageHandler<LoginMessage, LoginObserver> {
+    private static LoginMessageHandler INSTANCE = null;
 
-public class LoginMessageHandler implements NetMsgHandler<LoginMessage, LoginObserver> {
-
-    private HashMap<Class<? extends LoginObserver>, LoginObserver> clientIdObserverHolder = new HashMap<>();
+    public static LoginMessageHandler get() {
+        if( INSTANCE == null ) INSTANCE = new LoginMessageHandler();
+        return INSTANCE;
+    }
 
     @Override
     public Class<LoginMessage> getType() {
@@ -15,16 +17,8 @@ public class LoginMessageHandler implements NetMsgHandler<LoginMessage, LoginObs
 
     @Override
     public void handle(LoginMessage message) {
-        clientIdObserverHolder.values().forEach(loginObserver -> {
+        messageObserverHashMap.values().forEach(loginObserver -> {
             loginObserver.onNewClientId(message.getClientId());
         });
-    }
-
-    public void registerObserver(LoginObserver loginObserver) {
-        clientIdObserverHolder.put(loginObserver.getClass(), loginObserver);
-    }
-
-    public void unregisterObserver(LoginObserver loginObserver) {
-        clientIdObserverHolder.remove(loginObserver.getClass());
     }
 }

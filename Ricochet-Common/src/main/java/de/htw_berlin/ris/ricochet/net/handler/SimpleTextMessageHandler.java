@@ -5,7 +5,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 
-public class SimpleTextMessageHandler implements NetMsgHandler<SimpleTextMessage, SimpleTestMessageObserver> {
+public class SimpleTextMessageHandler extends AbsMessageHandler<SimpleTextMessage, SimpleTestMessageObserver> {
     private static Logger log = LogManager.getLogger();
 
     @Override
@@ -16,15 +16,5 @@ public class SimpleTextMessageHandler implements NetMsgHandler<SimpleTextMessage
     @Override
     public void handle(SimpleTextMessage message) {
         log.info(message.getTextMessage());
-    }
-
-    @Override
-    public void registerObserver(SimpleTestMessageObserver handlerObserver) {
-
-    }
-
-    @Override
-    public void unregisterObserver(SimpleTestMessageObserver handlerObserver) {
-
     }
 }

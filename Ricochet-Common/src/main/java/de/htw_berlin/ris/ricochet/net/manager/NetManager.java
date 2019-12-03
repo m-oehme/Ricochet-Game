@@ -1,7 +1,7 @@
 package de.htw_berlin.ris.ricochet.net.manager;
 
 import de.htw_berlin.ris.ricochet.net.handler.HandlerObserver;
-import de.htw_berlin.ris.ricochet.net.handler.NetMsgHandler;
+import de.htw_berlin.ris.ricochet.net.handler.NetMessageHandler;
 import de.htw_berlin.ris.ricochet.net.message.LoginMessage;
 import de.htw_berlin.ris.ricochet.net.message.NetMessage;
 import org.apache.logging.log4j.LogManager;
@@ -27,7 +27,7 @@ public class NetManager implements Runnable {
 
     private NetworkReceiver networkReceiver;
 
-    private HashMap<Class<? extends NetMessage>, NetMsgHandler> messageHandlerHolder = new HashMap<>();
+    private HashMap<Class<? extends NetMessage>, NetMessageHandler> messageHandlerHolder = new HashMap<>();
     private LinkedBlockingQueue<NetMessage> receivedMessageQueue = new LinkedBlockingQueue<>();
     private ReceivedMessageQuery receivedMessageQuery = new ReceivedMessageQuery();
 
@@ -66,15 +66,15 @@ public class NetManager implements Runnable {
         netManagerThreadPool.shutdown();
     }
 
-    public NetMsgHandler register(NetMsgHandler<? extends NetMessage, ? extends HandlerObserver> netMsgHandler) {
-        return messageHandlerHolder.put(netMsgHandler.getType(), netMsgHandler);
+    public NetMessageHandler register(NetMessageHandler<? extends NetMessage, ? extends HandlerObserver> netMessageHandler) {
+        return messageHandlerHolder.put(netMessageHandler.getType(), netMessageHandler);
     }
 
-    public void unregister(NetMsgHandler<? extends NetMessage, ? extends HandlerObserver> netMsgHandler) {
-        messageHandlerHolder.remove(netMsgHandler.getType());
+    public void unregister(NetMessageHandler<? extends NetMessage, ? extends HandlerObserver> netMessageHandler) {
+        messageHandlerHolder.remove(netMessageHandler.getType());
     }
 
-    public NetMsgHandler getRegisteredHandler(Class<? extends NetMessage> netMessageClass) {
+    public NetMessageHandler getRegisteredHandler(Class<? extends NetMessage> netMessageClass) {
         return messageHandlerHolder.get(netMessageClass);
     }
 
@@ -143,7 +143,7 @@ public class NetManager implements Runnable {
                 while (isRunning) {
                     NetMessage message = receivedMessageQueue.take();
 
-                    NetMsgHandler handler = messageHandlerHolder.get(message.getClass());
+                    NetMessageHandler handler = messageHandlerHolder.get(message.getClass());
                     if (handler != null) {
                         handler.handle(message);
                     }
