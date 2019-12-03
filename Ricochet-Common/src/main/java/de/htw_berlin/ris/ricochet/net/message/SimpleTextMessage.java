@@ -2,7 +2,7 @@ package de.htw_berlin.ris.ricochet.net.message;
 
 import de.htw_berlin.ris.ricochet.net.manager.ClientId;
 
-public class SimpleTextMessage extends ClientIdMessage implements NetMessage {
+public class SimpleTextMessage extends ScopedMessage implements NetMessage {
     private String textMessage = "TEST.TEST";
 
     public SimpleTextMessage(ClientId clientId, MessageScope messageScope) {

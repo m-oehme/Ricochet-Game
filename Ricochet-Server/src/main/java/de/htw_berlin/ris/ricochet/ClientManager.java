@@ -1,11 +1,8 @@
 package de.htw_berlin.ris.ricochet;
 
-import com.sun.istack.internal.Nullable;
 import de.htw_berlin.ris.ricochet.net.manager.ClientId;
-import de.htw_berlin.ris.ricochet.net.message.ClientIdMessage;
-import de.htw_berlin.ris.ricochet.net.message.MessageScope;
-import de.htw_berlin.ris.ricochet.net.message.NetMessage;
-import de.htw_berlin.ris.ricochet.net.message.SimpleTextMessage;
+import de.htw_berlin.ris.ricochet.net.message.LoginMessage;
+import de.htw_berlin.ris.ricochet.net.message.ScopedMessage;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -26,14 +23,14 @@ public class ClientManager {
     public void addNewClient(ClientId clientId) {
         log.info("New Client with ID: " + clientId);
         clientList.add(clientId);
-        clientNetUpdate.onNewMessageForClient(clientId, new SimpleTextMessage(clientId, MessageScope.SELF));
+        sendMessageToClients(new LoginMessage(clientId));
     }
 
-    public void sendMessageToClients(ClientIdMessage message) {
+    public void sendMessageToClients(ScopedMessage message) {
         sendMessageToClients(message, null);
     }
 
-    public void sendMessageToClients(ClientIdMessage message, @Nullable List<ClientId> receiverClients) {
+    public void sendMessageToClients(ScopedMessage message, List<ClientId> receiverClients) {
 
         switch (message.getMessageScope()) {
             case SELF:

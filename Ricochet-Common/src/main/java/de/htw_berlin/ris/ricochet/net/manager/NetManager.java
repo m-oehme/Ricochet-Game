@@ -75,6 +75,8 @@ public class NetManager implements Runnable {
 
             ObjectOutputStream out = new ObjectOutputStream(clientSocket.getOutputStream());
             out.writeObject(netMessage);
+            out.close();
+            clientSocket.close();
         } catch (IOException e) {
             log.error("Cannot sent message: " + e.getMessage(), e);
         }
@@ -113,6 +115,8 @@ public class NetManager implements Runnable {
                         receivedMessageQueue.offer(message);
                     }
                 }
+                in.close();
+                receiverSocket.close();
                 receiverSocket = null;
             }
         }

@@ -5,13 +5,12 @@ import de.htw_berlin.ris.ricochet.net.message.LoginMessage;
 import de.htw_berlin.ris.ricochet.net.message.NetMessage;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import sun.nio.ch.Net;
 
 import java.net.InetAddress;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-public class ClientNetManager implements ClientIdObserver {
+public class ClientNetManager implements LoginResponseObserver {
     private static Logger log = LogManager.getLogger();
     private static ClientNetManager INSTANCE = null;
 
@@ -27,10 +26,10 @@ public class ClientNetManager implements ClientIdObserver {
 
         netManger = new NetManager(serverAddress, serverPort);
 
-        ClientIdMessageHandler clientIdMessageHandler = new ClientIdMessageHandler();
-        clientIdMessageHandler.registerObserver(this);
+        LoginResponseMessageHandler loginResponseMessageHandler = new LoginResponseMessageHandler();
+        loginResponseMessageHandler.registerObserver(this);
 
-        netManger.register(clientIdMessageHandler);
+        netManger.register(loginResponseMessageHandler);
         netManagerThreadPool.execute(netManger);
     }
 

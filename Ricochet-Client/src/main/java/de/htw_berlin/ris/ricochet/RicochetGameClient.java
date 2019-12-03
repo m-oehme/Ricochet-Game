@@ -1,10 +1,10 @@
 package de.htw_berlin.ris.ricochet;
 
-import de.htw_berlin.ris.ricochet.net.handler.ClientIdMessageHandler;
-import de.htw_berlin.ris.ricochet.net.handler.ClientIdObserver;
+import de.htw_berlin.ris.ricochet.net.handler.LoginResponseObserver;
 import de.htw_berlin.ris.ricochet.net.manager.ClientId;
 import de.htw_berlin.ris.ricochet.net.manager.ClientNetManager;
-import de.htw_berlin.ris.ricochet.net.message.ClientIdMessage;
+import de.htw_berlin.ris.ricochet.net.message.LoginMessage;
+import de.htw_berlin.ris.ricochet.net.message.ScopedMessage;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -17,24 +17,22 @@ public class RicochetGameClient {
     private static ClientId clientId = null;
     private static ClientNetManager clientNetManager;
 
-    public static void main(String[] args) {
-        try {
-            startNetwork();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+    public static void main(String[] args) throws IOException {
+        InetAddress serverAddress = InetAddress.getByName(args[0]);
+        int serverPort = Integer.parseInt(args[1]);
 
+        startNetwork(serverAddress, serverPort);
     }
 
-    private static void startNetwork() throws IOException {
-        clientNetManager = ClientNetManager.create(InetAddress.getLocalHost(), 8080, 8081);
+    private static void startNetwork(InetAddress serverAddress, int serverPort) throws IOException {
+        clientNetManager = ClientNetManager.create(serverAddress, serverPort, 8081);
         clientNetManager.startMessageReceiver();
 
-        clientNetManager.registerHandlerObserver(ClientIdMessage.class, clientIdObserver);
+        clientNetManager.registerHandlerObserver(LoginMessage.class, loginResponseObserver);
         clientNetManager.sentLogin();
     }
 
-    private static ClientIdObserver clientIdObserver = clientIdValue -> {
+    private static LoginResponseObserver loginResponseObserver = clientIdValue -> {
         clientId = clientIdValue;
 
         log.debug("Received ID from Server: " + clientId);

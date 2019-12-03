@@ -4,6 +4,10 @@ import de.htw_berlin.ris.ricochet.net.manager.ServerNetManager;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import java.io.IOException;
+import java.net.InetAddress;
+import java.net.UnknownHostException;
+
 public class RicochetGameServer {
     private static Logger log = LogManager.getLogger();
 
@@ -16,6 +20,11 @@ public class RicochetGameServer {
         serverNetManager = new ServerNetManager(clientManager,8080,8081);
         serverNetManager.startServer();
 
+        try {
+            log.info("Server ready at: " + InetAddress.getLocalHost());
+        } catch (UnknownHostException e) {
+            e.printStackTrace();
+        }
     }
 
     static class ShutDownThread extends Thread {

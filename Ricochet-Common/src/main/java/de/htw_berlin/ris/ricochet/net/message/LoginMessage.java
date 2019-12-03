@@ -4,7 +4,7 @@ import de.htw_berlin.ris.ricochet.net.manager.ClientId;
 
 import java.net.InetAddress;
 
-public class LoginMessage extends ClientIdMessage implements NetMessage {
+public class LoginMessage extends ScopedMessage implements NetMessage {
     private InetAddress inetAddress;
 
     public LoginMessage() {
