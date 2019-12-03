@@ -1,7 +1,7 @@
 package de.htw_berlin.ris.ricochet.net.handler;
 
-import java.net.InetAddress;
+import de.htw_berlin.ris.ricochet.net.message.ChatMessage;
 
 public interface ChatMessageObserver extends HandlerObserver {
-    void onNewMessage(String chatMessage);
+    void onNewMessage(ChatMessage chatMessage);
 }

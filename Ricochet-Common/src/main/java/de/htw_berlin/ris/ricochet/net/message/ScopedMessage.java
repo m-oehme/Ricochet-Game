@@ -24,4 +24,8 @@ public abstract class ScopedMessage implements NetMessage {
     public MessageScope getMessageScope() {
         return messageScope;
     }
+
+    public void setMessageScope(MessageScope messageScope) {
+        this.messageScope = messageScope;
+    }
 }

@@ -1,10 +1,11 @@
 package de.htw_berlin.ris.ricochet;
 
+import de.htw_berlin.ris.ricochet.chat.ServerChatManager;
+import de.htw_berlin.ris.ricochet.net.handler.ChatMessageHandler;
 import de.htw_berlin.ris.ricochet.net.manager.ServerNetManager;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import java.io.IOException;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 
@@ -13,6 +14,8 @@ public class RicochetGameServer {
 
     private static ServerNetManager serverNetManager;
     private static ClientManager clientManager = new ClientManager();
+
+    private static ServerChatManager serverChatManager;
 
     public static void main(String[] args) {
         Runtime.getRuntime().addShutdownHook(new ShutDownThread());
@@ -25,6 +28,9 @@ public class RicochetGameServer {
         } catch (UnknownHostException e) {
             e.printStackTrace();
         }
+
+        serverChatManager = new ServerChatManager(clientManager);
+        serverNetManager.registerHandlerForAll(new ChatMessageHandler(serverChatManager));
     }
 
     static class ShutDownThread extends Thread {

@@ -2,6 +2,8 @@ package de.htw_berlin.ris.ricochet.net.manager;
 
 import de.htw_berlin.ris.ricochet.ClientManager;
 import de.htw_berlin.ris.ricochet.ClientNetUpdate;
+import de.htw_berlin.ris.ricochet.net.handler.HandlerObserver;
+import de.htw_berlin.ris.ricochet.net.handler.NetMsgHandler;
 import de.htw_berlin.ris.ricochet.net.message.LoginMessage;
 import de.htw_berlin.ris.ricochet.net.message.NetMessage;
 
@@ -53,6 +55,12 @@ public class ServerNetManager implements ClientNetUpdate {
     @Override
     public void onNewMessageForClient(ClientId receiverClientId, NetMessage message) {
         clientsHolder.get(receiverClientId).send(message);
+    }
+
+    public void registerHandlerForAll(NetMsgHandler<? extends NetMessage, ? extends HandlerObserver> netMsgHandler) {
+        clientsHolder.values().forEach(netManager -> {
+            netManager.register(netMsgHandler);
+        });
     }
 
 }

@@ -122,7 +122,6 @@ public class NetManager implements Runnable {
                         receivedMessageQueue.offer(message);
                     }
                 }
-                inputStream = null;
             }
         }
 

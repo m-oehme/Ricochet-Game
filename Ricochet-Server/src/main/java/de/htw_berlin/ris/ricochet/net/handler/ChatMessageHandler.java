@@ -13,6 +13,12 @@ public class ChatMessageHandler implements NetMsgHandler<ChatMessage, ChatMessag
 
     private HashMap<Class<? extends ChatMessageObserver>, ChatMessageObserver> chatMessageObserverHashMap = new HashMap<>();
 
+    public ChatMessageHandler() { }
+
+    public ChatMessageHandler(ChatMessageObserver handlerObserver) {
+        chatMessageObserverHashMap.put(handlerObserver.getClass(), handlerObserver);
+    }
+
     @Override
     public Class<ChatMessage> getType() {
         return ChatMessage.class;
@@ -22,7 +28,7 @@ public class ChatMessageHandler implements NetMsgHandler<ChatMessage, ChatMessag
     public synchronized void handle(ChatMessage message) {
         log.info("Chat Message: " + message.getClientId());
         chatMessageObserverHashMap.values().forEach(chatMessageObserver -> {
-            chatMessageObserver.onNewMessage(message.getChatMessage());
+            chatMessageObserver.onNewMessage(message);
         });
     }
 
