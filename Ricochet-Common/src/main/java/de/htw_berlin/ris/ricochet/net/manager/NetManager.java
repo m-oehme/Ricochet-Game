@@ -18,31 +18,40 @@ import java.util.concurrent.LinkedBlockingQueue;
 public class NetManager implements Runnable {
     private static Logger log = LogManager.getLogger();
 
-    private Socket receiverSocket = null;
-    private final InetAddress clientInetAddress;
-    private final Integer clientPort;
     private ClientId clientId;
+
+    private Socket socket;
+    private ObjectOutputStream outputStream;
 
     private ExecutorService netManagerThreadPool = Executors.newFixedThreadPool(2);
 
-    private NetworkReceiver networkReceiver = new NetworkReceiver();
+    private NetworkReceiver networkReceiver;
 
     private HashMap<Class<? extends NetMessage>, NetMsgHandler> messageHandlerHolder = new HashMap<>();
     private LinkedBlockingQueue<NetMessage> receivedMessageQueue = new LinkedBlockingQueue<>();
     private ReceivedMessageQuery receivedMessageQuery = new ReceivedMessageQuery();
 
-    public NetManager() {
-        this(null, null);
+
+    public NetManager(Socket socket, ClientId clientId) {
+        try {
+            this.socket = socket;
+            this.outputStream = new ObjectOutputStream(socket.getOutputStream());
+            this.networkReceiver = new NetworkReceiver(socket, new ObjectInputStream(socket.getInputStream()));
+        } catch (IOException e) {
+            log.error("Cannot create Output Socket: " + e.getMessage(), e);
+        }
+        this.clientId = clientId;
     }
 
     public NetManager(InetAddress clientInetAddress, Integer clientPort) {
-        this(clientInetAddress, clientPort, null);
-    }
-
-    public NetManager(InetAddress clientInetAddress, Integer clientPort, ClientId clientId) {
-        this.clientInetAddress = clientInetAddress;
-        this.clientPort = clientPort;
-        this.clientId = clientId;
+        try {
+            this.socket = new Socket(clientInetAddress, clientPort);
+            this.outputStream = new ObjectOutputStream(socket.getOutputStream());
+            this.networkReceiver = new NetworkReceiver(socket, new ObjectInputStream(socket.getInputStream()));
+        } catch (IOException e) {
+            log.error("Cannot create Socket Connection: " + e.getMessage(), e);
+        }
+        this.clientId = null;
     }
 
     @Override
@@ -71,23 +80,22 @@ public class NetManager implements Runnable {
 
     public void send(NetMessage netMessage) {
         try {
-            Socket clientSocket = new Socket(clientInetAddress, clientPort);
-
-            ObjectOutputStream out = new ObjectOutputStream(clientSocket.getOutputStream());
-            out.writeObject(netMessage);
-            out.close();
-            clientSocket.close();
+            outputStream.writeObject(netMessage);
         } catch (IOException e) {
             log.error("Cannot sent message: " + e.getMessage(), e);
         }
     }
 
-    public void processSocket(Socket receiverSocket) {
-        this.receiverSocket = receiverSocket;
-    }
-
     class NetworkReceiver implements Runnable {
         private boolean isRunning = true;
+
+        private Socket receiverSocket;
+        private ObjectInputStream inputStream;
+
+        public NetworkReceiver(Socket receiverSocket, ObjectInputStream inputStream) {
+            this.receiverSocket = receiverSocket;
+            this.inputStream = inputStream;
+        }
 
         @Override
         public void run() {
@@ -100,10 +108,9 @@ public class NetManager implements Runnable {
             }
         }
 
-        private void waitForMessage() throws IOException, ClassNotFoundException {
-            if (receiverSocket != null) {
-                ObjectInputStream in = new ObjectInputStream(receiverSocket.getInputStream());
-                NetMessage message = (NetMessage) in.readObject();
+        private synchronized void waitForMessage() throws IOException, ClassNotFoundException {
+            if (inputStream != null) {
+                NetMessage message = (NetMessage) inputStream.readObject();
 
                 if (clientId == null || clientId == message.getClientId()) {
 
@@ -115,9 +122,7 @@ public class NetManager implements Runnable {
                         receivedMessageQueue.offer(message);
                     }
                 }
-                in.close();
-                receiverSocket.close();
-                receiverSocket = null;
+                inputStream = null;
             }
         }
 

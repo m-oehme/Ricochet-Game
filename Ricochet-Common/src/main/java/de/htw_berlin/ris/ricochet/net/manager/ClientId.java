@@ -7,7 +7,7 @@ public class ClientId implements Comparable<ClientId>, Serializable {
     private String clientId;
 
     public ClientId(InetAddress inetAddress) {
-        clientId = Integer.toHexString(inetAddress.hashCode());
+        clientId = Integer.toHexString((int) (inetAddress.hashCode() * Math.random()));
     }
 
     public String getClientId() {

@@ -1,10 +1,9 @@
 package de.htw_berlin.ris.ricochet;
 
-import de.htw_berlin.ris.ricochet.net.handler.LoginResponseObserver;
+import de.htw_berlin.ris.ricochet.net.handler.LoginObserver;
 import de.htw_berlin.ris.ricochet.net.manager.ClientId;
 import de.htw_berlin.ris.ricochet.net.manager.ClientNetManager;
 import de.htw_berlin.ris.ricochet.net.message.LoginMessage;
-import de.htw_berlin.ris.ricochet.net.message.ScopedMessage;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -24,15 +23,12 @@ public class RicochetGameClient {
         startNetwork(serverAddress, serverPort);
     }
 
-    private static void startNetwork(InetAddress serverAddress, int serverPort) throws IOException {
-        clientNetManager = ClientNetManager.create(serverAddress, serverPort, 8081);
-        clientNetManager.startMessageReceiver();
-
-        clientNetManager.registerHandlerObserver(LoginMessage.class, loginResponseObserver);
-        clientNetManager.sentLogin();
+    private static void startNetwork(InetAddress serverAddress, int serverPort) {
+        clientNetManager = ClientNetManager.create(serverAddress, serverPort);
+        clientNetManager.registerHandlerObserver(LoginMessage.class, loginObserver);
     }
 
-    private static LoginResponseObserver loginResponseObserver = clientIdValue -> {
+    private static LoginObserver loginObserver = clientIdValue -> {
         clientId = clientIdValue;
 
         log.debug("Received ID from Server: " + clientId);

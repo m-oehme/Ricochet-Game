@@ -7,10 +7,6 @@ import java.net.InetAddress;
 public class LoginMessage extends ScopedMessage implements NetMessage {
     private InetAddress inetAddress;
 
-    public LoginMessage() {
-        super(null, MessageScope.SELF);
-    }
-
     public LoginMessage(ClientId clientId) {
         super(clientId, MessageScope.SELF);
     }

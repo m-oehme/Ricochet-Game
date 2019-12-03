@@ -6,6 +6,7 @@ import de.htw_berlin.ris.ricochet.net.message.ScopedMessage;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import java.net.InetAddress;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -20,10 +21,12 @@ public class ClientManager {
         this.clientNetUpdate = clientNetUpdate;
     }
 
-    public void addNewClient(ClientId clientId) {
+    public ClientId addNewClient(InetAddress clientInetAddress) {
+        ClientId clientId = new ClientId(clientInetAddress);
         log.info("New Client with ID: " + clientId);
         clientList.add(clientId);
-        sendMessageToClients(new LoginMessage(clientId));
+
+        return clientId;
     }
 
     public void sendMessageToClients(ScopedMessage message) {

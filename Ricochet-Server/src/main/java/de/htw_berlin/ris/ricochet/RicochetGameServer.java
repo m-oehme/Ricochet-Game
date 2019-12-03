@@ -17,7 +17,7 @@ public class RicochetGameServer {
     public static void main(String[] args) {
         Runtime.getRuntime().addShutdownHook(new ShutDownThread());
 
-        serverNetManager = new ServerNetManager(clientManager,8080,8081);
+        serverNetManager = new ServerNetManager(clientManager,8080);
         serverNetManager.startServer();
 
         try {
