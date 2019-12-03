@@ -4,10 +4,8 @@ import de.htw_berlin.ris.ricochet.net.message.ChatMessage;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import java.util.HashMap;
 
-
-public class ChatMessageHandler extends AbsMessageHandler<ChatMessage, ChatMessageObserver> {
+public class ChatMessageHandler extends NetMessageHandlerImpl<ChatMessage, ChatMessageObserver> {
     private static Logger log = LogManager.getLogger();
 
     private static ChatMessageHandler INSTANCE = null;

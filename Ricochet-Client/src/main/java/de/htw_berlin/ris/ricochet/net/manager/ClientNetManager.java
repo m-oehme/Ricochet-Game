@@ -40,7 +40,7 @@ public class ClientNetManager implements LoginObserver {
         netManger.send(message);
     }
 
-    public void registerHandler(NetMessageHandler<? extends NetMessage, ? extends HandlerObserver> netMessageHandler) {
+    public void registerHandler(NetMessageHandler<? extends NetMessage, ? extends NetMessageObserver> netMessageHandler) {
         netManger.register(netMessageHandler);
     }
 

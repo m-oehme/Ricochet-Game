@@ -2,7 +2,7 @@ package de.htw_berlin.ris.ricochet.net.handler;
 
 import de.htw_berlin.ris.ricochet.net.message.LoginMessage;
 
-public class LoginMessageHandler extends AbsMessageHandler<LoginMessage, LoginObserver> {
+public class LoginMessageHandler extends NetMessageHandlerImpl<LoginMessage, LoginObserver> {
     private static LoginMessageHandler INSTANCE = null;
 
     public static LoginMessageHandler get() {

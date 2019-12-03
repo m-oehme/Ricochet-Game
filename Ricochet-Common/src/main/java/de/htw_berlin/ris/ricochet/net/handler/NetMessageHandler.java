@@ -2,7 +2,7 @@ package de.htw_berlin.ris.ricochet.net.handler;
 
 import de.htw_berlin.ris.ricochet.net.message.NetMessage;
 
-public interface NetMessageHandler<T extends NetMessage, S extends HandlerObserver> {
+public interface NetMessageHandler<T extends NetMessage, S extends NetMessageObserver> {
 
     Class<T> getType();
 

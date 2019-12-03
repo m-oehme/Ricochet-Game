@@ -4,7 +4,6 @@ import de.htw_berlin.ris.ricochet.net.handler.LoginMessageHandler;
 import de.htw_berlin.ris.ricochet.net.handler.LoginObserver;
 import de.htw_berlin.ris.ricochet.net.manager.ClientId;
 import de.htw_berlin.ris.ricochet.net.manager.ClientNetManager;
-import de.htw_berlin.ris.ricochet.net.message.LoginMessage;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 

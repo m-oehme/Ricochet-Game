@@ -5,7 +5,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 
-public class SimpleTextMessageHandler extends AbsMessageHandler<SimpleTextMessage, SimpleTestMessageObserver> {
+public class SimpleTextMessageHandler extends NetMessageHandlerImpl<SimpleTextMessage, SimpleTestMessageObserver> {
     private static Logger log = LogManager.getLogger();
 
     @Override

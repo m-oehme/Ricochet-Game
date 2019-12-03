@@ -7,10 +7,10 @@ import org.apache.logging.log4j.Logger;
 
 import java.util.HashMap;
 
-public abstract class AbsMessageHandler<T extends NetMessage, S extends HandlerObserver> implements NetMessageHandler<T, S> {
+public abstract class NetMessageHandlerImpl<T extends NetMessage, S extends NetMessageObserver> implements NetMessageHandler<T, S> {
     private static Logger log = LogManager.getLogger();
 
-    protected HashMap<Class<? extends HandlerObserver>, S> messageObserverHashMap = new HashMap<>();
+    protected HashMap<Class<? extends NetMessageObserver>, S> messageObserverHashMap = new HashMap<>();
 
     @Override
     public NetMessageHandler<T, S> registerObserver(S handlerObserver) {
