@@ -1,5 +1,6 @@
 package de.htw_berlin.ris.ricochet.net.manager;
 
+import de.htw_berlin.ris.ricochet.net.ServerNetComponent;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -7,14 +8,14 @@ import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
 
-class ServerSocketListener implements Runnable {
+public class ServerSocketListener implements Runnable {
     private static Logger log = LogManager.getLogger();
 
     private boolean isRunning = true;
     private ServerSocket serverSocket;
-    private ServerNetManager serverNetManager;
+    private ServerNetComponent serverNetComponent;
 
-    ServerSocketListener(ServerNetManager serverNetManager, int port) {
+    public ServerSocketListener(ServerNetComponent serverNetComponent, int port) {
         try {
             this.serverSocket = new ServerSocket(port);
 
@@ -23,7 +24,7 @@ class ServerSocketListener implements Runnable {
             log.error("Cannot register Server Socket: " + e.getMessage());
             e.printStackTrace();
         }
-        this.serverNetManager = serverNetManager;
+        this.serverNetComponent = serverNetComponent;
     }
 
     @Override
@@ -45,7 +46,7 @@ class ServerSocketListener implements Runnable {
     }
 
     private void onNewSocketConnection(Socket receiveSocket) {
-        serverNetManager.addClientSocket(receiveSocket);
+        serverNetComponent.addClientSocket(receiveSocket);
     }
 
     public boolean isRunning() {

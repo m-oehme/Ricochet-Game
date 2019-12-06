@@ -1,20 +1,31 @@
 package de.htw_berlin.ris.ricochet.chat;
 
-import de.htw_berlin.ris.ricochet.ClientManager;
+import de.htw_berlin.ris.ricochet.client.ClientManager;
 import de.htw_berlin.ris.ricochet.net.handler.ChatMessageObserver;
 import de.htw_berlin.ris.ricochet.net.message.ChatMessage;
 import de.htw_berlin.ris.ricochet.net.message.MessageScope;
 
 import java.util.concurrent.LinkedBlockingQueue;
 
-public class ServerChatManager implements Runnable, ChatMessageObserver {
+public class ServerChatComponent implements Runnable, ChatMessageObserver {
+
+    private static ServerChatComponent INSTANCE = null;
+    public static ServerChatComponent get() {
+        return INSTANCE;
+    }
+    public static ServerChatComponent create(ClientManager clientManager) {
+        if( INSTANCE == null ) {
+            INSTANCE = new ServerChatComponent(clientManager);
+        }
+        return INSTANCE;
+    }
 
     private boolean isRunning = true;
 
     private ClientManager clientManager;
     private LinkedBlockingQueue<ChatMessage> chatMesssageQueue = new LinkedBlockingQueue<>();
 
-    public ServerChatManager(ClientManager clientManager) {
+    private ServerChatComponent(ClientManager clientManager) {
         this.clientManager = clientManager;
     }
 

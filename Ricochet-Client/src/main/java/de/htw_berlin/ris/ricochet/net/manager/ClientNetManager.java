@@ -36,7 +36,6 @@ public class ClientNetManager implements LoginObserver {
     }
 
     public void sentMessage(NetMessage message) {
-        message.setClientId(this.clientId);
         netManger.send(message);
     }
 

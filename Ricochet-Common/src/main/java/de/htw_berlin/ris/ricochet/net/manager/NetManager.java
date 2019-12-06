@@ -112,7 +112,7 @@ public class NetManager implements Runnable {
             if (inputStream != null) {
                 NetMessage message = (NetMessage) inputStream.readObject();
 
-                if (clientId == null || clientId == message.getClientId()) {
+                if (clientId == null || clientId.compareTo(message.getClientId()) == 0) {
 
                     if (message instanceof LoginMessage) {
                         ((LoginMessage) message).setInetAddress(receiverSocket.getInetAddress());

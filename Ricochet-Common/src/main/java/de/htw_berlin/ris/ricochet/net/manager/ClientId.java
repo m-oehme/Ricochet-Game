@@ -16,7 +16,7 @@ public class ClientId implements Comparable<ClientId>, Serializable {
 
     @Override
     public int compareTo(ClientId o) {
-        return clientId.compareTo(o.clientId);
+        return o == null ? -1 : clientId.compareTo(o.clientId);
     }
 
     @Override

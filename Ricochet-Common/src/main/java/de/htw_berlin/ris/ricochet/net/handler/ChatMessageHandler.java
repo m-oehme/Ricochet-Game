@@ -8,13 +8,6 @@ import org.apache.logging.log4j.Logger;
 public class ChatMessageHandler extends NetMessageHandlerImpl<ChatMessage, ChatMessageObserver> {
     private static Logger log = LogManager.getLogger();
 
-    private static ChatMessageHandler INSTANCE = null;
-
-    public static ChatMessageHandler get() {
-        if( INSTANCE == null ) INSTANCE = new ChatMessageHandler();
-        return INSTANCE;
-    }
-
     @Override
     public Class<ChatMessage> getType() {
         return ChatMessage.class;
