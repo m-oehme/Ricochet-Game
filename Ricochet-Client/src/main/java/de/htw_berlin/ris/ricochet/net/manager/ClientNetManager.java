@@ -1,6 +1,7 @@
 package de.htw_berlin.ris.ricochet.net.manager;
 
 import de.htw_berlin.ris.ricochet.net.handler.*;
+import de.htw_berlin.ris.ricochet.net.message.LoginMessage;
 import de.htw_berlin.ris.ricochet.net.message.NetMessage;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -9,7 +10,7 @@ import java.net.InetAddress;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-public class ClientNetManager implements LoginObserver {
+public class ClientNetManager implements NetMessageObserver<LoginMessage> {
     private static Logger log = LogManager.getLogger();
     private static ClientNetManager INSTANCE = null;
 
@@ -39,8 +40,8 @@ public class ClientNetManager implements LoginObserver {
         netManger.send(message);
     }
 
-    public void registerHandler(NetMessageHandler<? extends NetMessage, ? extends NetMessageObserver> netMessageHandler) {
-        netManger.register(netMessageHandler);
+    public <T extends NetMessage> void registerHandler(Class<T> messageType, NetMessageHandler<T> netMessageHandler) {
+        netManger.register(messageType, netMessageHandler);
     }
 
     public ClientId getClientId() {
@@ -48,7 +49,7 @@ public class ClientNetManager implements LoginObserver {
     }
 
     @Override
-    public void onNewClientId(ClientId clientId) {
-        this.clientId = clientId;
+    public void onNewMessage(LoginMessage loginMessage) {
+        this.clientId = loginMessage.getClientId();
     }
 }

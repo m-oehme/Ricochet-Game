@@ -1,11 +1,10 @@
 package de.htw_berlin.ris.ricochet;
 
-import de.htw_berlin.ris.ricochet.net.handler.ChatMessageHandler;
-import de.htw_berlin.ris.ricochet.net.handler.ChatMessageObserver;
-import de.htw_berlin.ris.ricochet.net.handler.LoginMessageHandler;
-import de.htw_berlin.ris.ricochet.net.handler.LoginObserver;
+import de.htw_berlin.ris.ricochet.net.handler.*;
 import de.htw_berlin.ris.ricochet.net.manager.ClientId;
 import de.htw_berlin.ris.ricochet.net.manager.ClientNetManager;
+import de.htw_berlin.ris.ricochet.net.message.ChatMessage;
+import de.htw_berlin.ris.ricochet.net.message.LoginMessage;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -34,27 +33,27 @@ class RicochetApplication {
     private void onInitialize(InetAddress serverAddress, int serverPort) {
         ClientNetManager.create(serverAddress, serverPort);
 
-        LoginMessageHandler loginMessageHandler = new LoginMessageHandler();
+        CommonNetMessageHandler<LoginMessage> loginMessageHandler = new CommonNetMessageHandler<>();
         loginMessageHandler.registerObserver(ClientNetManager.get()).registerObserver(loginObserver);
 
-        ChatMessageHandler chatMessageHandler = new ChatMessageHandler();
+        CommonNetMessageHandler<ChatMessage> chatMessageHandler = new CommonNetMessageHandler<>();
         chatMessageHandler.registerObserver(chatMessageObserver);
 
-        ClientNetManager.get().registerHandler(chatMessageHandler);
-        ClientNetManager.get().registerHandler(loginMessageHandler);
+        ClientNetManager.get().registerHandler(ChatMessage.class, chatMessageHandler);
+        ClientNetManager.get().registerHandler(LoginMessage.class, loginMessageHandler);
     }
 
     private void onStarted() {
 
     }
 
-    private LoginObserver loginObserver = clientIdValue -> {
-        clientId = clientIdValue;
+    private NetMessageObserver<LoginMessage> loginObserver = loginMessage -> {
+        clientId = loginMessage.getClientId();
 
         log.debug("Received ID from Server: " + clientId);
     };
 
-    private ChatMessageObserver chatMessageObserver = chatMessage -> {
+    private NetMessageObserver<ChatMessage> chatMessageObserver = chatMessage -> {
         System.out.println("Chat: " + chatMessage.getChatUsername() + " :: " + chatMessage.getChatMessage());
     };
 

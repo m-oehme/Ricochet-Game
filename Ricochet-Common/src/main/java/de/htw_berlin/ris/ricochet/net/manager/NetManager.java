@@ -27,7 +27,7 @@ public class NetManager implements Runnable {
 
     private NetworkReceiver networkReceiver;
 
-    private HashMap<Class<? extends NetMessage>, NetMessageHandler> messageHandlerHolder = new HashMap<>();
+    private HashMap<Class<? extends NetMessage>, NetMessageHandler<? extends NetMessage>> messageHandlerHolder = new HashMap<>();
     private LinkedBlockingQueue<NetMessage> receivedMessageQueue = new LinkedBlockingQueue<>();
     private ReceivedMessageQuery receivedMessageQuery = new ReceivedMessageQuery();
 
@@ -66,12 +66,12 @@ public class NetManager implements Runnable {
         netManagerThreadPool.shutdown();
     }
 
-    public NetMessageHandler register(NetMessageHandler<? extends NetMessage, ? extends NetMessageObserver> netMessageHandler) {
-        return messageHandlerHolder.put(netMessageHandler.getType(), netMessageHandler);
+    public <T extends NetMessage> NetMessageHandler<? extends NetMessage> register(Class<T> messageType, NetMessageHandler<T> netMessageHandler) {
+        return messageHandlerHolder.put(messageType, netMessageHandler);
     }
 
-    public void unregister(NetMessageHandler<? extends NetMessage, ? extends NetMessageObserver> netMessageHandler) {
-        messageHandlerHolder.remove(netMessageHandler.getType());
+    public <T extends NetMessage> void unregister(Class<T> messageType) {
+        messageHandlerHolder.remove(messageType);
     }
 
     public NetMessageHandler getRegisteredHandler(Class<? extends NetMessage> netMessageClass) {

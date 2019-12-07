@@ -1,13 +1,13 @@
 package de.htw_berlin.ris.ricochet.chat;
 
 import de.htw_berlin.ris.ricochet.client.ClientManager;
-import de.htw_berlin.ris.ricochet.net.handler.ChatMessageObserver;
+import de.htw_berlin.ris.ricochet.net.handler.NetMessageObserver;
 import de.htw_berlin.ris.ricochet.net.message.ChatMessage;
 import de.htw_berlin.ris.ricochet.net.message.MessageScope;
 
 import java.util.concurrent.LinkedBlockingQueue;
 
-public class ServerChatComponent implements Runnable, ChatMessageObserver {
+public class ServerChatComponent implements Runnable, NetMessageObserver<ChatMessage> {
 
     private static ServerChatComponent INSTANCE = null;
     public static ServerChatComponent get() {

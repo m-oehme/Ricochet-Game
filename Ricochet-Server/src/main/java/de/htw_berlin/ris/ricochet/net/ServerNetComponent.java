@@ -3,10 +3,11 @@ package de.htw_berlin.ris.ricochet.net;
 import de.htw_berlin.ris.ricochet.client.ClientManager;
 import de.htw_berlin.ris.ricochet.client.ClientNetUpdate;
 import de.htw_berlin.ris.ricochet.chat.ServerChatComponent;
-import de.htw_berlin.ris.ricochet.net.handler.ChatMessageHandler;
+import de.htw_berlin.ris.ricochet.net.handler.CommonNetMessageHandler;
 import de.htw_berlin.ris.ricochet.net.manager.ClientId;
 import de.htw_berlin.ris.ricochet.net.manager.NetManager;
 import de.htw_berlin.ris.ricochet.net.manager.ServerSocketListener;
+import de.htw_berlin.ris.ricochet.net.message.ChatMessage;
 import de.htw_berlin.ris.ricochet.net.message.LoginMessage;
 import de.htw_berlin.ris.ricochet.net.message.NetMessage;
 import javafx.collections.FXCollections;
@@ -70,9 +71,9 @@ public class ServerNetComponent implements ClientNetUpdate {
     }
 
     private MapChangeListener<ClientId, NetManager> onClientChange = change -> {
-        ChatMessageHandler chatMessageHandler = new ChatMessageHandler();
+        CommonNetMessageHandler<ChatMessage> chatMessageHandler = new CommonNetMessageHandler<>();
         chatMessageHandler.registerObserver(ServerChatComponent.get());
-        change.getValueAdded().register(chatMessageHandler);
+        change.getValueAdded().register(ChatMessage.class, chatMessageHandler);
 
     };
 

@@ -1,10 +1,5 @@
 package de.htw_berlin.ris.ricochet;
 
-import de.htw_berlin.ris.ricochet.net.handler.ChatMessageHandler;
-import de.htw_berlin.ris.ricochet.net.handler.ChatMessageObserver;
-import de.htw_berlin.ris.ricochet.net.handler.LoginMessageHandler;
-import de.htw_berlin.ris.ricochet.net.handler.LoginObserver;
-import de.htw_berlin.ris.ricochet.net.manager.ClientId;
 import de.htw_berlin.ris.ricochet.net.manager.ClientNetManager;
 import de.htw_berlin.ris.ricochet.net.message.ChatMessage;
 import de.htw_berlin.ris.ricochet.net.message.MessageScope;
