@@ -1,5 +1,6 @@
 package de.htw_berlin.ris.ricochet;
 
+
 import de.htw_berlin.ris.ricochet.chat.ServerChatComponent;
 import de.htw_berlin.ris.ricochet.client.ClientManager;
 import de.htw_berlin.ris.ricochet.net.ServerNetComponent;
@@ -11,19 +12,28 @@ import java.net.UnknownHostException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-public class RicochetGameServer {
+class RicochetServerApplication {
     private static Logger log = LogManager.getLogger();
 
-    private static ClientManager clientManager = new ClientManager();
-    private static ExecutorService mainThreadPool = Executors.newCachedThreadPool();
-
-    public static void main(String[] args) {
-        Runtime.getRuntime().addShutdownHook(new ShutDownThread());
-
-        initialization();
+    private static RicochetServerApplication INSTANCE = null;
+    public static RicochetServerApplication get() {
+        return INSTANCE;
+    }
+    public static RicochetServerApplication initialize() {
+        if( INSTANCE == null ) {
+            INSTANCE = new RicochetServerApplication();
+        }
+        return INSTANCE;
     }
 
-    private static void initialization() {
+    private ExecutorService mainThreadPool = Executors.newCachedThreadPool();
+    private ClientManager clientManager = new ClientManager();
+
+    public RicochetServerApplication() {
+        onInitialize();
+    }
+
+    private void onInitialize() {
         ServerNetComponent.create(clientManager,8080);
 
         ServerChatComponent.create(clientManager);
@@ -37,11 +47,8 @@ public class RicochetGameServer {
         }
     }
 
-    static class ShutDownThread extends Thread {
-        @Override
-        public void run() {
-            log.info("Shutting Down!");
-            ServerNetComponent.get().stopServer();
-        }
+    private void onStarted() {
+
     }
+
 }

@@ -45,7 +45,7 @@
                             <archive>
                                 <manifest>
                                     <mainClass>
-                                        de.htw_berlin.ris.ricochet.RicochetGameServer
+                                        de.htw_berlin.ris.ricochet.RicochetServerMain
                                     </mainClass>
                                 </manifest>
                             </archive>
