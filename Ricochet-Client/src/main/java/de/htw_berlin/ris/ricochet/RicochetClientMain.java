@@ -22,12 +22,14 @@ public class RicochetClientMain {
         Scanner scanner = new Scanner(System.in);
         System.out.print("\nUsername: ");
         String username = scanner.next();
+        RicochetGame.init();
 
         while (true) {
-            System.out.print("\nChat: ");
+       /*     System.out.print("\nChat: ");
             String message = scanner.next();
-
-            ClientNetManager.get().sentMessage(new ChatMessage(RicochetApplication.get().getClientId(), MessageScope.EXCEPT_SELF, username, message));
+            ClientNetManager.get().sentMessage(new ChatMessage(RicochetApplication.get().getClientId(), MessageScope.EXCEPT_SELF, username, message));*/
+            RicochetGame.Run();
         }
+
     }
 }

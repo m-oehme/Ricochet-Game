@@ -11,5 +11,11 @@
         <module name="ricochet-game-common" />
       </profile>
     </annotationProcessing>
+    <bytecodeTargetLevel>
+      <module name="ricochet-game" target="1.8" />
+      <module name="ricochet-game-client" target="1.8" />
+      <module name="ricochet-game-common" target="1.8" />
+      <module name="ricochet-game-server" target="1.8" />
+    </bytecodeTargetLevel>
   </component>
 </project>

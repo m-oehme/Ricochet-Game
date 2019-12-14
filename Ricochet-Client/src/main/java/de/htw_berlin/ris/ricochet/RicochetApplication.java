@@ -41,6 +41,7 @@ class RicochetApplication {
 
         ClientNetManager.get().registerHandler(ChatMessage.class, chatMessageHandler);
         ClientNetManager.get().registerHandler(LoginMessage.class, loginMessageHandler);
+        onStarted();
     }
 
     private void onStarted() {

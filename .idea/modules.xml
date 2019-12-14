@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ProjectModuleManager">
+    <modules>
+      <module fileurl="file://$PROJECT_DIR$/ricochet-game.iml" filepath="$PROJECT_DIR$/ricochet-game.iml" />
+      <module fileurl="file://$PROJECT_DIR$/Ricochet-Client/ricochet-game-client.iml" filepath="$PROJECT_DIR$/Ricochet-Client/ricochet-game-client.iml" />
+      <module fileurl="file://$PROJECT_DIR$/Ricochet-Common/ricochet-game-common.iml" filepath="$PROJECT_DIR$/Ricochet-Common/ricochet-game-common.iml" />
+      <module fileurl="file://$PROJECT_DIR$/Ricochet-Server/ricochet-game-server.iml" filepath="$PROJECT_DIR$/Ricochet-Server/ricochet-game-server.iml" />
+    </modules>
+  </component>
+</project>
