@@ -3,20 +3,14 @@ package de.htw_berlin.ris.ricochet;
 import de.htw_berlin.ris.ricochet.Entities.ContactListener;
 import de.htw_berlin.ris.ricochet.Entities.GameWorld;
 import de.htw_berlin.ris.ricochet.Entities.Scene;
-import de.htw_berlin.ris.ricochet.net.manager.ClientNetManager;
-import de.htw_berlin.ris.ricochet.net.message.ChatMessage;
-import de.htw_berlin.ris.ricochet.net.message.MessageScope;
 import de.htw_berlin.ris.ricochet.objects.GameObject;
 import de.htw_berlin.ris.ricochet.objects.Player;
 import org.jbox2d.common.Vec2;
-import org.jbox2d.dynamics.*;
+import org.jbox2d.dynamics.BodyType;
 import org.lwjgl.LWJGLException;
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.opengl.Display;
 import org.lwjgl.opengl.DisplayMode;
-
-import java.util.HashSet;
-import java.util.Set;
 
 import static org.lwjgl.opengl.GL11.*;
 /*
@@ -25,46 +19,54 @@ import static org.lwjgl.opengl.GL11.*;
 30 PIXELS == 1m!!!
  */
 
-public class RicochetGame {
+public class RicochetGameGUI {
+
+    private static RicochetGameGUI INSTANCE = null;
+    public static RicochetGameGUI get() {
+        if( INSTANCE == null ) {
+            INSTANCE = new RicochetGameGUI();
+        }
+        return INSTANCE;
+    }
 
     private static final String WINDOW_TITLE = "Ricochet!";
-    public static final int[] WINDOW_DIMENSIONS = {1280, 960};
+    public static final int[] WINDOW_DIMENSIONS = {1280, 720};
 
 
-    private static final ContactListener myListener = new ContactListener();
-    private static Player player;
+    private final ContactListener myListener = new ContactListener();
+    private Player player;
 
-    private static void render() {
+    private void render() {
         GameWorld.Instance.renderWorld();
     }
 
-    private static void logic() {
+    private void logic() {
         GameWorld.Instance.updateWorld();
     }
 
-    private static void input() {
+    private void input() {
         // TODO make this nice pls
         player.handleInput();
     }
 
 
-    static void cleanUp(boolean asCrash) {
+    void cleanUp(boolean asCrash) {
         Display.destroy();
         System.exit(asCrash ? 1 : 0);
     }
-    static void setUpMatrices() {
+    void setUpMatrices() {
         glMatrixMode(GL_PROJECTION);
         glOrtho(0, WINDOW_DIMENSIONS[0], 0, WINDOW_DIMENSIONS[1], 1, -1);
         glMatrixMode(GL_MODELVIEW);
     }
 
-    static void setUpListeners(){
+    void setUpListeners(){
 
         GameWorld.Instance.getPhysicsWorld().setContactListener(myListener);
         Keyboard.enableRepeatEvents(true);
     }
 
-    static void setUpWorld(){
+    void setUpWorld(){
         GameWorld.Instance = new GameWorld(new Vec2(0, 0),WINDOW_DIMENSIONS);
         Scene sceneCenter = new Scene(0, new Vec2(0,0));
         GameWorld.Instance.getWorldScenes().add(sceneCenter);
@@ -76,7 +78,7 @@ public class RicochetGame {
 
     }
 
-    static void setUpObjects() {
+    void setUpObjects() {
 /// TODO ADD CONVERSION METHOD TO GAMEWORLD
         Vec2 playerPos = new Vec2(0.5f,  0.5f);
         //Vec2 playerPos = new Vec2(21,  7.5f);
@@ -91,11 +93,11 @@ public class RicochetGame {
 
     }
 
-    private static void renderUpdate() {
+    private void renderUpdate() {
         Display.update();
     }
 
-    static void enterGameLoop() {
+    void enterGameLoop() {
         // TODO use Threads
         while (!Display.isCloseRequested()) {
             render();
@@ -106,7 +108,7 @@ public class RicochetGame {
     }
 
 
-    static void setUpDisplay() {
+    void setUpDisplay() {
         try {
             Display.setDisplayMode(new DisplayMode(WINDOW_DIMENSIONS[0], WINDOW_DIMENSIONS[1]));
             Display.setVSyncEnabled(true);
@@ -118,29 +120,28 @@ public class RicochetGame {
         }
     }
 
-    public static void main(String[] args) {
+//    public static void main(String[] args) {
+//        setUpDisplay();
+//        setUpWorld();
+//        setUpObjects();
+//        setUpMatrices();
+//        setUpListeners();
+//        enterGameLoop();
+//        cleanUp(false);
+//    }
+
+    public void init(){
         setUpDisplay();
         setUpWorld();
         setUpObjects();
         setUpMatrices();
         setUpListeners();
+    }
+    public void Run() {
         enterGameLoop();
         cleanUp(false);
     }
-    public static void init(){
-        setUpDisplay();
-        setUpWorld();
-        setUpObjects();
-        setUpMatrices();
-        setUpListeners();
-    }
-    public static void Run() {
-        render();
-        logic();
-        input();
-        renderUpdate();
-    }
-    public static void exit(){
+    public void exit(){
         cleanUp(false);
     }
 }

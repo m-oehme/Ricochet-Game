@@ -41,10 +41,13 @@ class RicochetApplication {
 
         ClientNetManager.get().registerHandler(ChatMessage.class, chatMessageHandler);
         ClientNetManager.get().registerHandler(LoginMessage.class, loginMessageHandler);
+
+        RicochetGameGUI.get().init();
         onStarted();
     }
 
     private void onStarted() {
+        RicochetGameGUI.get().Run();
 
     }
 

@@ -1,8 +1,5 @@
 package de.htw_berlin.ris.ricochet;
 
-import de.htw_berlin.ris.ricochet.net.manager.ClientNetManager;
-import de.htw_berlin.ris.ricochet.net.message.ChatMessage;
-import de.htw_berlin.ris.ricochet.net.message.MessageScope;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -18,18 +15,5 @@ public class RicochetClientMain {
         int serverPort = Integer.parseInt(args[1]);
 
         RicochetApplication.initialize(serverAddress, serverPort);
-
-        Scanner scanner = new Scanner(System.in);
-        System.out.print("\nUsername: ");
-        String username = scanner.next();
-        RicochetGame.init();
-
-        while (true) {
-       /*     System.out.print("\nChat: ");
-            String message = scanner.next();
-            ClientNetManager.get().sentMessage(new ChatMessage(RicochetApplication.get().getClientId(), MessageScope.EXCEPT_SELF, username, message));*/
-            RicochetGame.Run();
-        }
-
     }
 }
