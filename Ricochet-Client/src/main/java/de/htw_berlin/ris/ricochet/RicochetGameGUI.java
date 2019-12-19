@@ -9,6 +9,7 @@ import org.jbox2d.common.Vec2;
 import org.jbox2d.dynamics.BodyType;
 import org.lwjgl.LWJGLException;
 import org.lwjgl.input.Keyboard;
+import org.lwjgl.input.Mouse;
 import org.lwjgl.opengl.Display;
 import org.lwjgl.opengl.DisplayMode;
 
@@ -56,6 +57,7 @@ public class RicochetGameGUI {
     }
     void setUpMatrices() {
         glMatrixMode(GL_PROJECTION);
+        glLoadIdentity();
         glOrtho(0, WINDOW_DIMENSIONS[0], 0, WINDOW_DIMENSIONS[1], 1, -1);
         glMatrixMode(GL_MODELVIEW);
     }
@@ -104,6 +106,7 @@ public class RicochetGameGUI {
             logic();
             input();
             renderUpdate();
+            System.out.println(Mouse.getY());
         }
     }
 
@@ -112,7 +115,7 @@ public class RicochetGameGUI {
         try {
             Display.setDisplayMode(new DisplayMode(WINDOW_DIMENSIONS[0], WINDOW_DIMENSIONS[1]));
             Display.setVSyncEnabled(true);
-            Display.setTitle(WINDOW_TITLE);
+           // Display.setTitle(WINDOW_TITLE);
             Display.create();
         } catch (LWJGLException e) {
             e.printStackTrace();
