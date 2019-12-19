@@ -90,7 +90,7 @@ public class RicochetGameGUI {
         GameObject lowerWall = new GameObject(new Vec2(0,0), WINDOW_DIMENSIONS[0]/30+1, (WINDOW_DIMENSIONS[1]/30)/30,BodyType.STATIC, 1f, 0.5f);
         GameObject topWall = new GameObject(new Vec2(0,1), WINDOW_DIMENSIONS[0]/30+1, (WINDOW_DIMENSIONS[1]/30)/30,BodyType.STATIC, 1f, 0.5f);
         GameObject leftWall = new GameObject(new Vec2(0,0), WINDOW_DIMENSIONS[0]/30/30, (WINDOW_DIMENSIONS[1]/30),BodyType.STATIC, 1f, 0.5f);
-        GameObject rightWall = new GameObject(new Vec2(1.01f,0), WINDOW_DIMENSIONS[0]/30/30, (WINDOW_DIMENSIONS[1]/30),BodyType.STATIC, 1f, 0.5f);
+        //GameObject rightWall = new GameObject(new Vec2(1.01f,0), WINDOW_DIMENSIONS[0]/30/30, (WINDOW_DIMENSIONS[1]/30),BodyType.STATIC, 1f, 0.5f);
 
 
     }
@@ -106,7 +106,7 @@ public class RicochetGameGUI {
             logic();
             input();
             renderUpdate();
-            System.out.println(Mouse.getY());
+            System.out.println(Mouse.getX() + " , "+ Mouse.getY());
         }
     }
 

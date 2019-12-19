@@ -61,6 +61,11 @@ public class Player extends GameObject {
 
     }
 
+    @Override
+    public void Update(){
+        super.Update();
+    }
+
     public int getID() {
         return ID;
     }
