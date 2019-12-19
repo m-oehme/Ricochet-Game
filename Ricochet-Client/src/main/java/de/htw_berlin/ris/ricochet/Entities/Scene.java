@@ -11,13 +11,11 @@ public class Scene {
     private  int ID;
     private Vec2 location;
     private Set<GameObject> sceneObjects;
-    private ArrayList<Door> sceneDoors;
-
 
     public Scene(int ID, Vec2 location) {
         this.ID = ID;
         sceneObjects = new HashSet<GameObject>();
-        sceneDoors  = new ArrayList<Door>();
+
         this.location = location;
     }
 
@@ -37,10 +35,6 @@ public class Scene {
        this.sceneObjects = SceneObjects;
     }
 
-    public ArrayList<Door> getSceneDoors() {
-        return sceneDoors;
-    }
-
     public Vec2 getLocation() {
         return location;
     }
@@ -49,7 +43,4 @@ public class Scene {
         this.location = location;
     }
 
-    public void setSceneDoors(ArrayList<Door> sceneDoors) {
-        this.sceneDoors = sceneDoors;
-    }
 }

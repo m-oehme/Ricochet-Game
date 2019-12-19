@@ -1,6 +1,5 @@
 package de.htw_berlin.ris.ricochet.objects;
 
-import de.htw_berlin.ris.ricochet.Entities.Door;
 import de.htw_berlin.ris.ricochet.Entities.GameWorld;
 import org.jbox2d.collision.shapes.PolygonShape;
 import org.jbox2d.common.Vec2;
@@ -19,17 +18,16 @@ public class GameObject {
     public Body body;
     private FixtureDef bodyFixture;
     public Vec2 position;
-    private float width, height;
+    protected float width, height;
     public boolean contact;
     public java.awt.Color objectColor;
     protected GameObject colObj;
-    //TODO make unitConversion a cont in gameworld
-    protected static Vec2 unitConversion;
 
+ // TODO DO STUFF THAT LETS ME FLAG WETHER OR NOT TO ADD AS BODY, AND ADD FUNCTION THAT ENABLES REINSTATING PHYSICAL PROPERTIES!!!
     public GameObject(Vec2 pos, float width, float height, BodyType bodyType) {
-        unitConversion = new Vec2 (   GameWorld.Instance.WINDOW_DIMENSIONS[0]/30,   GameWorld.Instance.WINDOW_DIMENSIONS[1]/30);
+
         bodyDef = new BodyDef();
-        bodyDef.position.set(pos.x *unitConversion.x, pos.y*unitConversion.y);
+        bodyDef.position.set(pos.x , pos.y);
         bodyDef.type = bodyType;
         bodyDef.userData = this;
         PolygonShape boxShape = new PolygonShape();
@@ -50,9 +48,8 @@ public class GameObject {
     }
 
     public GameObject(Vec2 pos, float width, float height, BodyType bodyType, float density, float restitution) {
-        unitConversion = new Vec2 (   GameWorld.Instance.WINDOW_DIMENSIONS[0]/30,   GameWorld.Instance.WINDOW_DIMENSIONS[1]/30);
         bodyDef = new BodyDef();
-        bodyDef.position.set(pos.x*unitConversion.x, pos.y*unitConversion.y);
+        bodyDef.position.set(pos.x, pos.y);
         bodyDef.type = bodyType;
         bodyDef.userData = this;
         PolygonShape boxShape = new PolygonShape();
@@ -98,11 +95,8 @@ public class GameObject {
 
         float[] rgbVal = new float[4];
         if (contact) {
-
             Color.red.getRGBColorComponents(rgbVal);
-        } else if (this instanceof Door) {
-
-        } else {
+        }  else {
             objectColor.getRGBColorComponents(rgbVal);
         }
 

@@ -31,11 +31,11 @@ public class RicochetGameGUI {
     }
 
     private static final String WINDOW_TITLE = "Ricochet!";
-    public static final int[] WINDOW_DIMENSIONS = {1280, 720};
+    public static final int[] WINDOW_DIMENSIONS = {1280, 960};
 
 
     private final ContactListener myListener = new ContactListener();
-    private Player player;
+
 
     private void render() {
         GameWorld.Instance.renderWorld();
@@ -47,7 +47,7 @@ public class RicochetGameGUI {
 
     private void input() {
         // TODO make this nice pls
-        player.handleInput();
+        GameWorld.Instance.getPlayer().handleInput();
     }
 
 
@@ -71,26 +71,26 @@ public class RicochetGameGUI {
     void setUpWorld(){
         GameWorld.Instance = new GameWorld(new Vec2(0, 0),WINDOW_DIMENSIONS);
         Scene sceneCenter = new Scene(0, new Vec2(0,0));
-        GameWorld.Instance.getWorldScenes().add(sceneCenter);
+        GameWorld.Instance.getWorldScenes().put(sceneCenter.getLocation(),sceneCenter);
         Scene sceneRight = new Scene(1, new Vec2 (1,0));
-        GameWorld.Instance.getWorldScenes().add(sceneRight);
-        Scene sceneLeft = new Scene(-1, new Vec2 (1,0));
-        GameWorld.Instance.getWorldScenes().add(sceneLeft);
-        GameWorld.Instance.setCurrentScene(0);
+        GameWorld.Instance.getWorldScenes().put(sceneRight.getLocation(),sceneRight);
+        Scene sceneLeft = new Scene(-1, new Vec2 (-1,0));
+        GameWorld.Instance.getWorldScenes().put(sceneLeft.getLocation(),sceneLeft);
+        GameWorld.Instance.setCurrentScene(sceneCenter.getLocation());
 
     }
 
     void setUpObjects() {
-/// TODO ADD CONVERSION METHOD TO GAMEWORLD
-        Vec2 playerPos = new Vec2(0.5f,  0.5f);
+
+        Vec2 playerPos = new Vec2(GameWorld.covertedSize.x/2,  GameWorld.covertedSize.y/2);
         //Vec2 playerPos = new Vec2(21,  7.5f);
         Player playerObject = new Player(playerPos, 0.5f, 0.5f, BodyType.DYNAMIC);
-        player = playerObject;
 
-        GameObject lowerWall = new GameObject(new Vec2(0,0), WINDOW_DIMENSIONS[0]/30+1, (WINDOW_DIMENSIONS[1]/30)/30,BodyType.STATIC, 1f, 0.5f);
-        GameObject topWall = new GameObject(new Vec2(0,1), WINDOW_DIMENSIONS[0]/30+1, (WINDOW_DIMENSIONS[1]/30)/30,BodyType.STATIC, 1f, 0.5f);
-        GameObject leftWall = new GameObject(new Vec2(0,0), WINDOW_DIMENSIONS[0]/30/30, (WINDOW_DIMENSIONS[1]/30),BodyType.STATIC, 1f, 0.5f);
-        //GameObject rightWall = new GameObject(new Vec2(1.01f,0), WINDOW_DIMENSIONS[0]/30/30, (WINDOW_DIMENSIONS[1]/30),BodyType.STATIC, 1f, 0.5f);
+        GameWorld.Instance.setPlayer(playerObject);
+        GameObject lowerWall = new GameObject(new Vec2(0,0), GameWorld.covertedSize.x+1, GameWorld.covertedSize.y/30,BodyType.STATIC, 1f, 0.5f);
+        GameObject topWall = new GameObject(new Vec2(0,GameWorld.covertedSize.y), GameWorld.covertedSize.x+1, GameWorld.covertedSize.y/30,BodyType.STATIC, 1f, 0.5f);
+        GameObject leftWall = new GameObject(new Vec2(0,0), GameWorld.covertedSize.x/30, GameWorld.covertedSize.y,BodyType.STATIC, 1f, 0.5f);
+        //GameObject rightWall = new GameObject(new Vec2(1.01f,0), GameWorld.covertedSize.x/30, (WINDOW_DIMENSIONS[1]/30),BodyType.STATIC, 1f, 0.5f);
 
 
     }
@@ -106,7 +106,7 @@ public class RicochetGameGUI {
             logic();
             input();
             renderUpdate();
-            System.out.println(Mouse.getX() + " , "+ Mouse.getY());
+         //   System.out.println(Mouse.getX() + " , "+ Mouse.getY());
         }
     }
 
