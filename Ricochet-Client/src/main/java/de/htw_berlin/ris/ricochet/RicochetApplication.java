@@ -3,14 +3,14 @@ package de.htw_berlin.ris.ricochet;
 import de.htw_berlin.ris.ricochet.net.handler.*;
 import de.htw_berlin.ris.ricochet.net.manager.ClientId;
 import de.htw_berlin.ris.ricochet.net.manager.ClientNetManager;
-import de.htw_berlin.ris.ricochet.net.message.ChatMessage;
-import de.htw_berlin.ris.ricochet.net.message.LoginMessage;
+import de.htw_berlin.ris.ricochet.net.message.general.ChatMessage;
+import de.htw_berlin.ris.ricochet.net.message.general.LoginMessage;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import java.net.InetAddress;
 
-class RicochetApplication {
+public class RicochetApplication {
     private static Logger log = LogManager.getLogger();
 
     private static RicochetApplication INSTANCE = null;
@@ -21,6 +21,7 @@ class RicochetApplication {
         if( INSTANCE == null ) {
             INSTANCE = new RicochetApplication(serverAddress, serverPort);
         }
+        INSTANCE.onStarted();
         return INSTANCE;
     }
 
@@ -43,12 +44,10 @@ class RicochetApplication {
         ClientNetManager.get().registerHandler(LoginMessage.class, loginMessageHandler);
 
         RicochetGameGUI.get().init();
-        onStarted();
     }
 
     private void onStarted() {
         RicochetGameGUI.get().Run();
-
     }
 
     private NetMessageObserver<LoginMessage> loginObserver = loginMessage -> {

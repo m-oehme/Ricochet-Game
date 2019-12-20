@@ -4,6 +4,7 @@ package de.htw_berlin.ris.ricochet;
 import de.htw_berlin.ris.ricochet.chat.ServerChatComponent;
 import de.htw_berlin.ris.ricochet.client.ClientManager;
 import de.htw_berlin.ris.ricochet.net.ServerNetComponent;
+import de.htw_berlin.ris.ricochet.world.GameWorldComponent;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -31,13 +32,13 @@ class RicochetServerApplication {
 
     public RicochetServerApplication() {
         onInitialize();
+        onStarted();
     }
 
     private void onInitialize() {
         ServerNetComponent.create(clientManager,8080);
 
-        ServerChatComponent.create(clientManager);
-        mainThreadPool.execute(ServerChatComponent.get());
+        mainThreadPool.execute(ServerChatComponent.create(clientManager));
 
         ServerNetComponent.get().startServer();
         try {
@@ -48,7 +49,7 @@ class RicochetServerApplication {
     }
 
     private void onStarted() {
-
+        mainThreadPool.execute(GameWorldComponent.create(clientManager));
     }
 
 }

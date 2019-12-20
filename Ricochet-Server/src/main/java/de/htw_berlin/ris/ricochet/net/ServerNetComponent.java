@@ -7,9 +7,11 @@ import de.htw_berlin.ris.ricochet.net.handler.CommonNetMessageHandler;
 import de.htw_berlin.ris.ricochet.net.manager.ClientId;
 import de.htw_berlin.ris.ricochet.net.manager.NetManager;
 import de.htw_berlin.ris.ricochet.net.manager.ServerSocketListener;
-import de.htw_berlin.ris.ricochet.net.message.ChatMessage;
-import de.htw_berlin.ris.ricochet.net.message.LoginMessage;
+import de.htw_berlin.ris.ricochet.net.message.general.ChatMessage;
+import de.htw_berlin.ris.ricochet.net.message.general.LoginMessage;
 import de.htw_berlin.ris.ricochet.net.message.NetMessage;
+import de.htw_berlin.ris.ricochet.net.message.world.WorldMessage;
+import de.htw_berlin.ris.ricochet.world.GameWorldComponent;
 import javafx.collections.FXCollections;
 import javafx.collections.MapChangeListener;
 import javafx.collections.ObservableMap;
@@ -75,6 +77,9 @@ public class ServerNetComponent implements ClientNetUpdate {
         chatMessageHandler.registerObserver(ServerChatComponent.get());
         change.getValueAdded().register(ChatMessage.class, chatMessageHandler);
 
+        CommonNetMessageHandler<WorldMessage> worldMessageCommonNetMessageHandler = new CommonNetMessageHandler<>();
+        worldMessageCommonNetMessageHandler.registerObserver(GameWorldComponent.get());
+        change.getValueAdded().register(WorldMessage.class, worldMessageCommonNetMessageHandler);
     };
 
     @Override
