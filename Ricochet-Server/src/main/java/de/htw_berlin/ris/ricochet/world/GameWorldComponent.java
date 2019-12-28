@@ -38,7 +38,9 @@ public class GameWorldComponent implements Runnable, NetMessageObserver<WorldMes
             try {
                 WorldMessage msg = worldMessageQueue.take();
 
-                if (msg instanceof ObjectCreateMessage) {
+                if (msg instanceof WorldRequestMessage) {
+                    onRequestWorld((WorldRequestMessage) msg);
+                } else if (msg instanceof ObjectCreateMessage) {
                     onCreateObject((ObjectCreateMessage) msg);
                 } else if (msg instanceof ObjectMoveMessage) {
                     onMoveObject((ObjectMoveMessage) msg);
@@ -55,6 +57,12 @@ public class GameWorldComponent implements Runnable, NetMessageObserver<WorldMes
     @Override
     public void onNewMessage(WorldMessage message) {
         worldMessageQueue.offer(message);
+    }
+
+    private void onRequestWorld(WorldRequestMessage worldRequestMessage) {
+
+        worldRequestMessage.setGameObjectList(gameWorld.getDynamicGameObjects());
+        clientManager.sendMessageToClients(worldRequestMessage);
     }
 
     private void onCreateObject(ObjectCreateMessage objectCreateMessage) {
@@ -74,7 +82,7 @@ public class GameWorldComponent implements Runnable, NetMessageObserver<WorldMes
         gameWorld.updateGameObjectPosition(objectMoveMessage.getObjectId(), objectMoveMessage.getPosition());
 
         clientManager.sendMessageToClients(objectMoveMessage);
-        log.debug(String.format("Object Moved: %s", objectMoveMessage.getObjectId()));
+        log.debug(String.format("Object Moved: %s", objectMoveMessage.getObjectId() + "Position: " + objectMoveMessage.getPosition()));
     }
 
     private void onDestroyObject(ObjectDestroyMessage objectDestroyMessage) {

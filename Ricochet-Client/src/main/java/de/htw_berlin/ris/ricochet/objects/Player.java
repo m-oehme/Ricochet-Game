@@ -2,6 +2,8 @@ package de.htw_berlin.ris.ricochet.objects;
 
 import de.htw_berlin.ris.ricochet.Entities.GameWorld;
 import de.htw_berlin.ris.ricochet.math.Vector2;
+import de.htw_berlin.ris.ricochet.net.manager.ClientNetManager;
+import de.htw_berlin.ris.ricochet.net.message.world.ObjectMoveMessage;
 import org.jbox2d.common.Vec2;
 import org.jbox2d.dynamics.BodyType;
 import org.lwjgl.Sys;
@@ -83,6 +85,7 @@ public class Player extends GameObject {
             GameWorld.Instance.switchScene(GameWorld.switchDirection.DOWN);
         }
 
+//        ClientNetManager.get().sentMessage(new ObjectMoveMessage(ClientNetManager.get().getClientId(), this.getObjectId(), playerPosition));
     }
 
 

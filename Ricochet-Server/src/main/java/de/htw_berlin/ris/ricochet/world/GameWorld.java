@@ -4,6 +4,7 @@ import de.htw_berlin.ris.ricochet.objects.SGameObject;
 import de.htw_berlin.ris.ricochet.objects.ObjectId;
 import org.jbox2d.common.Vec2;
 
+import java.util.HashMap;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class GameWorld {
@@ -35,5 +36,9 @@ public class GameWorld {
         }
 
         return false;
+    }
+
+    public HashMap<ObjectId, SGameObject> getDynamicGameObjects() {
+        return new HashMap<>(dynamicGameObjects);
     }
 }
