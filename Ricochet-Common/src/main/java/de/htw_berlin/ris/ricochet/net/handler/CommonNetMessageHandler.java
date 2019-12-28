@@ -1,23 +1,22 @@
 package de.htw_berlin.ris.ricochet.net.handler;
 
-
 import de.htw_berlin.ris.ricochet.net.message.NetMessage;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import java.util.HashMap;
+import java.util.concurrent.LinkedBlockingQueue;
 
 public class CommonNetMessageHandler<T extends NetMessage> implements NetMessageHandler<T> {
-
     private static Logger log = LogManager.getLogger();
+    private boolean isRunning = true;
 
     protected HashMap<Class<? extends NetMessageObserver>, NetMessageObserver<T>> messageObserverHashMap = new HashMap<>();
+    private LinkedBlockingQueue<T> receivedMessageQueue = new LinkedBlockingQueue<>();
 
     @Override
     public void handle(T message) {
-        messageObserverHashMap.values().forEach(chatMessageObserver -> {
-            chatMessageObserver.onNewMessage(message);
-        });
+        receivedMessageQueue.offer(message);
     }
 
     @Override
@@ -31,4 +30,32 @@ public class CommonNetMessageHandler<T extends NetMessage> implements NetMessage
         messageObserverHashMap.remove(handlerObserver.getClass());
     }
 
+    private void processMessage() throws InterruptedException {
+        NetMessage msg = receivedMessageQueue.take();
+        messageObserverHashMap.values().forEach(chatMessageObserver -> {
+            chatMessageObserver.onNewMessage((T) msg);
+        });
+
+    }
+
+    @Override
+    public void run() {
+        try {
+            while (isRunning) {
+                processMessage();
+            }
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+    }
+
+    @Override
+    public boolean isRunning() {
+        return isRunning;
+    }
+
+    @Override
+    public void stop() {
+        isRunning = false;
+    }
 }

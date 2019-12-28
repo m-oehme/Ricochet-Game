@@ -28,6 +28,10 @@ public class ClientManager {
         return clientId;
     }
 
+    public void removeClient(ClientId clientId) {
+        clientList.remove(clientId);
+    }
+
     public void sendMessageToClients(ScopedMessage message) {
         sendMessageToClients(message, null);
     }

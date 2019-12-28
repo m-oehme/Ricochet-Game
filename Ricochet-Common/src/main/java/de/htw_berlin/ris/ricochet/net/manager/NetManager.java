@@ -23,6 +23,7 @@ public class NetManager implements Runnable {
     private ObjectOutputStream outputStream;
 
     private ExecutorService netManagerThreadPool = Executors.newFixedThreadPool(2);
+    private ExecutorService messageHandlerThreadPool = Executors.newCachedThreadPool();
 
     private NetworkReceiver networkReceiver;
 
@@ -30,6 +31,7 @@ public class NetManager implements Runnable {
     private LinkedBlockingQueue<NetMessage> receivedMessageQueue = new LinkedBlockingQueue<>();
     private ReceivedMessageQuery receivedMessageQuery = new ReceivedMessageQuery();
 
+    private NetworkEvent networkEvent;
 
     public NetManager(Socket socket, ClientId clientId) {
         try {
@@ -60,17 +62,20 @@ public class NetManager implements Runnable {
     }
 
     public void stopServer() {
-        receivedMessageQuery.setRunning(false);
+        receivedMessageQuery.stop();
         networkReceiver.stop();
+        messageHandlerHolder.values().forEach(NetMessageHandler::stop);
+        messageHandlerThreadPool.shutdown();
         netManagerThreadPool.shutdown();
     }
 
     public <T extends NetMessage> NetMessageHandler<? extends NetMessage> register(Class<T> messageType, NetMessageHandler<T> netMessageHandler) {
+        messageHandlerThreadPool.execute(netMessageHandler);
         return messageHandlerHolder.put(messageType, netMessageHandler);
     }
 
     public <T extends NetMessage> void unregister(Class<T> messageType) {
-        messageHandlerHolder.remove(messageType);
+        messageHandlerHolder.remove(messageType).stop();
     }
 
     public NetMessageHandler getRegisteredHandler(Class<? extends NetMessage> netMessageClass) {
@@ -83,6 +88,15 @@ public class NetManager implements Runnable {
         } catch (IOException e) {
             log.error("Cannot sent message: " + e.getMessage(), e);
         }
+    }
+
+    private void notifyConnectionBroken() {
+        stopServer();
+        networkEvent.onNetworkEvent(this, clientId, "LOGOUT");
+    }
+
+    public void setNetworkEvent(NetworkEvent networkEvent) {
+        this.networkEvent = networkEvent;
     }
 
     class NetworkReceiver implements Runnable {
@@ -102,6 +116,8 @@ public class NetManager implements Runnable {
                 while (isRunning) {
                     waitForMessage();
                 }
+            } catch (EOFException e) {
+                notifyConnectionBroken();
             } catch (IOException | ClassNotFoundException e) {
                 e.printStackTrace();
             }
@@ -138,22 +154,26 @@ public class NetManager implements Runnable {
 
         @Override
         public void run() {
-            try {
-                while (isRunning) {
-                    NetMessage message = receivedMessageQueue.take();
-
-                    NetMessageHandler handler = messageHandlerHolder.get(message.getClass());
-
-                    if (handler == null) {
-                        handler = messageHandlerHolder.get(message.getClass().getSuperclass());
-                    }
-
-                    if (handler != null) {
-                        handler.handle(message);
-                    }
+            while (isRunning) {
+                try {
+                    processMessage();
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
                 }
-            } catch (InterruptedException e) {
-                e.printStackTrace();
+            }
+        }
+
+        private synchronized void processMessage() throws InterruptedException {
+            NetMessage message = receivedMessageQueue.take();
+
+            NetMessageHandler handler = messageHandlerHolder.get(message.getClass());
+
+            if (handler == null) {
+                handler = messageHandlerHolder.get(message.getClass().getSuperclass());
+            }
+
+            if (handler != null) {
+                handler.handle(message);
             }
         }
 
@@ -161,8 +181,9 @@ public class NetManager implements Runnable {
             return isRunning;
         }
 
-        public void setRunning(boolean running) {
-            isRunning = running;
+        public void stop() {
+            isRunning = false;
         }
     }
+
 }

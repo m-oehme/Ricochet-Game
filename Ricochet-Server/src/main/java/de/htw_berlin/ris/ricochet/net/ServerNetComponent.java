@@ -6,6 +6,7 @@ import de.htw_berlin.ris.ricochet.chat.ServerChatComponent;
 import de.htw_berlin.ris.ricochet.net.handler.CommonNetMessageHandler;
 import de.htw_berlin.ris.ricochet.net.manager.ClientId;
 import de.htw_berlin.ris.ricochet.net.manager.NetManager;
+import de.htw_berlin.ris.ricochet.net.manager.NetworkEvent;
 import de.htw_berlin.ris.ricochet.net.manager.ServerSocketListener;
 import de.htw_berlin.ris.ricochet.net.message.general.ChatMessage;
 import de.htw_berlin.ris.ricochet.net.message.general.LoginMessage;
@@ -15,12 +16,15 @@ import de.htw_berlin.ris.ricochet.world.GameWorldComponent;
 import javafx.collections.FXCollections;
 import javafx.collections.MapChangeListener;
 import javafx.collections.ObservableMap;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.net.Socket;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-public class ServerNetComponent implements ClientNetUpdate {
+public class ServerNetComponent implements ClientNetUpdate, NetworkEvent {
+    private static Logger log = LogManager.getLogger();
 
     private static ServerNetComponent INSTANCE = null;
     public static ServerNetComponent get() {
@@ -65,6 +69,7 @@ public class ServerNetComponent implements ClientNetUpdate {
         ClientId client = clientManager.addNewClient(receiverSocket.getInetAddress());
 
         NetManager netManager = new NetManager(receiverSocket, client);
+        netManager.setNetworkEvent(this);
 
         clientsHolder.put(client, netManager);
         netManagerThreadPool.execute(netManager);
@@ -73,17 +78,28 @@ public class ServerNetComponent implements ClientNetUpdate {
     }
 
     private MapChangeListener<ClientId, NetManager> onClientChange = change -> {
-        CommonNetMessageHandler<ChatMessage> chatMessageHandler = new CommonNetMessageHandler<>();
-        chatMessageHandler.registerObserver(ServerChatComponent.get());
-        change.getValueAdded().register(ChatMessage.class, chatMessageHandler);
+        if (change.wasAdded()) {
+            CommonNetMessageHandler<ChatMessage> chatMessageHandler = new CommonNetMessageHandler<>();
+            chatMessageHandler.registerObserver(ServerChatComponent.get());
+            change.getValueAdded().register(ChatMessage.class, chatMessageHandler);
 
-        CommonNetMessageHandler<WorldMessage> worldMessageCommonNetMessageHandler = new CommonNetMessageHandler<>();
-        worldMessageCommonNetMessageHandler.registerObserver(GameWorldComponent.get());
-        change.getValueAdded().register(WorldMessage.class, worldMessageCommonNetMessageHandler);
+            CommonNetMessageHandler<WorldMessage> worldMessageCommonNetMessageHandler = new CommonNetMessageHandler<>();
+            worldMessageCommonNetMessageHandler.registerObserver(GameWorldComponent.get());
+            change.getValueAdded().register(WorldMessage.class, worldMessageCommonNetMessageHandler);
+        }
     };
 
     @Override
     public void onNewMessageForClient(ClientId receiverClientId, NetMessage message) {
         clientsHolder.get(receiverClientId).send(message);
+    }
+
+    @Override
+    public void onNetworkEvent(NetManager netManager, ClientId clientId, String event) {
+        if (event.equals("LOGOUT")) {
+            log.info("Logout from Client with ID: " + clientId);
+            clientsHolder.remove(clientId);
+            clientManager.removeClient(clientId);
+        }
     }
 }
