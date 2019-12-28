@@ -10,11 +10,9 @@ import java.net.InetAddress;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-public class ClientNetManager implements NetMessageObserver<LoginMessage> {
+public class ClientNetManager {
     private static Logger log = LogManager.getLogger();
     private static ClientNetManager INSTANCE = null;
-
-    private ClientId clientId;
 
     private ExecutorService netManagerThreadPool = Executors.newFixedThreadPool(2);
     private NetManager netManger;
@@ -44,12 +42,11 @@ public class ClientNetManager implements NetMessageObserver<LoginMessage> {
         netManger.register(messageType, netMessageHandler);
     }
 
-    public ClientId getClientId() {
-        return clientId;
+    public <T extends NetMessage> void registerHandler(Class<T> messageType) {
+        netManger.register(messageType, new CommonNetMessageHandler<T>());
     }
 
-    @Override
-    public void onNewMessage(LoginMessage loginMessage) {
-        this.clientId = loginMessage.getClientId();
+    public <T extends NetMessage> NetMessageHandler<T> getHandlerFor(Class<T> messageType) {
+        return netManger.getRegisteredHandler(messageType);
     }
 }

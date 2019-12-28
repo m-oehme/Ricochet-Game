@@ -5,7 +5,7 @@ import java.io.Serializable;
 public class ObjectId implements Comparable<ObjectId>, Serializable {
     private String objectId;
 
-    public ObjectId(GameObjectData o) {
+    public ObjectId(SGameObject o) {
         objectId = Integer.toHexString(o.hashCode()) + Long.toHexString((long) (Math.random() * Long.MAX_VALUE));
     }
 

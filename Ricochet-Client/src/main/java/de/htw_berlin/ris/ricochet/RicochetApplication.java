@@ -5,6 +5,9 @@ import de.htw_berlin.ris.ricochet.net.manager.ClientId;
 import de.htw_berlin.ris.ricochet.net.manager.ClientNetManager;
 import de.htw_berlin.ris.ricochet.net.message.general.ChatMessage;
 import de.htw_berlin.ris.ricochet.net.message.general.LoginMessage;
+import de.htw_berlin.ris.ricochet.net.message.world.ObjectCreateMessage;
+import de.htw_berlin.ris.ricochet.net.message.world.ObjectDestroyMessage;
+import de.htw_berlin.ris.ricochet.net.message.world.ObjectMoveMessage;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -19,40 +22,39 @@ public class RicochetApplication {
     }
     public static RicochetApplication initialize(InetAddress serverAddress, int serverPort) {
         if( INSTANCE == null ) {
-            INSTANCE = new RicochetApplication(serverAddress, serverPort);
+            INSTANCE = new RicochetApplication();
         }
+        INSTANCE.onInitialize(serverAddress, serverPort);
         INSTANCE.onStarted();
         return INSTANCE;
     }
 
     private ClientId clientId = null;
 
-    public RicochetApplication(InetAddress serverAddress, int serverPort) {
-        onInitialize(serverAddress, serverPort);
-    }
+    private RicochetApplication() { }
 
     private void onInitialize(InetAddress serverAddress, int serverPort) {
         ClientNetManager.create(serverAddress, serverPort);
+        log.info("Socket connection initialized");
 
-        CommonNetMessageHandler<LoginMessage> loginMessageHandler = new CommonNetMessageHandler<>();
-        loginMessageHandler.registerObserver(ClientNetManager.get()).registerObserver(loginObserver);
-
-        CommonNetMessageHandler<ChatMessage> chatMessageHandler = new CommonNetMessageHandler<>();
-        chatMessageHandler.registerObserver(chatMessageObserver);
-
-        ClientNetManager.get().registerHandler(ChatMessage.class, chatMessageHandler);
-        ClientNetManager.get().registerHandler(LoginMessage.class, loginMessageHandler);
+        setUpMessageHandler();
+        ClientNetManager.get().getHandlerFor(LoginMessage.class).registerObserver(loginObserver);
 
         RicochetGameGUI.get().init();
+        log.info("GUI initialized");
     }
 
     private void onStarted() {
+        ClientNetManager.get().getHandlerFor(ChatMessage.class).registerObserver(chatMessageObserver);
+
+        log.info("GUI starting");
         RicochetGameGUI.get().Run();
     }
 
     private NetMessageObserver<LoginMessage> loginObserver = loginMessage -> {
         clientId = loginMessage.getClientId();
 
+        log.info("Login on server successful");
         log.debug("Received ID from Server: " + clientId);
     };
 
@@ -62,5 +64,16 @@ public class RicochetApplication {
 
     public ClientId getClientId() {
         return clientId;
+    }
+
+    private void setUpMessageHandler() {
+        ClientNetManager.get().registerHandler(LoginMessage.class);
+        ClientNetManager.get().registerHandler(ChatMessage.class);
+
+        ClientNetManager.get().registerHandler(ObjectCreateMessage.class);
+        ClientNetManager.get().registerHandler(ObjectDestroyMessage.class);
+        ClientNetManager.get().registerHandler(ObjectMoveMessage.class);
+
+        log.debug("SetUp and Registered Network Message Handlers");
     }
 }

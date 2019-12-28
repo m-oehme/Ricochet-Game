@@ -4,6 +4,7 @@ import de.htw_berlin.ris.ricochet.client.ClientManager;
 import de.htw_berlin.ris.ricochet.net.handler.NetMessageObserver;
 import de.htw_berlin.ris.ricochet.net.message.world.*;
 import de.htw_berlin.ris.ricochet.objects.ObjectId;
+import de.htw_berlin.ris.ricochet.objects.SGameObject;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -38,11 +39,11 @@ public class GameWorldComponent implements Runnable, NetMessageObserver<WorldMes
                 WorldMessage msg = worldMessageQueue.take();
 
                 if (msg instanceof ObjectCreateMessage) {
-                    onNewCreatedMessage((ObjectCreateMessage) msg);
+                    onCreateObject((ObjectCreateMessage) msg);
                 } else if (msg instanceof ObjectMoveMessage) {
-                    onNewMoveMessage((ObjectMoveMessage) msg);
+                    onMoveObject((ObjectMoveMessage) msg);
                 } else if (msg instanceof ObjectDestroyMessage) {
-                    onNewDestroyMessage((ObjectDestroyMessage) msg);
+                    onDestroyObject((ObjectDestroyMessage) msg);
                 }
             } catch (InterruptedException e) {
                 e.printStackTrace();
@@ -56,24 +57,27 @@ public class GameWorldComponent implements Runnable, NetMessageObserver<WorldMes
         worldMessageQueue.offer(message);
     }
 
-    private void onNewCreatedMessage(ObjectCreateMessage objectCreateMessage) {
+    private void onCreateObject(ObjectCreateMessage objectCreateMessage) {
 
-        ObjectId objectId = gameWorld.addGameObject(objectCreateMessage.getGameObjectData());
+        SGameObject sGameObject = objectCreateMessage.getSGameObject();
+
+        ObjectId objectId = gameWorld.addGameObject(sGameObject);
         objectCreateMessage.setObjectId(objectId);
 
         clientManager.sendMessageToClients(objectCreateMessage);
 
-        log.debug(String.format("New Object: %s", objectId));
+        log.debug("New Object - Type: " + sGameObject.getClass().getSimpleName() + " ID: " + objectId);
+        log.debug("New Object - Position: " + sGameObject.getPosition());
     }
 
-    private void onNewMoveMessage(ObjectMoveMessage objectMoveMessage) {
+    private void onMoveObject(ObjectMoveMessage objectMoveMessage) {
         gameWorld.updateGameObjectPosition(objectMoveMessage.getObjectId(), objectMoveMessage.getPosition());
 
         clientManager.sendMessageToClients(objectMoveMessage);
         log.debug(String.format("Object Moved: %s", objectMoveMessage.getObjectId()));
     }
 
-    private void onNewDestroyMessage(ObjectDestroyMessage objectDestroyMessage) {
+    private void onDestroyObject(ObjectDestroyMessage objectDestroyMessage) {
         gameWorld.removeGameObject(objectDestroyMessage.getObjectId());
 
         clientManager.sendMessageToClients(objectDestroyMessage);

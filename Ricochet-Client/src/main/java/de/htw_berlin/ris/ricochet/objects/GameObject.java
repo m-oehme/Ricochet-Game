@@ -14,6 +14,7 @@ import static org.lwjgl.opengl.GL11.*;
 import static org.lwjgl.opengl.GL11.glRectf;
 
 public class GameObject {
+    private ObjectId objectId = null;
     private BodyDef bodyDef;
     public Body body;
     private FixtureDef bodyFixture;
@@ -115,5 +116,12 @@ public class GameObject {
 
     }
 
+    public ObjectId getObjectId() {
+        return objectId;
+    }
+
+    public void setObjectId(ObjectId objectId) {
+        this.objectId = objectId;
+    }
 
 }

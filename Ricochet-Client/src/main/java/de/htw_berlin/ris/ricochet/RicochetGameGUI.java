@@ -3,13 +3,18 @@ package de.htw_berlin.ris.ricochet;
 import de.htw_berlin.ris.ricochet.Entities.ContactListener;
 import de.htw_berlin.ris.ricochet.Entities.GameWorld;
 import de.htw_berlin.ris.ricochet.Entities.Scene;
+import de.htw_berlin.ris.ricochet.net.handler.NetMessageObserver;
+import de.htw_berlin.ris.ricochet.net.manager.ClientNetManager;
+import de.htw_berlin.ris.ricochet.net.message.world.ObjectCreateMessage;
 import de.htw_berlin.ris.ricochet.objects.GameObject;
 import de.htw_berlin.ris.ricochet.objects.Player;
+import de.htw_berlin.ris.ricochet.objects.SPlayer;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.jbox2d.common.Vec2;
 import org.jbox2d.dynamics.BodyType;
 import org.lwjgl.LWJGLException;
 import org.lwjgl.input.Keyboard;
-import org.lwjgl.input.Mouse;
 import org.lwjgl.opengl.Display;
 import org.lwjgl.opengl.DisplayMode;
 
@@ -21,6 +26,7 @@ import static org.lwjgl.opengl.GL11.*;
  */
 
 public class RicochetGameGUI {
+    private static Logger log = LogManager.getLogger();
 
     private static RicochetGameGUI INSTANCE = null;
     public static RicochetGameGUI get() {
@@ -47,7 +53,9 @@ public class RicochetGameGUI {
 
     private void input() {
         // TODO make this nice pls
-        GameWorld.Instance.getPlayer().handleInput();
+        if (GameWorld.Instance.getPlayer() != null) {
+            GameWorld.Instance.getPlayer().handleInput();
+        }
     }
 
 
@@ -80,20 +88,34 @@ public class RicochetGameGUI {
 
     }
 
+    void setUpNetworking() {
+        ClientNetManager.get().getHandlerFor(ObjectCreateMessage.class).registerObserver(objectCreateObserver);
+    }
+
     void setUpObjects() {
 
-        Vec2 playerPos = new Vec2(GameWorld.covertedSize.x/2,  GameWorld.covertedSize.y/2);
-        //Vec2 playerPos = new Vec2(21,  7.5f);
-        Player playerObject = new Player(playerPos, 0.5f, 0.5f, BodyType.DYNAMIC);
-
-        GameWorld.Instance.setPlayer(playerObject);
         GameObject lowerWall = new GameObject(new Vec2(0,0), GameWorld.covertedSize.x+1, GameWorld.covertedSize.y/30,BodyType.STATIC, 1f, 0.5f);
         GameObject topWall = new GameObject(new Vec2(0,GameWorld.covertedSize.y), GameWorld.covertedSize.x+1, GameWorld.covertedSize.y/30,BodyType.STATIC, 1f, 0.5f);
         GameObject leftWall = new GameObject(new Vec2(0,0), GameWorld.covertedSize.x/30, GameWorld.covertedSize.y,BodyType.STATIC, 1f, 0.5f);
-        //GameObject rightWall = new GameObject(new Vec2(1.01f,0), GameWorld.covertedSize.x/30, (WINDOW_DIMENSIONS[1]/30),BodyType.STATIC, 1f, 0.5f);
+//        GameObject rightWall = new GameObject(new Vec2(1.01f,0), GameWorld.covertedSize.x/30, (WINDOW_DIMENSIONS[1]/30),BodyType.STATIC, 1f, 0.5f);
 
-
+        Vec2 playerPos = new Vec2(GameWorld.covertedSize.x/2,  GameWorld.covertedSize.y/2);
+        ClientNetManager.get().sentMessage(new ObjectCreateMessage(RicochetApplication.get().getClientId(), null, new SPlayer(playerPos)));
     }
+
+    private NetMessageObserver<ObjectCreateMessage> objectCreateObserver = objectCreateMessage -> {
+        log.debug("Object Create - Type: " + objectCreateMessage.getSGameObject().getClass().getSimpleName() + " ID: " + objectCreateMessage.getObjectId());
+
+        if (objectCreateMessage.getSGameObject() instanceof SPlayer) {
+
+            //Vec2 playerPos = new Vec2(21,  7.5f);
+            Player playerObject = new Player(objectCreateMessage.getSGameObject().getPosition(), 0.5f, 0.5f, BodyType.DYNAMIC);
+            playerObject.setObjectId(objectCreateMessage.getObjectId());
+
+            GameWorld.Instance.setPlayer(playerObject);
+        }
+
+    };
 
     private void renderUpdate() {
         Display.update();
@@ -136,6 +158,7 @@ public class RicochetGameGUI {
     public void init(){
         setUpDisplay();
         setUpWorld();
+        setUpNetworking();
         setUpObjects();
         setUpMatrices();
         setUpListeners();

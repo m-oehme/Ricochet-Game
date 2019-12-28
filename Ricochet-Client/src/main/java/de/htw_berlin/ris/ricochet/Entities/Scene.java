@@ -4,8 +4,11 @@ import de.htw_berlin.ris.ricochet.objects.GameObject;
 import org.jbox2d.common.Vec2;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentSkipListSet;
 
 public class Scene {
     private  int ID;
@@ -14,7 +17,7 @@ public class Scene {
 
     public Scene(int ID, Vec2 location) {
         this.ID = ID;
-        sceneObjects = new HashSet<GameObject>();
+        sceneObjects = Collections.newSetFromMap(new ConcurrentHashMap<>());
 
         this.location = location;
     }
@@ -27,7 +30,7 @@ public class Scene {
         this.ID = ID;
     }
 
-    public Set<GameObject> getSceneObjects() {
+    public synchronized Set<GameObject> getSceneObjects() {
         return sceneObjects;
     }
 
