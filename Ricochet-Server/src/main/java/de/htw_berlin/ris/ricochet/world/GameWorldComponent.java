@@ -2,13 +2,17 @@ package de.htw_berlin.ris.ricochet.world;
 
 import de.htw_berlin.ris.ricochet.client.ClientManager;
 import de.htw_berlin.ris.ricochet.net.handler.NetMessageObserver;
+import de.htw_berlin.ris.ricochet.net.manager.ClientId;
 import de.htw_berlin.ris.ricochet.net.message.world.*;
 import de.htw_berlin.ris.ricochet.objects.ObjectId;
 import de.htw_berlin.ris.ricochet.objects.SGameObject;
+import de.htw_berlin.ris.ricochet.objects.SPlayer;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-
+import java.util.HashMap;
+import java.util.Map;
 import java.util.concurrent.LinkedBlockingQueue;
+import java.util.stream.Collectors;
 
 public class GameWorldComponent implements Runnable, NetMessageObserver<WorldMessage> {
     private static Logger log = LogManager.getLogger();
@@ -61,7 +65,13 @@ public class GameWorldComponent implements Runnable, NetMessageObserver<WorldMes
 
     private void onRequestWorld(WorldRequestMessage worldRequestMessage) {
 
-        worldRequestMessage.setGameObjectList(gameWorld.getDynamicGameObjects());
+        Map<ObjectId, SPlayer> playerMap = gameWorld.getPlayerObjects().entrySet().stream()
+                .filter(map -> !worldRequestMessage.getClientId().equals(map.getValue().getClientId()))
+                .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
+
+        HashMap<ObjectId, SGameObject> gameObjects = new HashMap<>(gameWorld.getDynamicGameObjects());
+        gameObjects.putAll(playerMap);
+        worldRequestMessage.setGameObjectList(gameObjects);
         clientManager.sendMessageToClients(worldRequestMessage);
     }
 
@@ -86,9 +96,13 @@ public class GameWorldComponent implements Runnable, NetMessageObserver<WorldMes
     }
 
     private void onDestroyObject(ObjectDestroyMessage objectDestroyMessage) {
-        gameWorld.removeGameObject(objectDestroyMessage.getObjectId());
+        gameWorld.removeDynamicGameObject(objectDestroyMessage.getObjectId());
 
         clientManager.sendMessageToClients(objectDestroyMessage);
         log.debug(String.format("Object Destroyed: %s", objectDestroyMessage.getObjectId()));
+    }
+
+    public void removeAllObjectsForPlayer(ClientId clientId) {
+        gameWorld.removePlayerObject(clientId);
     }
 }

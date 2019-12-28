@@ -100,6 +100,8 @@ public class ServerNetComponent implements ClientNetUpdate, NetworkEvent {
             log.info("Logout from Client with ID: " + clientId);
             clientsHolder.remove(clientId);
             clientManager.removeClient(clientId);
+
+            GameWorldComponent.get().removeAllObjectsForPlayer(clientId);
         }
     }
 }

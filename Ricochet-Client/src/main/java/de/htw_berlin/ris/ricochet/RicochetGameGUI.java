@@ -100,7 +100,7 @@ public class RicochetGameGUI {
 //        GameObject rightWall = new GameObject(new Vec2(1.01f,0), GameWorld.covertedSize.x/30, (WINDOW_DIMENSIONS[1]/30),BodyType.STATIC, 1f, 0.5f);
 
         Vec2 playerPos = new Vec2(GameWorld.covertedSize.x/2,  GameWorld.covertedSize.y/2);
-        ClientNetManager.get().sentMessage(new ObjectCreateMessage(ClientNetManager.get().getClientId(), null, new SPlayer(playerPos)));
+        ClientNetManager.get().sentMessage(new ObjectCreateMessage(ClientNetManager.get().getClientId(), null, new SPlayer(ClientNetManager.get().getClientId(), playerPos)));
     }
 
     private NetMessageObserver<ObjectCreateMessage> objectCreateObserver = objectCreateMessage -> {
