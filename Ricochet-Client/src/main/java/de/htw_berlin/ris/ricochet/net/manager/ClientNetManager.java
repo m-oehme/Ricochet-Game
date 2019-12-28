@@ -17,9 +17,15 @@ public class ClientNetManager {
     private ExecutorService netManagerThreadPool = Executors.newFixedThreadPool(2);
     private NetManager netManger;
 
-    private ClientNetManager(InetAddress serverAddress, int serverPort) {
+    private ClientId clientId = null;
 
+    private ClientNetManager(InetAddress serverAddress, int serverPort) {
         netManger = new NetManager(serverAddress, serverPort);
+
+        CommonNetMessageHandler<LoginMessage> loginMessageCommonNetMessageHandler = new CommonNetMessageHandler<LoginMessage>();
+        loginMessageCommonNetMessageHandler.registerObserver(loginObserver);
+        netManger.register(LoginMessage.class, loginMessageCommonNetMessageHandler);
+
         netManagerThreadPool.execute(netManger);
     }
 
@@ -49,4 +55,15 @@ public class ClientNetManager {
     public <T extends NetMessage> NetMessageHandler<T> getHandlerFor(Class<T> messageType) {
         return netManger.getRegisteredHandler(messageType);
     }
+
+    public ClientId getClientId() {
+        return clientId;
+    }
+
+    private NetMessageObserver<LoginMessage> loginObserver = loginMessage -> {
+        clientId = loginMessage.getClientId();
+
+        log.info("Login on server successful");
+        log.debug("Received ID from Server: " + clientId);
+    };
 }

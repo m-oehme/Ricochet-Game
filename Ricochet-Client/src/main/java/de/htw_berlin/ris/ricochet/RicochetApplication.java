@@ -29,8 +29,6 @@ public class RicochetApplication {
         return INSTANCE;
     }
 
-    private ClientId clientId = null;
-
     private RicochetApplication() { }
 
     private void onInitialize(InetAddress serverAddress, int serverPort) {
@@ -38,7 +36,6 @@ public class RicochetApplication {
         log.info("Socket connection initialized");
 
         setUpMessageHandler();
-        ClientNetManager.get().getHandlerFor(LoginMessage.class).registerObserver(loginObserver);
 
         RicochetGameGUI.get().init();
         log.info("GUI initialized");
@@ -51,23 +48,11 @@ public class RicochetApplication {
         RicochetGameGUI.get().Run();
     }
 
-    private NetMessageObserver<LoginMessage> loginObserver = loginMessage -> {
-        clientId = loginMessage.getClientId();
-
-        log.info("Login on server successful");
-        log.debug("Received ID from Server: " + clientId);
-    };
-
     private NetMessageObserver<ChatMessage> chatMessageObserver = chatMessage -> {
         System.out.println("Chat: " + chatMessage.getChatUsername() + " :: " + chatMessage.getChatMessage());
     };
 
-    public ClientId getClientId() {
-        return clientId;
-    }
-
     private void setUpMessageHandler() {
-        ClientNetManager.get().registerHandler(LoginMessage.class);
         ClientNetManager.get().registerHandler(ChatMessage.class);
 
         ClientNetManager.get().registerHandler(ObjectCreateMessage.class);
