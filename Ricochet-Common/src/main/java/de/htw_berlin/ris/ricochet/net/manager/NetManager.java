@@ -100,7 +100,7 @@ public class NetManager implements Runnable {
         } catch (IOException e) {
             log.error("Cannot close socket: " + e.getMessage(), e);
         }
-        networkEvent.onNetworkEvent(this, clientId, "LOGOUT");
+        if (networkEvent != null) networkEvent.onNetworkEvent(this, clientId, "LOGOUT");
     }
 
     public void setNetworkEvent(NetworkEvent networkEvent) {
