@@ -85,7 +85,7 @@ public class Player extends GameObject {
             GameWorld.Instance.switchScene(GameWorld.switchDirection.DOWN);
         }
 
-//        ClientNetManager.get().sentMessage(new ObjectMoveMessage(ClientNetManager.get().getClientId(), this.getObjectId(), playerPosition));
+        ClientNetManager.get().sentMessage(new ObjectMoveMessage(ClientNetManager.get().getClientId(), this.getObjectId(), playerPosition));
     }
 
 

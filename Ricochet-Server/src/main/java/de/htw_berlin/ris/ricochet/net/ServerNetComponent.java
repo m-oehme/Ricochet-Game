@@ -91,7 +91,10 @@ public class ServerNetComponent implements ClientNetUpdate, NetworkEvent {
 
     @Override
     public void onNewMessageForClient(ClientId receiverClientId, NetMessage message) {
-        clientsHolder.get(receiverClientId).send(message);
+        NetManager netManager = clientsHolder.get(receiverClientId);
+        if (netManager != null){
+            netManager.send(message);
+        }
     }
 
     @Override

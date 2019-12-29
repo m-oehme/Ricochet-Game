@@ -20,7 +20,7 @@ public class NetManager implements Runnable {
     private ClientId clientId;
 
     private Socket socket;
-    private ObjectOutputStream outputStream;
+    private volatile ObjectOutputStream outputStream;
 
     private ExecutorService netManagerThreadPool = Executors.newFixedThreadPool(2);
     private ExecutorService messageHandlerThreadPool = Executors.newCachedThreadPool();
@@ -57,8 +57,10 @@ public class NetManager implements Runnable {
 
     @Override
     public void run() {
-        netManagerThreadPool.execute(receivedMessageQuery);
-        netManagerThreadPool.execute(networkReceiver);
+        if (receivedMessageQuery != null && networkReceiver != null) {
+            netManagerThreadPool.execute(receivedMessageQuery);
+            netManagerThreadPool.execute(networkReceiver);
+        }
     }
 
     public void stopServer() {
@@ -82,16 +84,22 @@ public class NetManager implements Runnable {
         return messageHandlerHolder.get(netMessageClass);
     }
 
-    public void send(NetMessage netMessage) {
+    public synchronized void send(NetMessage netMessage) {
         try {
-            outputStream.writeObject(netMessage);
-        } catch (IOException e) {
+            if (!socket.isClosed()) outputStream.writeObject(netMessage);
+        } catch (IOException | NullPointerException e) {
             log.error("Cannot sent message: " + e.getMessage(), e);
         }
     }
 
     private void notifyConnectionBroken() {
-        stopServer();
+        try {
+            outputStream.close();
+            stopServer();
+            socket.close();
+        } catch (IOException e) {
+            log.error("Cannot close socket: " + e.getMessage(), e);
+        }
         networkEvent.onNetworkEvent(this, clientId, "LOGOUT");
     }
 
@@ -103,7 +111,7 @@ public class NetManager implements Runnable {
         private boolean isRunning = true;
 
         private Socket receiverSocket;
-        private ObjectInputStream inputStream;
+        private volatile ObjectInputStream inputStream;
 
         public NetworkReceiver(Socket receiverSocket, ObjectInputStream inputStream) {
             this.receiverSocket = receiverSocket;
@@ -116,9 +124,9 @@ public class NetManager implements Runnable {
                 while (isRunning) {
                     waitForMessage();
                 }
-            } catch (EOFException e) {
+            } catch (IOException e) {
                 notifyConnectionBroken();
-            } catch (IOException | ClassNotFoundException e) {
+            } catch (ClassNotFoundException e) {
                 e.printStackTrace();
             }
         }
@@ -145,6 +153,11 @@ public class NetManager implements Runnable {
         }
 
         public void stop() {
+            try {
+                inputStream.close();
+            } catch (IOException e) {
+                log.error("Cannot close InputStream: " + e.getMessage(), e);
+            }
             isRunning = false;
         }
     }

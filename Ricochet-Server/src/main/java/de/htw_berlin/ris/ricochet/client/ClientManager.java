@@ -7,12 +7,15 @@ import org.apache.logging.log4j.Logger;
 
 import java.net.InetAddress;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
+import java.util.Vector;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 public class ClientManager {
     private static Logger log = LogManager.getLogger();
 
-    private List<ClientId> clientList = new ArrayList<>();
+    private volatile List<ClientId> clientList = new CopyOnWriteArrayList<>();
 
     private ClientNetUpdate clientNetUpdate;
 
@@ -48,14 +51,14 @@ public class ClientManager {
                 });
                 break;
             case EXCEPT_SELF:
-                clientList.stream().filter(clientId -> !clientId.getClientId().equals(message.getClientId().getClientId())).forEach(clientId -> {
-                    clientNetUpdate.onNewMessageForClient(clientId, message);
-                });
+                clientList.stream()
+                        .filter(clientId -> !clientId.equals(message.getClientId()))
+                        .forEach(clientId -> clientNetUpdate.onNewMessageForClient(clientId, message));
                 break;
             case CLIENT:
-                receiverClients.stream().filter(receiver -> clientList.contains(receiver)).forEach(clientId -> {
-                    clientNetUpdate.onNewMessageForClient(clientId, message);
-                });
+                receiverClients.stream()
+                        .filter(receiver -> clientList.contains(receiver))
+                        .forEach(clientId -> clientNetUpdate.onNewMessageForClient(clientId, message));
                 break;
         }
 

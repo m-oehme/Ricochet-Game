@@ -92,17 +92,18 @@ public class GameWorldComponent implements Runnable, NetMessageObserver<WorldMes
         gameWorld.updateGameObjectPosition(objectMoveMessage.getObjectId(), objectMoveMessage.getPosition());
 
         clientManager.sendMessageToClients(objectMoveMessage);
-        log.debug(String.format("Object Moved: %s", objectMoveMessage.getObjectId() + "Position: " + objectMoveMessage.getPosition()));
     }
 
     private void onDestroyObject(ObjectDestroyMessage objectDestroyMessage) {
-        gameWorld.removeDynamicGameObject(objectDestroyMessage.getObjectId());
+        gameWorld.removeGameObject(objectDestroyMessage.getObjectId());
 
         clientManager.sendMessageToClients(objectDestroyMessage);
         log.debug(String.format("Object Destroyed: %s", objectDestroyMessage.getObjectId()));
     }
 
     public void removeAllObjectsForPlayer(ClientId clientId) {
-        gameWorld.removePlayerObject(clientId);
+        ObjectId objectId = gameWorld.removePlayerObject(clientId);
+
+        clientManager.sendMessageToClients(new ObjectDestroyMessage(clientId, objectId));
     }
 }

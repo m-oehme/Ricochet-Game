@@ -6,6 +6,9 @@ import de.htw_berlin.ris.ricochet.Entities.Scene;
 import de.htw_berlin.ris.ricochet.net.handler.NetMessageObserver;
 import de.htw_berlin.ris.ricochet.net.manager.ClientNetManager;
 import de.htw_berlin.ris.ricochet.net.message.world.ObjectCreateMessage;
+import de.htw_berlin.ris.ricochet.net.message.world.ObjectDestroyMessage;
+import de.htw_berlin.ris.ricochet.net.message.world.ObjectMoveMessage;
+import de.htw_berlin.ris.ricochet.net.message.world.WorldRequestMessage;
 import de.htw_berlin.ris.ricochet.objects.GameObject;
 import de.htw_berlin.ris.ricochet.objects.Player;
 import de.htw_berlin.ris.ricochet.objects.SPlayer;
@@ -90,6 +93,9 @@ public class RicochetGameGUI {
 
     void setUpNetworking() {
         ClientNetManager.get().getHandlerFor(ObjectCreateMessage.class).registerObserver(objectCreateObserver);
+        ClientNetManager.get().getHandlerFor(WorldRequestMessage.class).registerObserver(worldRequestMessageObserver);
+        ClientNetManager.get().getHandlerFor(ObjectMoveMessage.class).registerObserver(objectMoveObserver);
+        ClientNetManager.get().getHandlerFor(ObjectDestroyMessage.class).registerObserver(objectDestroyObserver);
     }
 
     void setUpObjects() {
@@ -103,18 +109,50 @@ public class RicochetGameGUI {
         ClientNetManager.get().sentMessage(new ObjectCreateMessage(ClientNetManager.get().getClientId(), null, new SPlayer(ClientNetManager.get().getClientId(), playerPos)));
     }
 
+    private NetMessageObserver<WorldRequestMessage> worldRequestMessageObserver = worldRequestMessage -> {
+        log.debug("Received: " + worldRequestMessage.getGameObjectList().toString());
+
+        worldRequestMessage.getGameObjectList().forEach((objectId, sGameObject) -> {
+            if (sGameObject instanceof SPlayer) {
+                GameObject playerObject = new GameObject(sGameObject.getPosition(), 0.5f, 0.5f, BodyType.DYNAMIC);
+                playerObject.setObjectId(objectId);
+            }
+        });
+    };
+
+    private NetMessageObserver<ObjectMoveMessage> objectMoveObserver = objectMoveMessage -> {
+        GameWorld.Instance.getCurrentScene().getSceneObjects().stream()
+                .filter(gameObject -> gameObject.getObjectId() != null)
+                .filter(gameObject -> gameObject.getObjectId().equals(objectMoveMessage.getObjectId()))
+                .findFirst()
+                .ifPresent(gameObject -> {
+//                        TODO Moving the objects
+                    gameObject.body.getPosition().set(objectMoveMessage.getPosition());
+                });
+    };
+
     private NetMessageObserver<ObjectCreateMessage> objectCreateObserver = objectCreateMessage -> {
         log.debug("Object Create - Type: " + objectCreateMessage.getSGameObject().getClass().getSimpleName() + " ID: " + objectCreateMessage.getObjectId());
 
         if (objectCreateMessage.getSGameObject() instanceof SPlayer) {
+            if (GameWorld.Instance.getPlayer() == null) {
+                Player playerObject = new Player(objectCreateMessage.getSGameObject().getPosition(), 0.5f, 0.5f, BodyType.DYNAMIC);
+                playerObject.setObjectId(objectCreateMessage.getObjectId());
 
-            //Vec2 playerPos = new Vec2(21,  7.5f);
-            Player playerObject = new Player(objectCreateMessage.getSGameObject().getPosition(), 0.5f, 0.5f, BodyType.DYNAMIC);
-            playerObject.setObjectId(objectCreateMessage.getObjectId());
-
-            GameWorld.Instance.setPlayer(playerObject);
+                GameWorld.Instance.setPlayer(playerObject);
+            } else {
+                GameObject playerObject = new GameObject(objectCreateMessage.getSGameObject().getPosition(), 0.5f, 0.5f, BodyType.DYNAMIC);
+                playerObject.setObjectId(objectCreateMessage.getObjectId());
+            }
         }
+    };
 
+    private NetMessageObserver<ObjectDestroyMessage> objectDestroyObserver = objectDestroyMessage -> {
+        GameWorld.Instance.getCurrentScene().getSceneObjects().stream()
+                .filter(gameObject -> gameObject.getObjectId() != null)
+                .filter(gameObject -> gameObject.getObjectId().equals(objectDestroyMessage.getObjectId()))
+                .findFirst()
+                .ifPresent(GameObject::Destroy);
     };
 
     private void renderUpdate() {

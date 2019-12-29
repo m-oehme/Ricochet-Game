@@ -1,6 +1,9 @@
 package de.htw_berlin.ris.ricochet.objects;
 
+import de.htw_berlin.ris.ricochet.net.manager.ClientId;
+
 import java.io.Serializable;
+import java.util.Objects;
 
 public class ObjectId implements Comparable<ObjectId>, Serializable {
     private String objectId;
@@ -21,5 +24,18 @@ public class ObjectId implements Comparable<ObjectId>, Serializable {
     @Override
     public String toString() {
         return objectId;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (o instanceof ObjectId) {
+            return this.objectId.equals(((ObjectId) o).getObjectId());
+        }
+        return false;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(objectId);
     }
 }
