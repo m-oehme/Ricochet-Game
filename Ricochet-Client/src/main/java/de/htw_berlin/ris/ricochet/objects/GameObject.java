@@ -15,6 +15,7 @@ import static org.lwjgl.opengl.GL11.*;
 import static org.lwjgl.opengl.GL11.glRectf;
 
 public class GameObject {
+    public String name;
     private BodyDef bodyDef;
     public Body body;
     private FixtureDef bodyFixture;
@@ -24,15 +25,13 @@ public class GameObject {
     public java.awt.Color objectColor;
     protected GameObject colObj;
 
-    // TODO DO STUFF THAT LETS ME FLAG WETHER OR NOT TO ADD AS BODY, AND ADD FUNCTION THAT ENABLES REINSTATING PHYSICAL PROPERTIES!!!
 
-    public static GameObject Wall(Vec2 position, boolean horizontal, Scene whichScene){
+
+    public static GameObject FullWall(Vec2 position, boolean horizontal, Scene whichScene){
        GameObject Wall =  new GameObject(position, (horizontal) ? GameWorld.covertedSize.x+1 :GameWorld.covertedSize.x/30,  (horizontal) ? GameWorld.covertedSize.y/30 : GameWorld.covertedSize.y,BodyType.STATIC, 1f, 0.5f,whichScene );
        return Wall;
 
     }
-
-
 
     public GameObject(Vec2 pos, float width, float height, BodyType bodyType, Scene whichScene) {
 
@@ -107,7 +106,7 @@ public class GameObject {
 
     // Code for drawing the objects
     public void Render() {
-
+// TODO :: rethink rendering now its always 2x width & height
         float[] rgbVal = new float[4];
         if (contact) {
             Color.red.getRGBColorComponents(rgbVal);

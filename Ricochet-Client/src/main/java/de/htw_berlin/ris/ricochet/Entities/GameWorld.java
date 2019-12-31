@@ -61,6 +61,20 @@ public class GameWorld {
         return currentScene;
     }
 
+// TODO :: make generated world Method viable
+    public void generateWorld (int sizeX, int sizeY){
+
+        for (int y =-sizeY/2; y < sizeY/2;y++){
+
+            for(int x = -sizeX/2; x < sizeX/2; x++){
+
+                Scene sceneCenter = new Scene(0, new Vec2(x,y));
+                Instance.getWorldScenes().put(sceneCenter.getLocation(),sceneCenter);
+            }
+        }
+
+    }
+
 
     public void switchScene(switchDirection direction) {
 
@@ -86,7 +100,7 @@ public class GameWorld {
     }
 
     private void finalizeSceneSwitch(){
-       //Todo all new bodies to the physics world
+
         currentScene.getSceneObjects().remove(player);
          destroySceneBodies(currentScene);
         setCurrentScene(newLocation);
@@ -135,7 +149,6 @@ public class GameWorld {
             O.Render();
             glPopMatrix();
         }
-
     }
 
     public void cleanUp() {

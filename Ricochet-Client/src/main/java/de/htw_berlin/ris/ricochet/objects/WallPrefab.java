@@ -1,0 +1,86 @@
+package de.htw_berlin.ris.ricochet.objects;
+
+import de.htw_berlin.ris.ricochet.Entities.GameWorld;
+import de.htw_berlin.ris.ricochet.Entities.Scene;
+import javafx.geometry.Pos;
+import org.jbox2d.common.Vec2;
+import org.jbox2d.dynamics.BodyType;
+
+import static de.htw_berlin.ris.ricochet.objects.WallPrefab.PrefabType.HalfWall;
+import static de.htw_berlin.ris.ricochet.objects.WallPrefab.PrefabPosition.Left;
+
+public class WallPrefab {
+
+    private GameObject[] childObjects;
+    // public PrefabType type;
+
+    public enum PrefabType {
+        FullWall,
+        HalfWall,
+        DoorWall,
+        QuarterWall
+    }
+
+    public enum PrefabPosition{
+        Left,
+        Right,
+        Bottom,
+        Top
+    }
+
+    public WallPrefab(PrefabType type, PrefabPosition position, Scene whichScene) {
+
+
+
+
+
+        switch (type) {
+
+
+            case HalfWall:
+
+                break;
+
+            case DoorWall:
+                Vec2 Postion1 = new Vec2();
+                Vec2 Postion2 = new Vec2();
+                boolean horizontal = false;
+
+                switch (position){
+                    case Left:
+
+                        Postion1 = new Vec2 (0,(GameWorld.covertedSize.y/6));
+                        Postion2 = new Vec2 (0, (GameWorld.covertedSize.y/6)*5);
+                        break;
+
+                    case Right:
+
+                        Postion1 = new Vec2 (GameWorld.covertedSize.x,(GameWorld.covertedSize.y/6));
+                        Postion2 = new Vec2 (GameWorld.covertedSize.x, (GameWorld.covertedSize.y/6)*5);
+                        break;
+                    case Top:
+
+                        Postion1 = new Vec2 (GameWorld.covertedSize.x/6,GameWorld.covertedSize.y);
+                        Postion2 = new Vec2 (GameWorld.covertedSize.x/6*5, GameWorld.covertedSize.y);
+                        horizontal = true;
+                        break;
+
+                    case Bottom:
+                        Postion1 = new Vec2 (GameWorld.covertedSize.x/6,0);
+                        Postion2 = new Vec2 (GameWorld.covertedSize.x/6*5, 0);
+                        horizontal = true;
+                        break;
+                }
+                GameObject wallBottom =  new GameObject(Postion1, (horizontal) ? GameWorld.covertedSize.x/6 :GameWorld.covertedSize.x/30,  (horizontal) ? GameWorld.covertedSize.y/30 : GameWorld.covertedSize.y/6,BodyType.STATIC, 1f, 0.5f,whichScene );
+                GameObject wallTop =  new GameObject(Postion2, (horizontal) ? GameWorld.covertedSize.x/6:GameWorld.covertedSize.x/30,  (horizontal) ? GameWorld.covertedSize.y/30 : GameWorld.covertedSize.y/6,BodyType.STATIC, 1f, 0.5f,whichScene );
+                break;
+
+
+
+        }
+
+
+    }
+
+
+}

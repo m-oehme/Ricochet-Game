@@ -5,6 +5,7 @@ import de.htw_berlin.ris.ricochet.Entities.GameWorld;
 import de.htw_berlin.ris.ricochet.Entities.Scene;
 import de.htw_berlin.ris.ricochet.objects.GameObject;
 import de.htw_berlin.ris.ricochet.objects.Player;
+import de.htw_berlin.ris.ricochet.objects.WallPrefab;
 import org.jbox2d.common.Vec2;
 import org.jbox2d.dynamics.BodyType;
 import org.lwjgl.LWJGLException;
@@ -84,14 +85,12 @@ public class RicochetGameGUI {
         //Vec2 playerPos = new Vec2(21,  7.5f);
         Player playerObject = new Player(playerPos, 0.5f, 0.5f, BodyType.DYNAMIC, GameWorld.Instance.getCurrentScene());
         GameWorld.Instance.setPlayer(playerObject);
-        GameObject lowerWall = GameObject.Wall(new Vec2 (0,0),true, GameWorld.Instance.getCurrentScene());
-        GameObject topWall = GameObject.Wall(new Vec2(0,GameWorld.covertedSize.y), true,GameWorld.Instance.getCurrentScene());
-        GameObject leftWall = GameObject.Wall(new Vec2 (0,0), false,GameWorld.Instance.getCurrentScene());
 
-     /* GameObject lowerWall = new GameObject(new Vec2(0,0), GameWorld.covertedSize.x+1, GameWorld.covertedSize.y/30,BodyType.STATIC, 1f, 0.5f, GameWorld.Instance.getCurrentScene());
-        GameObject topWall = new GameObject(new Vec2(0,GameWorld.covertedSize.y), GameWorld.covertedSize.x+1, GameWorld.covertedSize.y/30,BodyType.STATIC, 1f, 0.5f, GameWorld.Instance.getCurrentScene());
-        GameObject leftWall = new GameObject(new Vec2(0,0), GameWorld.covertedSize.x/30, GameWorld.covertedSize.y,BodyType.STATIC, 1f, 0.5f, GameWorld.Instance.getCurrentScene());*/
-        //GameObject rightWall = new GameObject(new Vec2(1.01f,0), GameWorld.covertedSize.x/30, (WINDOW_DIMENSIONS[1]/30),BodyType.STATIC, 1f, 0.5f);
+        WallPrefab lowerWall = new WallPrefab(WallPrefab.PrefabType.DoorWall, WallPrefab.PrefabPosition.Bottom,GameWorld.Instance.getCurrentScene());
+        WallPrefab topWall = new WallPrefab(WallPrefab.PrefabType.DoorWall, WallPrefab.PrefabPosition.Top,GameWorld.Instance.getCurrentScene());
+        WallPrefab leftWall = new WallPrefab(WallPrefab.PrefabType.DoorWall, WallPrefab.PrefabPosition.Left,GameWorld.Instance.getCurrentScene());
+        WallPrefab rightWall = new WallPrefab(WallPrefab.PrefabType.DoorWall, WallPrefab.PrefabPosition.Right,GameWorld.Instance.getCurrentScene());
+
 
     }
 
