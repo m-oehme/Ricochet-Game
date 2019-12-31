@@ -1,6 +1,7 @@
 package de.htw_berlin.ris.ricochet.objects;
 
 import de.htw_berlin.ris.ricochet.Entities.GameWorld;
+import de.htw_berlin.ris.ricochet.Entities.Scene;
 import org.jbox2d.collision.shapes.PolygonShape;
 import org.jbox2d.common.Vec2;
 import org.jbox2d.dynamics.Body;
@@ -23,31 +24,18 @@ public class GameObject {
     public java.awt.Color objectColor;
     protected GameObject colObj;
 
- // TODO DO STUFF THAT LETS ME FLAG WETHER OR NOT TO ADD AS BODY, AND ADD FUNCTION THAT ENABLES REINSTATING PHYSICAL PROPERTIES!!!
-    public GameObject(Vec2 pos, float width, float height, BodyType bodyType) {
+    // TODO DO STUFF THAT LETS ME FLAG WETHER OR NOT TO ADD AS BODY, AND ADD FUNCTION THAT ENABLES REINSTATING PHYSICAL PROPERTIES!!!
 
-        bodyDef = new BodyDef();
-        bodyDef.position.set(pos.x , pos.y);
-        bodyDef.type = bodyType;
-        bodyDef.userData = this;
-        PolygonShape boxShape = new PolygonShape();
-        this.width = width;
-        this.height = height;
-        boxShape.setAsBox(width, height);
-        body = GameWorld.Instance.getPhysicsWorld().createBody(bodyDef);
-        bodyFixture = new FixtureDef();
-        bodyFixture.density = 0.1f;
-        bodyFixture.shape = boxShape;
-        body.createFixture(bodyFixture);
-        if (this instanceof Player){
-            body.setLinearDamping(0.75f);
-        }
-        contact = false;
-        objectColor = new java.awt.Color((float) Math.random(), (float) Math.random(), (float) Math.random());
-        Init();
+    public static GameObject Wall(Vec2 position, boolean horizontal, Scene whichScene){
+       GameObject Wall =  new GameObject(position, (horizontal) ? GameWorld.covertedSize.x+1 :GameWorld.covertedSize.x/30,  (horizontal) ? GameWorld.covertedSize.y/30 : GameWorld.covertedSize.y,BodyType.STATIC, 1f, 0.5f,whichScene );
+       return Wall;
+
     }
 
-    public GameObject(Vec2 pos, float width, float height, BodyType bodyType, float density, float restitution) {
+
+
+    public GameObject(Vec2 pos, float width, float height, BodyType bodyType, Scene whichScene) {
+
         bodyDef = new BodyDef();
         bodyDef.position.set(pos.x, pos.y);
         bodyDef.type = bodyType;
@@ -56,21 +44,48 @@ public class GameObject {
         this.width = width;
         this.height = height;
         boxShape.setAsBox(width, height);
-        body = GameWorld.Instance.getPhysicsWorld().createBody(bodyDef);
+        bodyFixture = new FixtureDef();
+        bodyFixture.density = 0.1f;
+        bodyFixture.shape = boxShape;
+
+        contact = false;
+        objectColor = new java.awt.Color((float) Math.random(), (float) Math.random(), (float) Math.random());
+        whichScene.getSceneObjects().add(this);
+        if (whichScene.equals(GameWorld.Instance.getCurrentScene())){
+            Init();
+        }
+
+    }
+
+    public GameObject(Vec2 pos, float width, float height, BodyType bodyType, float density, float restitution, Scene whichScene) {
+        bodyDef = new BodyDef();
+        bodyDef.position.set(pos.x, pos.y);
+        bodyDef.type = bodyType;
+        bodyDef.userData = this;
+        PolygonShape boxShape = new PolygonShape();
+        this.width = width;
+        this.height = height;
+        boxShape.setAsBox(width, height);
         bodyFixture = new FixtureDef();
         bodyFixture.density = density;
         bodyFixture.shape = boxShape;
         bodyFixture.restitution = restitution;
-        body.createFixture(bodyFixture);
         contact = false;
         objectColor = new java.awt.Color((float) Math.random(), (float) Math.random(), (float) Math.random());
-        Init();
+        whichScene.getSceneObjects().add(this);
+        if (whichScene.equals(GameWorld.Instance.getCurrentScene())){
+            Init();
+        }
     }
 
     public void Init() {
-
-        GameWorld.Instance.getCurrentScene().getSceneObjects().add(this);
+        body = GameWorld.Instance.getPhysicsWorld().createBody(bodyDef);
+        body.createFixture(bodyFixture);
+        if (this instanceof Player) {
+            body.setLinearDamping(0.75f);
+        }
     }
+
 
     // Game Logic goes here
     public void Update() {
@@ -96,7 +111,7 @@ public class GameObject {
         float[] rgbVal = new float[4];
         if (contact) {
             Color.red.getRGBColorComponents(rgbVal);
-        }  else {
+        } else {
             objectColor.getRGBColorComponents(rgbVal);
         }
 

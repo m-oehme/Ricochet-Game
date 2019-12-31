@@ -63,7 +63,6 @@ public class RicochetGameGUI {
     }
 
     void setUpListeners(){
-
         GameWorld.Instance.getPhysicsWorld().setContactListener(myListener);
         Keyboard.enableRepeatEvents(true);
     }
@@ -77,21 +76,22 @@ public class RicochetGameGUI {
         Scene sceneLeft = new Scene(-1, new Vec2 (-1,0));
         GameWorld.Instance.getWorldScenes().put(sceneLeft.getLocation(),sceneLeft);
         GameWorld.Instance.setCurrentScene(sceneCenter.getLocation());
-
     }
 
     void setUpObjects() {
 
         Vec2 playerPos = new Vec2(GameWorld.covertedSize.x/2,  GameWorld.covertedSize.y/2);
         //Vec2 playerPos = new Vec2(21,  7.5f);
-        Player playerObject = new Player(playerPos, 0.5f, 0.5f, BodyType.DYNAMIC);
-
+        Player playerObject = new Player(playerPos, 0.5f, 0.5f, BodyType.DYNAMIC, GameWorld.Instance.getCurrentScene());
         GameWorld.Instance.setPlayer(playerObject);
-        GameObject lowerWall = new GameObject(new Vec2(0,0), GameWorld.covertedSize.x+1, GameWorld.covertedSize.y/30,BodyType.STATIC, 1f, 0.5f);
-        GameObject topWall = new GameObject(new Vec2(0,GameWorld.covertedSize.y), GameWorld.covertedSize.x+1, GameWorld.covertedSize.y/30,BodyType.STATIC, 1f, 0.5f);
-        GameObject leftWall = new GameObject(new Vec2(0,0), GameWorld.covertedSize.x/30, GameWorld.covertedSize.y,BodyType.STATIC, 1f, 0.5f);
-        //GameObject rightWall = new GameObject(new Vec2(1.01f,0), GameWorld.covertedSize.x/30, (WINDOW_DIMENSIONS[1]/30),BodyType.STATIC, 1f, 0.5f);
+        GameObject lowerWall = GameObject.Wall(new Vec2 (0,0),true, GameWorld.Instance.getCurrentScene());
+        GameObject topWall = GameObject.Wall(new Vec2(0,GameWorld.covertedSize.y), true,GameWorld.Instance.getCurrentScene());
+        GameObject leftWall = GameObject.Wall(new Vec2 (0,0), false,GameWorld.Instance.getCurrentScene());
 
+     /* GameObject lowerWall = new GameObject(new Vec2(0,0), GameWorld.covertedSize.x+1, GameWorld.covertedSize.y/30,BodyType.STATIC, 1f, 0.5f, GameWorld.Instance.getCurrentScene());
+        GameObject topWall = new GameObject(new Vec2(0,GameWorld.covertedSize.y), GameWorld.covertedSize.x+1, GameWorld.covertedSize.y/30,BodyType.STATIC, 1f, 0.5f, GameWorld.Instance.getCurrentScene());
+        GameObject leftWall = new GameObject(new Vec2(0,0), GameWorld.covertedSize.x/30, GameWorld.covertedSize.y,BodyType.STATIC, 1f, 0.5f, GameWorld.Instance.getCurrentScene());*/
+        //GameObject rightWall = new GameObject(new Vec2(1.01f,0), GameWorld.covertedSize.x/30, (WINDOW_DIMENSIONS[1]/30),BodyType.STATIC, 1f, 0.5f);
 
     }
 

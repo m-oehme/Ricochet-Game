@@ -1,6 +1,7 @@
 package de.htw_berlin.ris.ricochet.objects;
 
 import de.htw_berlin.ris.ricochet.Entities.GameWorld;
+import de.htw_berlin.ris.ricochet.Entities.Scene;
 import de.htw_berlin.ris.ricochet.math.Vector2;
 import org.jbox2d.common.Vec2;
 import org.jbox2d.dynamics.BodyType;
@@ -12,8 +13,8 @@ public class Player extends GameObject {
     private int ID;
     public float speed = 1.0f;
 
-    public Player(Vec2 pos, float width, float height, BodyType bodyType) {
-        super(pos, width, height, bodyType);
+    public Player(Vec2 pos, float width, float height, BodyType bodyType, Scene scene) {
+        super(pos, width, height, bodyType,scene);
         body.setFixedRotation(true);
     }
 

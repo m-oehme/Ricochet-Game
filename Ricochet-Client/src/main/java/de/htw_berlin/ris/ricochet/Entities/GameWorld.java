@@ -39,7 +39,6 @@ public class GameWorld {
         physicsWorld = new World(new Vec2(0, 0), true);
         worldScenes = new Hashtable<>();
         covertedSize = new Vec2(WINDOW_DIMENSIONS[0] * unitConversion, WINDOW_DIMENSIONS[1] * unitConversion);
-
     }
 
     public Dictionary<Vec2, Scene> getWorldScenes() {
@@ -87,10 +86,11 @@ public class GameWorld {
     }
 
     private void finalizeSceneSwitch(){
-//Todo all new bodies to the physics world
+       //Todo all new bodies to the physics world
         currentScene.getSceneObjects().remove(player);
-        destroySceneBodies(currentScene);
+         destroySceneBodies(currentScene);
         setCurrentScene(newLocation);
+        setUpNewScene(currentScene);
         currentScene.getSceneObjects().add(player);
         player.body.setTransform(switchPos,0);
         switchScene = false;
@@ -111,8 +111,12 @@ public class GameWorld {
         }
     }
 
-    private  void setUpNewScene(){
-
+    private  void setUpNewScene(Scene scene){
+        for (GameObject G: scene.getSceneObjects()) {
+            if (!(G instanceof Player)) {
+                G.Init();
+            }
+        }
     }
 
     // TODO this is weird
