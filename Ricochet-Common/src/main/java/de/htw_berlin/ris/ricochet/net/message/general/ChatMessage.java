@@ -1,6 +1,9 @@
-package de.htw_berlin.ris.ricochet.net.message;
+package de.htw_berlin.ris.ricochet.net.message.general;
 
 import de.htw_berlin.ris.ricochet.net.manager.ClientId;
+import de.htw_berlin.ris.ricochet.net.message.MessageScope;
+import de.htw_berlin.ris.ricochet.net.message.NetMessage;
+import de.htw_berlin.ris.ricochet.net.message.ScopedMessage;
 
 public class ChatMessage extends ScopedMessage implements NetMessage {
     private String chatUsername;

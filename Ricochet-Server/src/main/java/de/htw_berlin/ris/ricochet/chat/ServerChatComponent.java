@@ -2,7 +2,7 @@ package de.htw_berlin.ris.ricochet.chat;
 
 import de.htw_berlin.ris.ricochet.client.ClientManager;
 import de.htw_berlin.ris.ricochet.net.handler.NetMessageObserver;
-import de.htw_berlin.ris.ricochet.net.message.ChatMessage;
+import de.htw_berlin.ris.ricochet.net.message.general.ChatMessage;
 import de.htw_berlin.ris.ricochet.net.message.MessageScope;
 
 import java.util.concurrent.LinkedBlockingQueue;

@@ -1,7 +1,7 @@
 package de.htw_berlin.ris.ricochet.net.manager;
 
 import de.htw_berlin.ris.ricochet.net.handler.*;
-import de.htw_berlin.ris.ricochet.net.message.LoginMessage;
+import de.htw_berlin.ris.ricochet.net.message.general.LoginMessage;
 import de.htw_berlin.ris.ricochet.net.message.NetMessage;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
