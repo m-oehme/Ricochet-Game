@@ -25,7 +25,7 @@ public class WallPrefab {
         Bottom,
         Top
     }
-
+// TODO : Add halfWall and Quaterwall
     public WallPrefab(PrefabType type, PrefabPosition position, Scene whichScene) {
         Vec2 Postion1 = new Vec2();
         Vec2 Postion2 = new Vec2();

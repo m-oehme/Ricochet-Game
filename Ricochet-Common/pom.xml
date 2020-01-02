@@ -38,5 +38,11 @@
             <artifactId>jbox2d-library</artifactId>
             <version>2.1.2.2</version>
         </dependency>
+        <dependency>
+            <groupId>org.jbox2d</groupId>
+            <artifactId>jbox2d-library</artifactId>
+            <version>2.1.2.2</version>
+            <scope>compile</scope>
+        </dependency>
     </dependencies>
 </project>

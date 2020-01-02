@@ -70,16 +70,9 @@ public class RicochetGameGUI {
 
     void setUpWorld(){
         GameWorld.Instance = new GameWorld(new Vec2(0, 0),WINDOW_DIMENSIONS);
-       /* Scene sceneCenter = new Scene(0, new Vec2(0,0));
-        GameWorld.Instance.getWorldScenes().put(sceneCenter.getLocation(),sceneCenter);
-        Scene sceneRight = new Scene(1, new Vec2 (1,0));
-        GameWorld.Instance.getWorldScenes().put(sceneRight.getLocation(),sceneRight);
-        Scene sceneLeft = new Scene(-1, new Vec2 (-1,0));
-        GameWorld.Instance.getWorldScenes().put(sceneLeft.getLocation(),sceneLeft);*/
         GameWorld.Instance.generateWorld(4,4);
         GameWorld.Instance.setCurrentScene(new Vec2(0,0));
         GameWorld.Instance.getCurrentScene().init();
-
 
 
     }
@@ -87,15 +80,8 @@ public class RicochetGameGUI {
     void setUpObjects() {
 
         Vec2 playerPos = new Vec2(GameWorld.covertedSize.x/2,  GameWorld.covertedSize.y/2);
-        //Vec2 playerPos = new Vec2(21,  7.5f);
         Player playerObject = new Player(playerPos, 0.5f, 0.5f, BodyType.DYNAMIC, GameWorld.Instance.getCurrentScene());
         GameWorld.Instance.setPlayer(playerObject);
-
-        /*WallPrefab lowerWall = new WallPrefab(WallPrefab.PrefabType.DoorWall, WallPrefab.PrefabPosition.Bottom,GameWorld.Instance.getCurrentScene());
-        WallPrefab topWall = new WallPrefab(WallPrefab.PrefabType.DoorWall, WallPrefab.PrefabPosition.Top,GameWorld.Instance.getCurrentScene());
-        WallPrefab leftWall = new WallPrefab(WallPrefab.PrefabType.DoorWall, WallPrefab.PrefabPosition.Left,GameWorld.Instance.getCurrentScene());
-        WallPrefab rightWall = new WallPrefab(WallPrefab.PrefabType.DoorWall, WallPrefab.PrefabPosition.Right,GameWorld.Instance.getCurrentScene());*/
-
 
     }
 
@@ -110,7 +96,6 @@ public class RicochetGameGUI {
             logic();
             input();
             renderUpdate();
-         //   System.out.println(Mouse.getX() + " , "+ Mouse.getY());
         }
     }
 
@@ -126,16 +111,6 @@ public class RicochetGameGUI {
             cleanUp(true);
         }
     }
-
-//    public static void main(String[] args) {
-//        setUpDisplay();
-//        setUpWorld();
-//        setUpObjects();
-//        setUpMatrices();
-//        setUpListeners();
-//        enterGameLoop();
-//        cleanUp(false);
-//    }
 
     public void init(){
         setUpDisplay();

@@ -12,7 +12,7 @@ import java.util.*;
 import static org.lwjgl.opengl.GL11.*;
 
 public class GameWorld {
-    // TODO MAKE DELTA TIME FUNCTION!! ADD CONVERSION METHOD
+    // TODO MAKE DELTA TIME FUNCTION!!
     private Map<Vec2, Scene> worldScenes;
     private Player player;
     public static GameWorld Instance;
@@ -126,7 +126,6 @@ public class GameWorld {
     }
 
 
-    // TODO this is weird
     public void setCurrentScene(Vec2 location) {
         currentScene = worldScenes.get(location);
     }
