@@ -13,7 +13,7 @@ import static org.lwjgl.opengl.GL11.*;
 
 public class GameWorld {
     // TODO MAKE DELTA TIME FUNCTION!! ADD CONVERSION METHOD
-    private Dictionary<Vec2, Scene> worldScenes;
+    private Map<Vec2, Scene> worldScenes;
     private Player player;
     public static GameWorld Instance;
     private World physicsWorld;
@@ -41,7 +41,7 @@ public class GameWorld {
         covertedSize = new Vec2(WINDOW_DIMENSIONS[0] * unitConversion, WINDOW_DIMENSIONS[1] * unitConversion);
     }
 
-    public Dictionary<Vec2, Scene> getWorldScenes() {
+    public Map<Vec2, Scene> getWorldScenes() {
         return worldScenes;
     }
 
@@ -61,20 +61,20 @@ public class GameWorld {
         return currentScene;
     }
 
-// TODO :: make generated world Method viable
     public void generateWorld (int sizeX, int sizeY){
-
+        int indexer = 0;
+        boolean leftRight = false;
         for (int y =-sizeY/2; y < sizeY/2;y++){
-
             for(int x = -sizeX/2; x < sizeX/2; x++){
-
-                Scene sceneCenter = new Scene(0, new Vec2(x,y));
+                Scene sceneCenter = new Scene(indexer, new Vec2(x,y));
                 Instance.getWorldScenes().put(sceneCenter.getLocation(),sceneCenter);
+                indexer ++;
             }
         }
-
+        for (Map.Entry<Vec2,Scene> Entry: worldScenes.entrySet()){
+            Entry.getValue().buildScene();
+        }
     }
-
 
     public void switchScene(switchDirection direction) {
 
@@ -104,7 +104,7 @@ public class GameWorld {
         currentScene.getSceneObjects().remove(player);
          destroySceneBodies(currentScene);
         setCurrentScene(newLocation);
-        setUpNewScene(currentScene);
+        currentScene.init();
         currentScene.getSceneObjects().add(player);
         player.body.setTransform(switchPos,0);
         switchScene = false;
@@ -125,20 +125,10 @@ public class GameWorld {
         }
     }
 
-    private  void setUpNewScene(Scene scene){
-        for (GameObject G: scene.getSceneObjects()) {
-            if (!(G instanceof Player)) {
-                G.Init();
-            }
-        }
-    }
 
     // TODO this is weird
     public void setCurrentScene(Vec2 location) {
         currentScene = worldScenes.get(location);
-      /*  for (Scene s : worldScenes) {
-            if (s.getID() == ID) this.currentScene = s;
-        }*/
     }
 
     public void renderWorld() {

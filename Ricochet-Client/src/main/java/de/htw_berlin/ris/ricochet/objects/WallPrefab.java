@@ -11,8 +11,6 @@ import static de.htw_berlin.ris.ricochet.objects.WallPrefab.PrefabPosition.Left;
 
 public class WallPrefab {
 
-    private GameObject[] childObjects;
-    // public PrefabType type;
 
     public enum PrefabType {
         FullWall,
@@ -29,22 +27,44 @@ public class WallPrefab {
     }
 
     public WallPrefab(PrefabType type, PrefabPosition position, Scene whichScene) {
+        Vec2 Postion1 = new Vec2();
+        Vec2 Postion2 = new Vec2();
 
-
-
-
+        boolean horizontal = false;
 
         switch (type) {
 
 
-            case HalfWall:
+            case FullWall:
+
+                switch (position){
+                    case Left:
+
+                        Postion1 = new Vec2 (0,GameWorld.covertedSize.y/2);
+                        break;
+
+                    case Right:
+
+                        Postion1 = new Vec2 (GameWorld.covertedSize.x,GameWorld.covertedSize.y/2);
+                        break;
+                    case Top:
+
+                        Postion1 = new Vec2 (GameWorld.covertedSize.x/2,GameWorld.covertedSize.y);
+                        horizontal = true;
+                        break;
+
+                    case Bottom:
+                        Postion1 = new Vec2 (GameWorld.covertedSize.x/2,0);
+                        horizontal = true;
+                        break;
+                }
+
+                GameObject Wall =  new GameObject(Postion1, (horizontal) ? GameWorld.covertedSize.x/2:GameWorld.covertedSize.x/30,  (horizontal) ? GameWorld.covertedSize.y/30 : GameWorld.covertedSize.y/2,BodyType.STATIC, 1f, 0.5f,whichScene );
 
                 break;
 
             case DoorWall:
-                Vec2 Postion1 = new Vec2();
-                Vec2 Postion2 = new Vec2();
-                boolean horizontal = false;
+
 
                 switch (position){
                     case Left:
