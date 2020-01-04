@@ -25,7 +25,7 @@ public class Bullet extends GameObject {
             public void run() {
                 Destroy();
             }
-        }, 10000);
+        }, 2000);
     }
 
 
@@ -35,6 +35,7 @@ public class Bullet extends GameObject {
 
             if (colObj != null && colObj instanceof Player) {
                 Destroy();
+                ((Player) colObj).health--;
             }
         }
 

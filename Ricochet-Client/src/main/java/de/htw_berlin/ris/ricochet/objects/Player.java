@@ -2,6 +2,9 @@ package de.htw_berlin.ris.ricochet.objects;
 
 import de.htw_berlin.ris.ricochet.Entities.GameWorld;
 import de.htw_berlin.ris.ricochet.Entities.Scene;
+import de.htw_berlin.ris.ricochet.items.MachineGun;
+import de.htw_berlin.ris.ricochet.items.Pistol;
+import de.htw_berlin.ris.ricochet.items.Weapon;
 import de.htw_berlin.ris.ricochet.math.Vector2;
 import org.jbox2d.common.Vec2;
 import org.jbox2d.dynamics.BodyType;
@@ -12,10 +15,15 @@ import org.lwjgl.input.Mouse;
 public class Player extends GameObject {
     private int ID;
     public float speed = 1.0f;
+    // TODO :: Make Death and Reset Game
+    public int health = 5;
+    protected Weapon currentWeapon;
+    protected boolean fire;
 
     public Player(Vec2 pos, float width, float height, BodyType bodyType, Scene scene) {
         super(pos, width, height, bodyType,scene);
         body.setFixedRotation(true);
+        currentWeapon = new MachineGun(this);
     }
 
     public void handleInput() {
@@ -35,25 +43,14 @@ public class Player extends GameObject {
 
         body.setLinearVelocity(Velocity);
 
+        if(Mouse.isButtonDown(0) )currentWeapon.shoot();
 
-        while (Mouse.next()) {
-            if (Mouse.getEventButtonState()) {
-                if (Mouse.getEventButton() == 0)
-                    shoot(10);
-            }
-        }
+
     }
 
 
-    public void shoot(float shotSpeed) {
-        Vec2 playerPosition = new Vec2(body.getPosition().x, body.getPosition().y);
-        Vec2 mousePosition = new Vec2(Mouse.getX(), Mouse.getY()).mul(1 / 30f);
-        Vec2 shotDir = mousePosition.sub(playerPosition);
-        shotDir.normalize();
-        Bullet Bullet = new Bullet(playerPosition.add((shotDir.mul(1.5f))), 0.25f, 0.25f, BodyType.DYNAMIC);
-        shotDir = shotDir.mul(shotSpeed * 10);
-        Bullet.body.applyForce(shotDir, Bullet.body.getPosition());
-    }
+
+
 
     @Override
     public void Render() {
