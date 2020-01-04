@@ -91,5 +91,8 @@ public class Player extends GameObject {
     public void setID(int ID) {
         this.ID = ID;
     }
+    public void death(){
+        System.out.println("I Died");
+    }
 }
 

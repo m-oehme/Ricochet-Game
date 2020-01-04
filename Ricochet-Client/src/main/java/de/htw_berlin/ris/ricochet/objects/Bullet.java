@@ -36,6 +36,7 @@ public class Bullet extends GameObject {
             if (colObj != null && colObj instanceof Player) {
                 Destroy();
                 ((Player) colObj).health--;
+                if (((Player) colObj).health <= 0)((Player) colObj).death();
             }
         }
 
