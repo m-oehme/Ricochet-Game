@@ -11,7 +11,7 @@ public class MachineGun extends  Weapon {
 
     public MachineGun(Player player){
         fireRate = 100;
-        magazineSize = 20;
+        magazineSize = 10;
         reloadTime = 5000;
         shotSpeed = 10;
         this.player = player;
