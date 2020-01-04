@@ -10,6 +10,8 @@ import java.util.TimerTask;
 public class Bullet extends GameObject {
 
     public int lifeTime = 10;
+    //TODO make didBounce visually determinable
+    public boolean didBounce;
 
     public Bullet(Vec2 pos, float width, float height, BodyType bodyType) {
         super(pos, width, height, bodyType, GameWorld.Instance.getCurrentScene());
@@ -35,9 +37,15 @@ public class Bullet extends GameObject {
 
             if (colObj != null && colObj instanceof Player) {
                 Destroy();
-                ((Player) colObj).health--;
-                if (((Player) colObj).health <= 0)((Player) colObj).death();
+                if(didBounce){
+                    ((Player) colObj).health--;
+                    if (((Player) colObj).health <= 0)((Player) colObj).death();
+                }
+
+            }else{
+                didBounce = true;
             }
+
         }
 
     }
