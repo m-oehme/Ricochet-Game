@@ -49,7 +49,9 @@ public class GameObject {
         float grayscale  = (float)Math.random() * 0.25f + 0.25f;
         objectColor = new java.awt.Color(grayscale, grayscale, grayscale);
       //  objectColor = new java.awt.Color((float) Math.random() * 0.1f, (float) Math.random() * 0.5f + 0.5f, (float) Math.random() * 0.75f + 0.25f);
-        whichScene.getSceneObjects().add(this);
+        if (bodyType == BodyType.DYNAMIC) whichScene.getSceneObjectsDynamic().add(this);
+        else  whichScene.getSceneObjectsStatic().add(this);
+
         if (whichScene.equals(GameWorld.Instance.getCurrentScene())) {
             Init();
         }
@@ -73,7 +75,9 @@ public class GameObject {
         float grayscale  = 0.25f;//(float)Math.random() * 0.25f + 0.25f;
         objectColor = new java.awt.Color(grayscale, grayscale, grayscale);
        // objectColor = new java.awt.Color((float) Math.random(), (float) Math.random(), (float) Math.random());
-        whichScene.getSceneObjects().add(this);
+        if (bodyType == BodyType.DYNAMIC) whichScene.getSceneObjectsDynamic().add(this);
+        else  whichScene.getSceneObjectsStatic().add(this);
+
         if (whichScene.equals(GameWorld.Instance.getCurrentScene())) {
             Init();
         }

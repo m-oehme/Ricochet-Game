@@ -12,11 +12,13 @@ import java.util.Set;
 public class Scene {
     private int ID;
     private Vec2 location;
-    private Set<GameObject> sceneObjects;
+    private Set<GameObject> sceneObjectsStatic;
+    private Set<GameObject> sceneObjectsDynamic;
 
     public Scene(int ID, Vec2 location) {
         this.ID = ID;
-        sceneObjects = new HashSet<GameObject>();
+        sceneObjectsStatic = new HashSet<GameObject>();
+        sceneObjectsDynamic = new HashSet<GameObject>();
 
 
         this.location = location;
@@ -36,7 +38,12 @@ public class Scene {
     }
 
     public void init() {
-        for (GameObject G : sceneObjects) {
+        for (GameObject G : sceneObjectsStatic) {
+            if (!(G instanceof Player)) {
+                G.Init();
+            }
+        }
+        for (GameObject G : sceneObjectsDynamic) {
             if (!(G instanceof Player)) {
                 G.Init();
             }
@@ -51,12 +58,20 @@ public class Scene {
         this.ID = ID;
     }
 
-    public Set<GameObject> getSceneObjects() {
-        return sceneObjects;
+    public Set<GameObject> getSceneObjectsStatic() {
+        return sceneObjectsStatic;
     }
 
-    public void setSceneObjects(Set<GameObject> SceneObjects) {
-        this.sceneObjects = SceneObjects;
+    public void setSceneObjectsStatic(Set<GameObject> SceneObjectsStatic) {
+        this.sceneObjectsStatic = SceneObjectsStatic;
+    }
+
+    public Set<GameObject> getSceneObjectsDynamic() {
+        return sceneObjectsDynamic;
+    }
+
+    public void setSceneObjectsDynamic(Set<GameObject> SceneObjectsDynamic) {
+        this.sceneObjectsDynamic = SceneObjectsDynamic;
     }
 
     public Vec2 getLocation() {
