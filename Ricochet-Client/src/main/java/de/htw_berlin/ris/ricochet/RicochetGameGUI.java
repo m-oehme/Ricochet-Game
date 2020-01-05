@@ -78,11 +78,9 @@ public class RicochetGameGUI {
     }
 
     void setUpObjects() {
-
         Vec2 playerPos = new Vec2(GameWorld.covertedSize.x/2,  GameWorld.covertedSize.y/2);
         Player playerObject = new Player(playerPos, 0.5f, 0.5f, BodyType.DYNAMIC, GameWorld.Instance.getCurrentScene());
         GameWorld.Instance.setPlayer(playerObject);
-
     }
 
     private void renderUpdate() {

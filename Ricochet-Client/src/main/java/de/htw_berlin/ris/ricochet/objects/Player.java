@@ -12,6 +12,10 @@ import org.lwjgl.Sys;
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.input.Mouse;
 
+import java.awt.*;
+
+import static org.lwjgl.opengl.GL11.glColor3f;
+
 public class Player extends GameObject {
     private int ID;
     public float speed = 1.0f;
@@ -19,9 +23,12 @@ public class Player extends GameObject {
     public int health = 5;
     protected Weapon currentWeapon;
     protected boolean fire;
+    public Color playerColor;
 
     public Player(Vec2 pos, float width, float height, BodyType bodyType, Scene scene) {
         super(pos, width, height, bodyType,scene);
+        playerColor = new java.awt.Color((float) Math.random() * 0.1f, (float) Math.random() * 0.15f + 0.15f, (float) Math.random() * 0.75f + 0.25f);
+        objectColor = playerColor;
         body.setFixedRotation(true);
         currentWeapon = new MachineGun(this);
     }
@@ -54,7 +61,14 @@ public class Player extends GameObject {
 
     @Override
     public void Render() {
+        float[] rgbVal = new float[4];
+        if (contact) {
+            Color.red.getRGBColorComponents(rgbVal);
+        } else {
+            objectColor.getRGBColorComponents(rgbVal);
+        }
 
+        glColor3f(rgbVal[0], rgbVal[1], rgbVal[3]);
         super.Render();
 
     }

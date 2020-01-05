@@ -22,7 +22,6 @@ public class Pistol extends Weapon{
     public void shoot(){
         if (reloading|| coolDown) return;
         super.shoot();
-
         Vec2 playerPosition = new Vec2(player.body.getPosition().x, player.body.getPosition().y);
         Vec2 mousePosition = new Vec2(Mouse.getX(), Mouse.getY()).mul(1 / 30f);
         Vec2 shotDir = mousePosition.sub(playerPosition);

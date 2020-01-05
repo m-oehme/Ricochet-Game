@@ -26,11 +26,9 @@ public class GameObject {
     protected GameObject colObj;
 
 
-
-    public static GameObject FullWall(Vec2 position, boolean horizontal, Scene whichScene){
-       GameObject Wall =  new GameObject(position, (horizontal) ? GameWorld.covertedSize.x+1 :GameWorld.covertedSize.x/30,  (horizontal) ? GameWorld.covertedSize.y/30 : GameWorld.covertedSize.y,BodyType.STATIC, 1f, 0.5f,whichScene );
-       return Wall;
-
+    public static GameObject FullWall(Vec2 position, boolean horizontal, Scene whichScene) {
+        GameObject Wall = new GameObject(position, (horizontal) ? GameWorld.covertedSize.x + 1 : GameWorld.covertedSize.x / 30, (horizontal) ? GameWorld.covertedSize.y / 30 : GameWorld.covertedSize.y, BodyType.STATIC, 1f, 0.5f, whichScene);
+        return Wall;
     }
 
     public GameObject(Vec2 pos, float width, float height, BodyType bodyType, Scene whichScene) {
@@ -48,9 +46,11 @@ public class GameObject {
         bodyFixture.shape = boxShape;
 
         contact = false;
-        objectColor = new java.awt.Color((float) Math.random(), (float) Math.random(), (float) Math.random());
+        float grayscale  = (float)Math.random() * 0.25f + 0.25f;
+        objectColor = new java.awt.Color(grayscale, grayscale, grayscale);
+      //  objectColor = new java.awt.Color((float) Math.random() * 0.1f, (float) Math.random() * 0.5f + 0.5f, (float) Math.random() * 0.75f + 0.25f);
         whichScene.getSceneObjects().add(this);
-        if (whichScene.equals(GameWorld.Instance.getCurrentScene())){
+        if (whichScene.equals(GameWorld.Instance.getCurrentScene())) {
             Init();
         }
 
@@ -70,9 +70,11 @@ public class GameObject {
         bodyFixture.shape = boxShape;
         bodyFixture.restitution = restitution;
         contact = false;
-        objectColor = new java.awt.Color((float) Math.random(), (float) Math.random(), (float) Math.random());
+        float grayscale  = 0.25f;//(float)Math.random() * 0.25f + 0.25f;
+        objectColor = new java.awt.Color(grayscale, grayscale, grayscale);
+       // objectColor = new java.awt.Color((float) Math.random(), (float) Math.random(), (float) Math.random());
         whichScene.getSceneObjects().add(this);
-        if (whichScene.equals(GameWorld.Instance.getCurrentScene())){
+        if (whichScene.equals(GameWorld.Instance.getCurrentScene())) {
             Init();
         }
     }
@@ -92,29 +94,23 @@ public class GameObject {
     }
 
     public void StartContact(GameObject gameObject) {
-
         contact = true;
         this.colObj = gameObject;
     }
 
     public void EndContact(GameObject gameObject) {
-
         contact = false;
         this.colObj = null;
-
     }
 
     // Code for drawing the objects
     public void Render() {
 // TODO :: rethink rendering now its always 2x width & height
-        float[] rgbVal = new float[4];
-        if (contact) {
-            Color.red.getRGBColorComponents(rgbVal);
-        } else {
+        if (!(this instanceof Player) &&!(this instanceof Bullet)) {
+            float[] rgbVal = new float[4];
             objectColor.getRGBColorComponents(rgbVal);
+            glColor3f(rgbVal[0], rgbVal[1], rgbVal[3]);
         }
-
-        glColor3f(rgbVal[0], rgbVal[1], rgbVal[3]);
         Vec2 bodyPosition = body.getPosition().mul(30);
         glTranslatef(bodyPosition.x, bodyPosition.y, 0);
         glRotated(Math.toDegrees(body.getAngle()), 0, 0, 1);

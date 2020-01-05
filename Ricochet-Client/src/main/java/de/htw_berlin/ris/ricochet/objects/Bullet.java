@@ -4,8 +4,11 @@ import de.htw_berlin.ris.ricochet.Entities.GameWorld;
 import org.jbox2d.common.Vec2;
 import org.jbox2d.dynamics.BodyType;
 
+import java.awt.*;
 import java.util.Timer;
 import java.util.TimerTask;
+
+import static org.lwjgl.opengl.GL11.glColor3f;
 
 public class Bullet extends GameObject {
 
@@ -34,20 +37,30 @@ public class Bullet extends GameObject {
     @Override
     public void Update() {
         if (contact) {
-
-            if (colObj != null && colObj instanceof Player) {
+            if (colObj == null ) return;
+            if (colObj instanceof Player) {
                 Destroy();
                 if(didBounce){
                     ((Player) colObj).health--;
                     if (((Player) colObj).health <= 0)((Player) colObj).death();
                 }
-
             }else{
                 didBounce = true;
             }
 
         }
+    }
+    @Override
+    public void Render(){
+        float[] rgbVal = new float[4];
+        if (didBounce) {
+            Color.red.getRGBColorComponents(rgbVal);
+        } else {
+            objectColor.getRGBColorComponents(rgbVal);
+        }
 
+        glColor3f(rgbVal[0], rgbVal[1], rgbVal[3]);
+        super.Render();
     }
 }
 
