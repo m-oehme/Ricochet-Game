@@ -25,6 +25,7 @@ public class GameWorld {
     public static final float unitConversion = 1 / 30f;
     public static Vec2 covertedSize;
     private Vec2 switchPos;
+    private boolean gameOver;
 
     public enum switchDirection {
         UP,
@@ -60,6 +61,10 @@ public class GameWorld {
 
     public Scene getCurrentScene() {
         return currentScene;
+    }
+
+    public void setGameOver(boolean gameOver){
+        this.gameOver = gameOver;
     }
 
     public void generateWorld(int sizeX, int sizeY) {
@@ -102,6 +107,14 @@ public class GameWorld {
 
     public void Reset() {
 
+        currentScene.getSceneObjectsDynamic().remove(player);
+        destroySceneBodies(currentScene);
+        destroyAllDynamicBodies();
+        setCurrentScene(new Vec2(0,0));
+        currentScene.init();
+        currentScene.getSceneObjectsDynamic().add(player);
+        player.body.setTransform(new Vec2(GameWorld.covertedSize.x/2,  GameWorld.covertedSize.y/2), 0);
+        gameOver = false;
 
     }
 
@@ -109,6 +122,7 @@ public class GameWorld {
 
         currentScene.getSceneObjectsDynamic().remove(player);
         destroySceneBodies(currentScene);
+        destroyAllDynamicBodies();
         setCurrentScene(newLocation);
         currentScene.init();
         currentScene.getSceneObjectsDynamic().add(player);
@@ -121,6 +135,13 @@ public class GameWorld {
         for (b = physicsWorld.getBodyList(); b != null; b = b.getNext()) {
             physicsWorld.destroyBody(b);
         }
+    }
+
+    private void destroyAllDynamicBodies(){
+        for (GameObject G : currentScene.getSceneObjectsDynamic()) {
+             Destroy(G);
+        }
+
     }
 
     private void destroySceneBodies(Scene scene) {
@@ -160,7 +181,7 @@ public class GameWorld {
     public void cleanUp() {
         for (GameObject g : objectsToBeDestroyed) {
             getPhysicsWorld().destroyBody(g.body);
-            getCurrentScene().getSceneObjectsDynamic().remove(g);
+            g.myScene.getSceneObjectsDynamic().remove(g);
         }
         objectsToBeDestroyed.clear();
     }
@@ -181,6 +202,7 @@ public class GameWorld {
         }
         physicsWorld.step(timeStep, 4, 3);
         if (switchScene) finalizeSceneSwitch();
+        if (gameOver) Reset();
         cleanUp();
     }
 

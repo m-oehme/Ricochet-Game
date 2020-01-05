@@ -107,6 +107,7 @@ public class Player extends GameObject {
     }
     public void death(){
         System.out.println("I Died");
+        GameWorld.Instance.setGameOver(true);
     }
 }
 

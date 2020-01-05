@@ -24,6 +24,7 @@ public class GameObject {
     public boolean contact;
     public java.awt.Color objectColor;
     protected GameObject colObj;
+    public Scene myScene;
 
 
     public static GameObject FullWall(Vec2 position, boolean horizontal, Scene whichScene) {
@@ -55,6 +56,7 @@ public class GameObject {
         if (whichScene.equals(GameWorld.Instance.getCurrentScene())) {
             Init();
         }
+        myScene = whichScene;
 
     }
 
@@ -81,6 +83,7 @@ public class GameObject {
         if (whichScene.equals(GameWorld.Instance.getCurrentScene())) {
             Init();
         }
+        myScene = whichScene;
     }
 
     public void Init() {
