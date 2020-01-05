@@ -81,13 +81,9 @@ public class RicochetGameGUI {
 
     void setUpWorld(){
         GameWorld.Instance = new GameWorld(new Vec2(0, 0),WINDOW_DIMENSIONS);
-        Scene sceneCenter = new Scene(0, new Vec2(0,0));
-        GameWorld.Instance.getWorldScenes().put(sceneCenter.getLocation(),sceneCenter);
-        Scene sceneRight = new Scene(1, new Vec2 (1,0));
-        GameWorld.Instance.getWorldScenes().put(sceneRight.getLocation(),sceneRight);
-        Scene sceneLeft = new Scene(-1, new Vec2 (-1,0));
-        GameWorld.Instance.getWorldScenes().put(sceneLeft.getLocation(),sceneLeft);
-        GameWorld.Instance.setCurrentScene(sceneCenter.getLocation());
+        GameWorld.Instance.generateWorld(4,4);
+        GameWorld.Instance.setCurrentScene(new Vec2(0,0));
+        GameWorld.Instance.getCurrentScene().init();
 
     }
 
@@ -100,10 +96,7 @@ public class RicochetGameGUI {
 
     void setUpObjects() {
 
-        GameObject lowerWall = new GameObject(new Vec2(0,0), GameWorld.covertedSize.x+1, GameWorld.covertedSize.y/30,BodyType.STATIC, 1f, 0.5f);
-        GameObject topWall = new GameObject(new Vec2(0,GameWorld.covertedSize.y), GameWorld.covertedSize.x+1, GameWorld.covertedSize.y/30,BodyType.STATIC, 1f, 0.5f);
-        GameObject leftWall = new GameObject(new Vec2(0,0), GameWorld.covertedSize.x/30, GameWorld.covertedSize.y,BodyType.STATIC, 1f, 0.5f);
-//        GameObject rightWall = new GameObject(new Vec2(1.01f,0), GameWorld.covertedSize.x/30, (WINDOW_DIMENSIONS[1]/30),BodyType.STATIC, 1f, 0.5f);
+
 
         Vec2 playerPos = new Vec2(GameWorld.covertedSize.x/2,  GameWorld.covertedSize.y/2);
         ClientNetManager.get().sentMessage(new ObjectCreateMessage(ClientNetManager.get().getClientId(), null, new SPlayer(ClientNetManager.get().getClientId(), playerPos)));
@@ -114,14 +107,14 @@ public class RicochetGameGUI {
 
         worldRequestMessage.getGameObjectList().forEach((objectId, sGameObject) -> {
             if (sGameObject instanceof SPlayer) {
-                GameObject playerObject = new GameObject(sGameObject.getPosition(), 0.5f, 0.5f, BodyType.DYNAMIC);
+                GameObject playerObject = new GameObject(sGameObject.getPosition(), 0.5f, 0.5f, BodyType.DYNAMIC, GameWorld.Instance.getCurrentScene());
                 playerObject.setObjectId(objectId);
             }
         });
     };
 
     private NetMessageObserver<ObjectMoveMessage> objectMoveObserver = objectMoveMessage -> {
-        GameWorld.Instance.getCurrentScene().getSceneObjects().stream()
+        GameWorld.Instance.getCurrentScene().getSceneObjectsDynamic().stream()
                 .filter(gameObject -> gameObject.getObjectId() != null)
                 .filter(gameObject -> gameObject.getObjectId().equals(objectMoveMessage.getObjectId()))
                 .findFirst()
@@ -136,19 +129,19 @@ public class RicochetGameGUI {
 
         if (objectCreateMessage.getSGameObject() instanceof SPlayer) {
             if (GameWorld.Instance.getPlayer() == null) {
-                Player playerObject = new Player(objectCreateMessage.getSGameObject().getPosition(), 0.5f, 0.5f, BodyType.DYNAMIC);
+                Player playerObject = new Player(objectCreateMessage.getSGameObject().getPosition(), 0.5f, 0.5f, BodyType.DYNAMIC, GameWorld.Instance.getCurrentScene());
                 playerObject.setObjectId(objectCreateMessage.getObjectId());
 
                 GameWorld.Instance.setPlayer(playerObject);
             } else {
-                GameObject playerObject = new GameObject(objectCreateMessage.getSGameObject().getPosition(), 0.5f, 0.5f, BodyType.DYNAMIC);
+                GameObject playerObject = new GameObject(objectCreateMessage.getSGameObject().getPosition(), 0.5f, 0.5f, BodyType.DYNAMIC, GameWorld.Instance.getCurrentScene());
                 playerObject.setObjectId(objectCreateMessage.getObjectId());
             }
         }
     };
 
     private NetMessageObserver<ObjectDestroyMessage> objectDestroyObserver = objectDestroyMessage -> {
-        GameWorld.Instance.getCurrentScene().getSceneObjects().stream()
+        GameWorld.Instance.getCurrentScene().getSceneObjectsDynamic().stream()
                 .filter(gameObject -> gameObject.getObjectId() != null)
                 .filter(gameObject -> gameObject.getObjectId().equals(objectDestroyMessage.getObjectId()))
                 .findFirst()
@@ -183,15 +176,6 @@ public class RicochetGameGUI {
         }
     }
 
-//    public static void main(String[] args) {
-//        setUpDisplay();
-//        setUpWorld();
-//        setUpObjects();
-//        setUpMatrices();
-//        setUpListeners();
-//        enterGameLoop();
-//        cleanUp(false);
-//    }
 
     public void init(){
         setUpDisplay();

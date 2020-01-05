@@ -12,8 +12,8 @@ import java.util.*;
 import static org.lwjgl.opengl.GL11.*;
 
 public class GameWorld {
-    // TODO MAKE DELTA TIME FUNCTION!! ADD CONVERSION METHOD
-    private Dictionary<Vec2, Scene> worldScenes;
+    // TODO MAKE DELTA TIME FUNCTION!!
+    private Map<Vec2, Scene> worldScenes;
     private Player player;
     public static GameWorld Instance;
     private World physicsWorld;
@@ -21,10 +21,12 @@ public class GameWorld {
     private boolean switchScene;
     private Vec2 newLocation;
     public static int[] WINDOW_DIMENSIONS;
-    private float timeStep = 1 / 60f;
+    private float timeStep = 1 / 30f;
     public static final float unitConversion = 1 / 30f;
     public static Vec2 covertedSize;
     private Vec2 switchPos;
+    private boolean gameOver;
+
     public enum switchDirection {
         UP,
         DOWN,
@@ -39,10 +41,9 @@ public class GameWorld {
         physicsWorld = new World(new Vec2(0, 0), true);
         worldScenes = new Hashtable<>();
         covertedSize = new Vec2(WINDOW_DIMENSIONS[0] * unitConversion, WINDOW_DIMENSIONS[1] * unitConversion);
-
     }
 
-    public Dictionary<Vec2, Scene> getWorldScenes() {
+    public Map<Vec2, Scene> getWorldScenes() {
         return worldScenes;
     }
 
@@ -62,82 +63,125 @@ public class GameWorld {
         return currentScene;
     }
 
+    public void setGameOver(boolean gameOver){
+        this.gameOver = gameOver;
+    }
+
+    public void generateWorld(int sizeX, int sizeY) {
+        int indexer = 0;
+        boolean leftRight = false;
+        for (int y = -sizeY / 2; y < sizeY / 2; y++) {
+            for (int x = -sizeX / 2; x < sizeX / 2; x++) {
+                Scene sceneCenter = new Scene(indexer, new Vec2(x, y));
+                Instance.getWorldScenes().put(sceneCenter.getLocation(), sceneCenter);
+                indexer++;
+            }
+        }
+        for (Map.Entry<Vec2, Scene> Entry : worldScenes.entrySet()) {
+            Entry.getValue().buildScene();
+        }
+    }
 
     public void switchScene(switchDirection direction) {
 
         switch (direction) {
             case UP:
                 newLocation = currentScene.getLocation().add(new Vec2(0, 1));
-                switchPos = new Vec2(player.body.getPosition().x,0+0.5f);
+                switchPos = new Vec2(player.body.getPosition().x, 0 + 0.5f);
                 break;
             case DOWN:
                 newLocation = currentScene.getLocation().add(new Vec2(0, -1));
-                switchPos = new Vec2(player.body.getPosition().x,covertedSize.y-0.5f);
+                switchPos = new Vec2(player.body.getPosition().x, covertedSize.y - 0.5f);
                 break;
             case LEFT:
                 newLocation = currentScene.getLocation().add(new Vec2(-1, 0));
-                switchPos = new Vec2(covertedSize.x-0.5f,player.body.getPosition().y);
+                switchPos = new Vec2(covertedSize.x - 0.5f, player.body.getPosition().y);
                 break;
             case RIGHT:
                 newLocation = currentScene.getLocation().add(new Vec2(1, 0));
-                switchPos = new Vec2(0+0.5f,player.body.getPosition().y);
+                switchPos = new Vec2(0 + 0.5f, player.body.getPosition().y);
                 break;
         }
         switchScene = true;
     }
 
-    private void finalizeSceneSwitch(){
-//Todo all new bodies to the physics world
-        currentScene.getSceneObjects().remove(player);
+    public void Reset() {
+
+        currentScene.getSceneObjectsDynamic().remove(player);
         destroySceneBodies(currentScene);
+        destroyAllDynamicBodies();
+        setCurrentScene(new Vec2(0,0));
+        currentScene.init();
+        currentScene.getSceneObjectsDynamic().add(player);
+        player.body.setTransform(new Vec2(GameWorld.covertedSize.x/2,  GameWorld.covertedSize.y/2), 0);
+        gameOver = false;
+
+    }
+
+    private void finalizeSceneSwitch() {
+
+        currentScene.getSceneObjectsDynamic().remove(player);
+        destroySceneBodies(currentScene);
+        destroyAllDynamicBodies();
         setCurrentScene(newLocation);
-        currentScene.getSceneObjects().add(player);
-        player.body.setTransform(switchPos,0);
+        currentScene.init();
+        currentScene.getSceneObjectsDynamic().add(player);
+        player.body.setTransform(switchPos, 0);
         switchScene = false;
     }
 
-    private  void destroyAllBodies(){
+    private void destroyAllBodies() {
         Body b;
-        for(b = physicsWorld.getBodyList(); b != null; b = b.getNext()){
+        for (b = physicsWorld.getBodyList(); b != null; b = b.getNext()) {
             physicsWorld.destroyBody(b);
         }
     }
 
-    private void destroySceneBodies(Scene scene){
-        for (GameObject G: scene.getSceneObjects()) {
-            if ( !(G instanceof Player)){
+    private void destroyAllDynamicBodies(){
+        for (GameObject G : currentScene.getSceneObjectsDynamic()) {
+            Destroy(G);
+        }
+
+    }
+
+    private void destroySceneBodies(Scene scene) {
+        for (GameObject G : scene.getSceneObjectsStatic()) {
+
+            physicsWorld.destroyBody(G.body);
+
+        }
+
+        for (GameObject G : scene.getSceneObjectsDynamic()) {
+            if (!(G instanceof Player)) {
                 physicsWorld.destroyBody(G.body);
             }
         }
     }
 
-    private  void setUpNewScene(){
 
-    }
-
-    // TODO this is weird
     public void setCurrentScene(Vec2 location) {
         currentScene = worldScenes.get(location);
-      /*  for (Scene s : worldScenes) {
-            if (s.getID() == ID) this.currentScene = s;
-        }*/
     }
 
     public void renderWorld() {
         // TODO add renderLayers
         glClear(GL_COLOR_BUFFER_BIT);
-        for (GameObject O : currentScene.getSceneObjects()) {
+        for (GameObject O : currentScene.getSceneObjectsStatic()) {
             glPushMatrix();
             O.Render();
             glPopMatrix();
         }
-
+        for (GameObject O : currentScene.getSceneObjectsDynamic()) {
+            glPushMatrix();
+            O.Render();
+            glPopMatrix();
+        }
     }
 
     public void cleanUp() {
         for (GameObject g : objectsToBeDestroyed) {
             getPhysicsWorld().destroyBody(g.body);
-            getCurrentScene().getSceneObjects().remove(g);
+            g.myScene.getSceneObjectsDynamic().remove(g);
         }
         objectsToBeDestroyed.clear();
     }
@@ -147,12 +191,18 @@ public class GameWorld {
     }
 
     public void updateWorld() {
-        for (GameObject O : currentScene.getSceneObjects()
+        //TODO:: DO Static objects have to be updated?
+        for (GameObject O : currentScene.getSceneObjectsDynamic()
         ) {
             O.Update();
         }
-        physicsWorld.step(timeStep, 8, 3);
+        for (GameObject O : currentScene.getSceneObjectsStatic()
+        ) {
+            O.Update();
+        }
+        physicsWorld.step(timeStep, 4, 3);
         if (switchScene) finalizeSceneSwitch();
+        if (gameOver) Reset();
         cleanUp();
     }
 
