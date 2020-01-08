@@ -120,7 +120,8 @@ public class RicochetGameGUI {
                 .findFirst()
                 .ifPresent(gameObject -> {
 //                        TODO Moving the objects
-                    gameObject.body.getPosition().set(objectMoveMessage.getPosition());
+//                    gameObject.body.getPosition().set(objectMoveMessage.getPosition());
+                    gameObject.body.setTransform(objectMoveMessage.getPosition(), 0);
                 });
     };
 
