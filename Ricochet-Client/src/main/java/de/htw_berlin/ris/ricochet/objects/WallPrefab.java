@@ -6,27 +6,10 @@ import javafx.geometry.Pos;
 import org.jbox2d.common.Vec2;
 import org.jbox2d.dynamics.BodyType;
 
-import static de.htw_berlin.ris.ricochet.objects.WallPrefab.PrefabType.HalfWall;
-import static de.htw_berlin.ris.ricochet.objects.WallPrefab.PrefabPosition.Left;
-
 public class WallPrefab {
 
-
-    public enum PrefabType {
-        FullWall,
-        HalfWall,
-        DoorWall,
-        QuarterWall
-    }
-
-    public enum PrefabPosition{
-        Left,
-        Right,
-        Bottom,
-        Top
-    }
     // TODO : Add halfWall and Quaterwall
-    public WallPrefab(PrefabType type, PrefabPosition position, Scene whichScene) {
+    public WallPrefab(WallPrefabConfig.PrefabType type, WallPrefabConfig.PrefabPosition position, Scene whichScene) {
         Vec2 Postion1 = new Vec2();
         Vec2 Postion2 = new Vec2();
 

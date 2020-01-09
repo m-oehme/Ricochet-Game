@@ -4,12 +4,10 @@ import de.htw_berlin.ris.ricochet.Entities.GameWorld;
 import de.htw_berlin.ris.ricochet.Entities.Scene;
 import de.htw_berlin.ris.ricochet.items.MachineGun;
 import de.htw_berlin.ris.ricochet.items.Weapon;
-import de.htw_berlin.ris.ricochet.math.Vector2;
 import de.htw_berlin.ris.ricochet.net.manager.ClientNetManager;
 import de.htw_berlin.ris.ricochet.net.message.world.ObjectMoveMessage;
 import org.jbox2d.common.Vec2;
 import org.jbox2d.dynamics.BodyType;
-import org.lwjgl.Sys;
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.input.Mouse;
 
@@ -29,11 +27,18 @@ public class Player extends GameObject {
         super(pos, width, height, bodyType,scene);
         playerColor = new java.awt.Color((float) Math.random() * 0.1f, (float) Math.random() * 0.15f + 0.15f, (float) Math.random() * 0.75f + 0.25f);
         objectColor = playerColor;
-        body.setFixedRotation(true);
         currentWeapon = new MachineGun(this);
     }
 
+    @Override
+    public void Init() {
+        super.Init();
+
+        body.setFixedRotation(true);
+    }
+
     public void handleInput() {
+        if (body == null) return;
 
         Vec2 force = new Vec2();
         Vec2 Velocity = body.getLinearVelocity();
@@ -82,6 +87,7 @@ public class Player extends GameObject {
 
     @Override
     public void Update() {
+        super.Update();
         Vec2 playerPosition = new Vec2(body.getPosition().x, body.getPosition().y);
 
         if (playerPosition.x > GameWorld.covertedSize.x) {
@@ -102,7 +108,7 @@ public class Player extends GameObject {
             GameWorld.Instance.switchScene(GameWorld.switchDirection.DOWN);
         }
 
-        ClientNetManager.get().sentMessage(new ObjectMoveMessage(ClientNetManager.get().getClientId(), this.getObjectId(), playerPosition));
+        ClientNetManager.get().sentMessage(new ObjectMoveMessage(ClientNetManager.get().getClientId(), this.getObjectId(), myScene.getLocation(), playerPosition));
     }
 
 

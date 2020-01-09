@@ -5,10 +5,12 @@ import de.htw_berlin.ris.ricochet.net.handler.NetMessageObserver;
 import de.htw_berlin.ris.ricochet.net.manager.ClientId;
 import de.htw_berlin.ris.ricochet.net.message.world.*;
 import de.htw_berlin.ris.ricochet.objects.ObjectId;
-import de.htw_berlin.ris.ricochet.objects.SGameObject;
-import de.htw_berlin.ris.ricochet.objects.SPlayer;
+import de.htw_berlin.ris.ricochet.objects.shared.SGameObject;
+import de.htw_berlin.ris.ricochet.objects.shared.SPlayer;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.jbox2d.common.Vec2;
+
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.LinkedBlockingQueue;
@@ -38,6 +40,7 @@ public class GameWorldComponent implements Runnable, NetMessageObserver<WorldMes
 
     @Override
     public void run() {
+        initialize();
         while (isRunning) {
             try {
                 WorldMessage msg = worldMessageQueue.take();
@@ -55,7 +58,10 @@ public class GameWorldComponent implements Runnable, NetMessageObserver<WorldMes
                 e.printStackTrace();
             }
         }
+    }
 
+    private void initialize() {
+        gameWorld.generateStaticWorld(4,4);
     }
 
     @Override
@@ -69,9 +75,10 @@ public class GameWorldComponent implements Runnable, NetMessageObserver<WorldMes
                 .filter(map -> !worldRequestMessage.getClientId().equals(map.getValue().getClientId()))
                 .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
 
-        HashMap<ObjectId, SGameObject> gameObjects = new HashMap<>(gameWorld.getDynamicGameObjects());
+        HashMap<ObjectId, SGameObject> gameObjects = new HashMap<>(gameWorld.getStaticGameObjects());
         gameObjects.putAll(playerMap);
         worldRequestMessage.setGameObjectList(gameObjects);
+        worldRequestMessage.setWorldSize(new Vec2(4,4));
         clientManager.sendMessageToClients(worldRequestMessage);
     }
 
@@ -104,6 +111,8 @@ public class GameWorldComponent implements Runnable, NetMessageObserver<WorldMes
     public void removeAllObjectsForPlayer(ClientId clientId) {
         ObjectId objectId = gameWorld.removePlayerObject(clientId);
 
-        clientManager.sendMessageToClients(new ObjectDestroyMessage(clientId, objectId));
+        if (objectId != null) {
+            clientManager.sendMessageToClients(new ObjectDestroyMessage(clientId, objectId));
+        }
     }
 }

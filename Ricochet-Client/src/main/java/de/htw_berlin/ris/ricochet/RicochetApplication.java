@@ -1,18 +1,22 @@
 package de.htw_berlin.ris.ricochet;
 
+import de.htw_berlin.ris.ricochet.Entities.GameWorld;
 import de.htw_berlin.ris.ricochet.net.handler.*;
-import de.htw_berlin.ris.ricochet.net.manager.ClientId;
 import de.htw_berlin.ris.ricochet.net.manager.ClientNetManager;
 import de.htw_berlin.ris.ricochet.net.message.general.ChatMessage;
-import de.htw_berlin.ris.ricochet.net.message.general.LoginMessage;
 import de.htw_berlin.ris.ricochet.net.message.world.ObjectCreateMessage;
 import de.htw_berlin.ris.ricochet.net.message.world.ObjectDestroyMessage;
 import de.htw_berlin.ris.ricochet.net.message.world.ObjectMoveMessage;
 import de.htw_berlin.ris.ricochet.net.message.world.WorldRequestMessage;
+import de.htw_berlin.ris.ricochet.objects.ObjectId;
+import de.htw_berlin.ris.ricochet.objects.shared.SGameObject;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.jbox2d.common.Vec2;
 
 import java.net.InetAddress;
+import java.util.HashMap;
+import java.util.List;
 
 public class RicochetApplication {
     private static Logger log = LogManager.getLogger();
@@ -25,35 +29,52 @@ public class RicochetApplication {
         if( INSTANCE == null ) {
             INSTANCE = new RicochetApplication();
         }
-        INSTANCE.onInitialize(serverAddress, serverPort);
-        INSTANCE.onStarted();
+        try {
+            INSTANCE.onInitialize(serverAddress, serverPort);
+            INSTANCE.onStarted();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
         return INSTANCE;
     }
-
     private RicochetApplication() { }
 
-    private void onInitialize(InetAddress serverAddress, int serverPort) {
+    private volatile boolean result = false;
+
+
+    private void onInitialize(InetAddress serverAddress, int serverPort) throws InterruptedException {
         ClientNetManager.create(serverAddress, serverPort);
         log.info("Socket connection initialized");
 
         setUpMessageHandler();
 
-        RicochetGameGUI.get().init();
-        log.info("GUI initialized");
-    }
-
-    private void onStarted() {
         ClientNetManager.get().getHandlerFor(ChatMessage.class).registerObserver(chatMessageObserver);
         ClientNetManager.get().getHandlerFor(WorldRequestMessage.class).registerObserver(worldRequestMessageObserver);
 
+
         log.info("Requesting GameWorld from Server");
-        ClientNetManager.get().sentMessage(new WorldRequestMessage(ClientNetManager.get().getClientId(), null));
+        ClientNetManager.get().sentMessage(new WorldRequestMessage(ClientNetManager.get().getClientId()));
+
+        do {
+            if (result) {
+                RicochetGameGUI.get().init();
+                log.info("GUI initialized");
+                break;
+            }
+        } while (true);
+    }
+
+    private void onStarted() {
+
         log.info("GUI starting");
         RicochetGameGUI.get().Run();
     }
 
     private NetMessageObserver<WorldRequestMessage> worldRequestMessageObserver = worldRequestMessage -> {
         log.debug("Received: " + worldRequestMessage.getGameObjectList().toString());
+        RicochetGameGUI.get().setUpWorld(worldRequestMessage.getWorldSize(), worldRequestMessage.getGameObjectList());
+
+        result = true;
     };
 
     private NetMessageObserver<ChatMessage> chatMessageObserver = chatMessage -> {

@@ -2,12 +2,19 @@ package de.htw_berlin.ris.ricochet.Entities;
 
 import de.htw_berlin.ris.ricochet.math.Vector2;
 import de.htw_berlin.ris.ricochet.objects.GameObject;
+import de.htw_berlin.ris.ricochet.objects.ObjectId;
 import de.htw_berlin.ris.ricochet.objects.Player;
+import de.htw_berlin.ris.ricochet.objects.WallPrefab;
+import de.htw_berlin.ris.ricochet.objects.shared.SGameObject;
+import de.htw_berlin.ris.ricochet.objects.shared.SPlayer;
+import de.htw_berlin.ris.ricochet.objects.shared.SWallPrefab;
 import org.jbox2d.common.Vec2;
 import org.jbox2d.dynamics.Body;
+import org.jbox2d.dynamics.BodyType;
 import org.jbox2d.dynamics.World;
 
 import java.util.*;
+import java.util.concurrent.ConcurrentLinkedQueue;
 
 import static org.lwjgl.opengl.GL11.*;
 
@@ -26,6 +33,7 @@ public class GameWorld {
     public static Vec2 covertedSize;
     private Vec2 switchPos;
     private boolean gameOver;
+    private ConcurrentLinkedQueue<GameObject> addObjectQueue = new ConcurrentLinkedQueue<>();
 
     public enum switchDirection {
         UP,
@@ -67,19 +75,26 @@ public class GameWorld {
         this.gameOver = gameOver;
     }
 
-    public void generateWorld(int sizeX, int sizeY) {
+    public void generateWorld(int sizeX, int sizeY, HashMap<ObjectId, SGameObject> gameObjectList) {
         int indexer = 0;
-        boolean leftRight = false;
         for (int y = -sizeY / 2; y < sizeY / 2; y++) {
             for (int x = -sizeX / 2; x < sizeX / 2; x++) {
                 Scene sceneCenter = new Scene(indexer, new Vec2(x, y));
-                Instance.getWorldScenes().put(sceneCenter.getLocation(), sceneCenter);
+                worldScenes.put(sceneCenter.getLocation(), sceneCenter);
                 indexer++;
             }
         }
-        for (Map.Entry<Vec2, Scene> Entry : worldScenes.entrySet()) {
-            Entry.getValue().buildScene();
-        }
+
+        gameObjectList.forEach((objectId, sGameObject) -> {
+            Scene scene = worldScenes.get(sGameObject.getScene());
+            if (sGameObject instanceof SPlayer) {
+                GameObject playerObject = new GameObject(sGameObject.getPosition(), 0.5f, 0.5f, BodyType.DYNAMIC, scene);
+                playerObject.setObjectId(objectId);
+            } else if(sGameObject instanceof SWallPrefab){
+                SWallPrefab sWallPrefab = (SWallPrefab) sGameObject;
+                new WallPrefab(sWallPrefab.getPrefabType(), sWallPrefab.getPrefabPosition(), scene);
+            }
+        });
     }
 
     public void switchScene(switchDirection direction) {
@@ -191,6 +206,13 @@ public class GameWorld {
     }
 
     public void updateWorld() {
+        GameObject G = addObjectQueue.poll();
+        while (G != null) {
+            G.Init();
+
+            G = addObjectQueue.poll();
+        }
+
         //TODO:: DO Static objects have to be updated?
         for (GameObject O : currentScene.getSceneObjectsDynamic()
         ) {
@@ -212,5 +234,9 @@ public class GameWorld {
 
     public void setPlayer(Player player) {
         this.player = player;
+    }
+
+    public void addGameObject(GameObject gameObject) {
+        addObjectQueue.offer(gameObject);
     }
 }

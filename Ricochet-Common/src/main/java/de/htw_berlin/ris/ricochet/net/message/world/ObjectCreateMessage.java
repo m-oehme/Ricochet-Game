@@ -3,7 +3,7 @@ package de.htw_berlin.ris.ricochet.net.message.world;
 import de.htw_berlin.ris.ricochet.net.manager.ClientId;
 import de.htw_berlin.ris.ricochet.net.message.MessageScope;
 import de.htw_berlin.ris.ricochet.net.message.NetMessage;
-import de.htw_berlin.ris.ricochet.objects.SGameObject;
+import de.htw_berlin.ris.ricochet.objects.shared.SGameObject;
 import de.htw_berlin.ris.ricochet.objects.ObjectId;
 
 public class ObjectCreateMessage extends WorldMessage implements NetMessage {

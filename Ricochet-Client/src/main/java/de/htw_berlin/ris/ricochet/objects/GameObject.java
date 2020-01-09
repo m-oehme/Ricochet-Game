@@ -19,7 +19,7 @@ public class GameObject {
     private BodyDef bodyDef;
     public Body body;
     private FixtureDef bodyFixture;
-    public Vec2 position;
+    private Vec2 positionUpdate;
     protected float width, height;
     public boolean contact;
     public java.awt.Color objectColor;
@@ -46,14 +46,10 @@ public class GameObject {
         float grayscale  = (float)Math.random() * 0.25f + 0.25f;
         objectColor = new java.awt.Color(grayscale, grayscale, grayscale);
         //  objectColor = new java.awt.Color((float) Math.random() * 0.1f, (float) Math.random() * 0.5f + 0.5f, (float) Math.random() * 0.75f + 0.25f);
-        if (bodyType == BodyType.DYNAMIC) whichScene.getSceneObjectsDynamic().add(this);
-        else  whichScene.getSceneObjectsStatic().add(this);
 
-        if (whichScene.equals(GameWorld.Instance.getCurrentScene())) {
-            Init();
-        }
         myScene = whichScene;
 
+        GameWorld.Instance.addGameObject(this);
     }
 
     public GameObject(Vec2 pos, float width, float height, BodyType bodyType, float density, float restitution, Scene whichScene) {
@@ -73,27 +69,33 @@ public class GameObject {
         float grayscale  = 0.25f;//(float)Math.random() * 0.25f + 0.25f;
         objectColor = new java.awt.Color(grayscale, grayscale, grayscale);
         // objectColor = new java.awt.Color((float) Math.random(), (float) Math.random(), (float) Math.random());
-        if (bodyType == BodyType.DYNAMIC) whichScene.getSceneObjectsDynamic().add(this);
-        else  whichScene.getSceneObjectsStatic().add(this);
 
-        if (whichScene.equals(GameWorld.Instance.getCurrentScene())) {
-            Init();
-        }
         myScene = whichScene;
+
+        GameWorld.Instance.addGameObject(this);
     }
 
     public void Init() {
+        if (bodyDef.type == BodyType.DYNAMIC) {
+            myScene.getSceneObjectsDynamic().add(this);
+        }
+        else  myScene.getSceneObjectsStatic().add(this);
 
-        body = GameWorld.Instance.getPhysicsWorld().createBody(bodyDef);
-        body.createFixture(bodyFixture);
-        if (this instanceof Player) {
-            body.setLinearDamping(0.75f);
+        if (myScene.equals(GameWorld.Instance.getCurrentScene())) {
+            body = GameWorld.Instance.getPhysicsWorld().createBody(bodyDef);
+            body.createFixture(bodyFixture);
+            if (this instanceof Player) {
+                body.setLinearDamping(0.75f);
+            }
         }
     }
 
     // Game Logic goes here
     public void Update() {
-
+        if (positionUpdate != null) {
+            body.setTransform(positionUpdate, 0);
+            positionUpdate = null;
+        }
     }
 
     public void StartContact(GameObject gameObject) {
@@ -138,4 +140,7 @@ public class GameObject {
         this.objectId = objectId;
     }
 
+    public void setPositionUpdate(Vec2 positionUpdate) {
+        this.positionUpdate = positionUpdate;
+    }
 }

@@ -3,6 +3,7 @@ package de.htw_berlin.ris.ricochet.Entities;
 import de.htw_berlin.ris.ricochet.objects.GameObject;
 import de.htw_berlin.ris.ricochet.objects.Player;
 import de.htw_berlin.ris.ricochet.objects.WallPrefab;
+import de.htw_berlin.ris.ricochet.objects.WallPrefabConfig;
 import org.jbox2d.common.Vec2;
 
 import java.util.ArrayList;
@@ -28,13 +29,13 @@ public class Scene {
 
         boolean neighbor = GameWorld.Instance.getWorldScenes().get(location.add(new Vec2(0, -1))) != null;
 
-        WallPrefab lowerWall = new WallPrefab(neighbor ? WallPrefab.PrefabType.DoorWall : WallPrefab.PrefabType.FullWall, WallPrefab.PrefabPosition.Bottom, this);
+        WallPrefab lowerWall = new WallPrefab(neighbor ? WallPrefabConfig.PrefabType.DoorWall : WallPrefabConfig.PrefabType.FullWall, WallPrefabConfig.PrefabPosition.Bottom, this);
         neighbor = GameWorld.Instance.getWorldScenes().get(location.add(new Vec2(0, +1))) != null;
-        WallPrefab topWall = new WallPrefab(neighbor ? WallPrefab.PrefabType.DoorWall : WallPrefab.PrefabType.FullWall, WallPrefab.PrefabPosition.Top, this);
+        WallPrefab topWall = new WallPrefab(neighbor ? WallPrefabConfig.PrefabType.DoorWall : WallPrefabConfig.PrefabType.FullWall, WallPrefabConfig.PrefabPosition.Top, this);
         neighbor = GameWorld.Instance.getWorldScenes().get(location.add(new Vec2(-1, 0))) != null;
-        WallPrefab leftWall = new WallPrefab(neighbor ? WallPrefab.PrefabType.DoorWall : WallPrefab.PrefabType.FullWall, WallPrefab.PrefabPosition.Left, this);
+        WallPrefab leftWall = new WallPrefab(neighbor ? WallPrefabConfig.PrefabType.DoorWall : WallPrefabConfig.PrefabType.FullWall, WallPrefabConfig.PrefabPosition.Left, this);
         neighbor = GameWorld.Instance.getWorldScenes().get(location.add(new Vec2(+1, 0))) != null;
-        WallPrefab rightWall = new WallPrefab(neighbor ? WallPrefab.PrefabType.DoorWall : WallPrefab.PrefabType.FullWall, WallPrefab.PrefabPosition.Right, this);
+        WallPrefab rightWall = new WallPrefab(neighbor ? WallPrefabConfig.PrefabType.DoorWall : WallPrefabConfig.PrefabType.FullWall, WallPrefabConfig.PrefabPosition.Right, this);
     }
 
     public void init() {

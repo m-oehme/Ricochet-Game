@@ -8,12 +8,14 @@ import org.jbox2d.common.Vec2;
 
 public class ObjectMoveMessage extends WorldMessage implements NetMessage {
     private ObjectId objectId;
+    private Vec2 scene;
     private Vec2 position;
 
-    public ObjectMoveMessage(ClientId clientId, ObjectId objectId, Vec2 position) {
+    public ObjectMoveMessage(ClientId clientId, ObjectId objectId, Vec2 scene, Vec2 position) {
         super(clientId, MessageScope.EXCEPT_SELF);
 
         this.objectId = objectId;
+        this.scene = scene;
         this.position = position;
     }
 
@@ -23,5 +25,9 @@ public class ObjectMoveMessage extends WorldMessage implements NetMessage {
 
     public Vec2 getPosition() {
         return position;
+    }
+
+    public Vec2 getScene() {
+        return scene;
     }
 }

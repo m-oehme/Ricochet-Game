@@ -1,6 +1,6 @@
 package de.htw_berlin.ris.ricochet.objects;
 
-import de.htw_berlin.ris.ricochet.net.manager.ClientId;
+import de.htw_berlin.ris.ricochet.objects.shared.SGameObject;
 
 import java.io.Serializable;
 import java.util.Objects;
