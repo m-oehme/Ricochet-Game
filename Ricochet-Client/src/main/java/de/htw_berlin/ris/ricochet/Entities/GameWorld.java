@@ -138,6 +138,7 @@ public class GameWorld {
         currentScene.init();
         currentScene.getSceneObjectsDynamic().add(player);
         player.body.setTransform(switchPos, 0);
+        player.myScene = currentScene;
         switchScene = false;
     }
 

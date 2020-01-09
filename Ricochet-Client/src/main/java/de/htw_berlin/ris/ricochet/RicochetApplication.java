@@ -17,6 +17,7 @@ import org.jbox2d.common.Vec2;
 import java.net.InetAddress;
 import java.util.HashMap;
 import java.util.List;
+import java.util.concurrent.LinkedBlockingQueue;
 
 public class RicochetApplication {
     private static Logger log = LogManager.getLogger();
@@ -39,8 +40,7 @@ public class RicochetApplication {
     }
     private RicochetApplication() { }
 
-    private volatile boolean result = false;
-
+    private LinkedBlockingQueue<Boolean> result = new LinkedBlockingQueue<>();
 
     private void onInitialize(InetAddress serverAddress, int serverPort) throws InterruptedException {
         ClientNetManager.create(serverAddress, serverPort);
@@ -48,20 +48,16 @@ public class RicochetApplication {
 
         setUpMessageHandler();
 
-        ClientNetManager.get().getHandlerFor(ChatMessage.class).registerObserver(chatMessageObserver);
         ClientNetManager.get().getHandlerFor(WorldRequestMessage.class).registerObserver(worldRequestMessageObserver);
 
 
         log.info("Requesting GameWorld from Server");
         ClientNetManager.get().sentMessage(new WorldRequestMessage(ClientNetManager.get().getClientId()));
 
-        do {
-            if (result) {
-                RicochetGameGUI.get().init();
-                log.info("GUI initialized");
-                break;
-            }
-        } while (true);
+        result.take();
+
+        RicochetGameGUI.get().init();
+        log.info("GUI initialized");
     }
 
     private void onStarted() {
@@ -74,11 +70,7 @@ public class RicochetApplication {
         log.debug("Received: " + worldRequestMessage.getGameObjectList().toString());
         RicochetGameGUI.get().setUpWorld(worldRequestMessage.getWorldSize(), worldRequestMessage.getGameObjectList());
 
-        result = true;
-    };
-
-    private NetMessageObserver<ChatMessage> chatMessageObserver = chatMessage -> {
-        System.out.println("Chat: " + chatMessage.getChatUsername() + " :: " + chatMessage.getChatMessage());
+        result.offer(true);
     };
 
     private void setUpMessageHandler() {

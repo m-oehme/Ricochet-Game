@@ -125,9 +125,10 @@ public class NetManager implements Runnable {
                     waitForMessage();
                 }
             } catch (IOException e) {
+                log.debug(e.getMessage(), e);
                 notifyConnectionBroken();
             } catch (ClassNotFoundException e) {
-                e.printStackTrace();
+                log.error(e.getMessage(), e);
             }
         }
 

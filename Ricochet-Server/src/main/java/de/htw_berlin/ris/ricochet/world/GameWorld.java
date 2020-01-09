@@ -57,12 +57,14 @@ public class GameWorld {
         }
     }
 
-    public boolean updateGameObjectPosition(ObjectId objectId, Vec2 position) {
+    public boolean updateGameObjectPosition(ObjectId objectId, Vec2 scene, Vec2 position) {
         if (playerObjects.containsKey(objectId)) {
             playerObjects.get(objectId).setPosition(position);
+            playerObjects.get(objectId).setScene(scene);
             return true;
         } else if (dynamicGameObjects.containsKey(objectId)) {
             dynamicGameObjects.get(objectId).setPosition(position);
+            dynamicGameObjects.get(objectId).setScene(scene);
             return true;
         }
 

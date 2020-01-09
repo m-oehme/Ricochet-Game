@@ -25,4 +25,8 @@ public class SGameObject implements Serializable {
     public Vec2 getScene() {
         return scene;
     }
+
+    public void setScene(Vec2 scene) {
+        this.scene = scene;
+    }
 }

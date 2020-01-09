@@ -25,19 +25,6 @@ public class Scene {
         this.location = location;
     }
 
-    public void buildScene() {
-
-        boolean neighbor = GameWorld.Instance.getWorldScenes().get(location.add(new Vec2(0, -1))) != null;
-
-        WallPrefab lowerWall = new WallPrefab(neighbor ? WallPrefabConfig.PrefabType.DoorWall : WallPrefabConfig.PrefabType.FullWall, WallPrefabConfig.PrefabPosition.Bottom, this);
-        neighbor = GameWorld.Instance.getWorldScenes().get(location.add(new Vec2(0, +1))) != null;
-        WallPrefab topWall = new WallPrefab(neighbor ? WallPrefabConfig.PrefabType.DoorWall : WallPrefabConfig.PrefabType.FullWall, WallPrefabConfig.PrefabPosition.Top, this);
-        neighbor = GameWorld.Instance.getWorldScenes().get(location.add(new Vec2(-1, 0))) != null;
-        WallPrefab leftWall = new WallPrefab(neighbor ? WallPrefabConfig.PrefabType.DoorWall : WallPrefabConfig.PrefabType.FullWall, WallPrefabConfig.PrefabPosition.Left, this);
-        neighbor = GameWorld.Instance.getWorldScenes().get(location.add(new Vec2(+1, 0))) != null;
-        WallPrefab rightWall = new WallPrefab(neighbor ? WallPrefabConfig.PrefabType.DoorWall : WallPrefabConfig.PrefabType.FullWall, WallPrefabConfig.PrefabPosition.Right, this);
-    }
-
     public void init() {
         for (GameObject G : sceneObjectsStatic) {
             if (!(G instanceof Player)) {

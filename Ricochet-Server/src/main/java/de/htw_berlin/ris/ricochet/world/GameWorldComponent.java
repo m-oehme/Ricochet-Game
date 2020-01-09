@@ -79,6 +79,8 @@ public class GameWorldComponent implements Runnable, NetMessageObserver<WorldMes
         gameObjects.putAll(playerMap);
         worldRequestMessage.setGameObjectList(gameObjects);
         worldRequestMessage.setWorldSize(new Vec2(4,4));
+
+        log.debug("Sending World: " + worldRequestMessage.toString());
         clientManager.sendMessageToClients(worldRequestMessage);
     }
 
@@ -96,7 +98,7 @@ public class GameWorldComponent implements Runnable, NetMessageObserver<WorldMes
     }
 
     private void onMoveObject(ObjectMoveMessage objectMoveMessage) {
-        gameWorld.updateGameObjectPosition(objectMoveMessage.getObjectId(), objectMoveMessage.getPosition());
+        gameWorld.updateGameObjectPosition(objectMoveMessage.getObjectId(), objectMoveMessage.getScene(), objectMoveMessage.getPosition());
 
         clientManager.sendMessageToClients(objectMoveMessage);
     }

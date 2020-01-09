@@ -22,12 +22,14 @@ public class Player extends EnemyPlayer {
     protected Weapon currentWeapon;
     protected boolean fire;
     public Color playerColor;
+    public Vec2 currentPosition;
 
     public Player(ObjectId objectId, Vec2 pos, float width, float height, BodyType bodyType, Scene scene) {
         super(objectId, pos, width, height, bodyType,scene);
         playerColor = new java.awt.Color((float) Math.random() * 0.1f, (float) Math.random() * 0.15f + 0.15f, (float) Math.random() * 0.75f + 0.25f);
         objectColor = playerColor;
         currentWeapon = new MachineGun(this);
+        currentPosition = pos;
     }
 
     public void handleInput() {
@@ -90,7 +92,10 @@ public class Player extends EnemyPlayer {
             GameWorld.Instance.switchScene(GameWorld.switchDirection.DOWN);
         }
 
-        ClientNetManager.get().sentMessage(new ObjectMoveMessage(ClientNetManager.get().getClientId(), this.getObjectId(), myScene.getLocation(), playerPosition));
+        if (!currentPosition.equals(playerPosition)) {
+            currentPosition = playerPosition;
+            ClientNetManager.get().sentMessage(new ObjectMoveMessage(ClientNetManager.get().getClientId(), this.getObjectId(), myScene.getLocation(), playerPosition));
+        }
     }
 
 

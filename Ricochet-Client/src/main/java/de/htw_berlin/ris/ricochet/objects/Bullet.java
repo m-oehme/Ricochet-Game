@@ -32,9 +32,9 @@ public class Bullet extends GameObject {
 
             @Override
             public void run() {
-                Destroy();
+                ClientNetManager.get().sentMessage(new ObjectDestroyMessage(ClientNetManager.get().getClientId(), getObjectId()));
             }
-        }, 2000);
+        }, 20000);
     }
 
 

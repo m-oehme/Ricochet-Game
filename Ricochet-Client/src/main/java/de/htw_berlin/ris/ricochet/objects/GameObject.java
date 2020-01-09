@@ -138,4 +138,10 @@ public class GameObject {
     public void setPositionUpdate(Vec2 positionUpdate) {
         this.positionUpdate = positionUpdate;
     }
+
+    public void changeScene(Scene newScene) {
+        myScene.getSceneObjectsDynamic().remove(this);
+        myScene = newScene;
+        newScene.getSceneObjectsDynamic().add(this);
+    }
 }
