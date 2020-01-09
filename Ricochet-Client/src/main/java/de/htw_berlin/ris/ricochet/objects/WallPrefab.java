@@ -42,7 +42,7 @@ public class WallPrefab {
                         break;
                 }
 
-                GameObject Wall =  new GameObject(Postion1, (horizontal) ? GameWorld.covertedSize.x/2:GameWorld.covertedSize.x/30,  (horizontal) ? GameWorld.covertedSize.y/30 : GameWorld.covertedSize.y/2,BodyType.STATIC, 1f, 0.5f,whichScene );
+                GameObject Wall =  new GameObject(null, Postion1, (horizontal) ? GameWorld.covertedSize.x/2:GameWorld.covertedSize.x/30,  (horizontal) ? GameWorld.covertedSize.y/30 : GameWorld.covertedSize.y/2,BodyType.STATIC, 1f, 0.5f,whichScene );
 
                 break;
 
@@ -74,8 +74,8 @@ public class WallPrefab {
                         horizontal = true;
                         break;
                 }
-                GameObject wallBottom =  new GameObject(Postion1, (horizontal) ? GameWorld.covertedSize.x/6 :GameWorld.covertedSize.x/30,  (horizontal) ? GameWorld.covertedSize.y/30 : GameWorld.covertedSize.y/6,BodyType.STATIC, 1f, 0.5f,whichScene );
-                GameObject wallTop =  new GameObject(Postion2, (horizontal) ? GameWorld.covertedSize.x/6:GameWorld.covertedSize.x/30,  (horizontal) ? GameWorld.covertedSize.y/30 : GameWorld.covertedSize.y/6,BodyType.STATIC, 1f, 0.5f,whichScene );
+                GameObject wallBottom =  new GameObject(null, Postion1, (horizontal) ? GameWorld.covertedSize.x/6 :GameWorld.covertedSize.x/30,  (horizontal) ? GameWorld.covertedSize.y/30 : GameWorld.covertedSize.y/6,BodyType.STATIC, 1f, 0.5f,whichScene );
+                GameObject wallTop =  new GameObject(null, Postion2, (horizontal) ? GameWorld.covertedSize.x/6:GameWorld.covertedSize.x/30,  (horizontal) ? GameWorld.covertedSize.y/30 : GameWorld.covertedSize.y/6,BodyType.STATIC, 1f, 0.5f,whichScene );
                 break;
 
 

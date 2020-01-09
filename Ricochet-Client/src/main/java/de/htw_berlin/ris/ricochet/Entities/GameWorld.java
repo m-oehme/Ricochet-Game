@@ -1,10 +1,7 @@
 package de.htw_berlin.ris.ricochet.Entities;
 
 import de.htw_berlin.ris.ricochet.math.Vector2;
-import de.htw_berlin.ris.ricochet.objects.GameObject;
-import de.htw_berlin.ris.ricochet.objects.ObjectId;
-import de.htw_berlin.ris.ricochet.objects.Player;
-import de.htw_berlin.ris.ricochet.objects.WallPrefab;
+import de.htw_berlin.ris.ricochet.objects.*;
 import de.htw_berlin.ris.ricochet.objects.shared.SGameObject;
 import de.htw_berlin.ris.ricochet.objects.shared.SPlayer;
 import de.htw_berlin.ris.ricochet.objects.shared.SWallPrefab;
@@ -88,8 +85,7 @@ public class GameWorld {
         gameObjectList.forEach((objectId, sGameObject) -> {
             Scene scene = worldScenes.get(sGameObject.getScene());
             if (sGameObject instanceof SPlayer) {
-                GameObject playerObject = new GameObject(sGameObject.getPosition(), 0.5f, 0.5f, BodyType.DYNAMIC, scene);
-                playerObject.setObjectId(objectId);
+                EnemyPlayer playerObject = new EnemyPlayer(objectId, sGameObject.getPosition(), 0.5f, 0.5f, BodyType.DYNAMIC, scene);
             } else if(sGameObject instanceof SWallPrefab){
                 SWallPrefab sWallPrefab = (SWallPrefab) sGameObject;
                 new WallPrefab(sWallPrefab.getPrefabType(), sWallPrefab.getPrefabPosition(), scene);

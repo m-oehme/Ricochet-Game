@@ -5,13 +5,14 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import java.util.HashMap;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.LinkedBlockingQueue;
 
 public class CommonNetMessageHandler<T extends NetMessage> implements NetMessageHandler<T> {
     private static Logger log = LogManager.getLogger();
     private boolean isRunning = true;
 
-    protected HashMap<Class<? extends NetMessageObserver>, NetMessageObserver<T>> messageObserverHashMap = new HashMap<>();
+    protected ConcurrentHashMap<Class<? extends NetMessageObserver>, NetMessageObserver<T>> messageObserverHashMap = new ConcurrentHashMap<>();
     private LinkedBlockingQueue<T> receivedMessageQueue = new LinkedBlockingQueue<>();
 
     @Override

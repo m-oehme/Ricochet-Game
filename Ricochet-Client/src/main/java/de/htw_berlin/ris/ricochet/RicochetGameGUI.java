@@ -9,10 +9,7 @@ import de.htw_berlin.ris.ricochet.net.message.world.ObjectCreateMessage;
 import de.htw_berlin.ris.ricochet.net.message.world.ObjectDestroyMessage;
 import de.htw_berlin.ris.ricochet.net.message.world.ObjectMoveMessage;
 import de.htw_berlin.ris.ricochet.net.message.world.WorldRequestMessage;
-import de.htw_berlin.ris.ricochet.objects.GameObject;
-import de.htw_berlin.ris.ricochet.objects.ObjectId;
-import de.htw_berlin.ris.ricochet.objects.Player;
-import de.htw_berlin.ris.ricochet.objects.WallPrefab;
+import de.htw_berlin.ris.ricochet.objects.*;
 import de.htw_berlin.ris.ricochet.objects.shared.SGameObject;
 import de.htw_berlin.ris.ricochet.objects.shared.SPlayer;
 import de.htw_berlin.ris.ricochet.objects.shared.SWallPrefab;
@@ -119,23 +116,22 @@ public class RicochetGameGUI {
 
         if (objectCreateMessage.getSGameObject() instanceof SPlayer) {
             if (GameWorld.Instance.getPlayer() == null) {
-                Player playerObject = new Player(objectCreateMessage.getSGameObject().getPosition(), 0.5f, 0.5f, BodyType.DYNAMIC, GameWorld.Instance.getWorldScenes().get(objectCreateMessage.getSGameObject().getScene()));
-                playerObject.setObjectId(objectCreateMessage.getObjectId());
-
+                Player playerObject = new Player(objectCreateMessage.getObjectId(), objectCreateMessage.getSGameObject().getPosition(), 0.5f, 0.5f, BodyType.DYNAMIC, GameWorld.Instance.getWorldScenes().get(objectCreateMessage.getSGameObject().getScene()));
                 GameWorld.Instance.setPlayer(playerObject);
             } else {
-                GameObject playerObject = new GameObject(objectCreateMessage.getSGameObject().getPosition(), 0.5f, 0.5f, BodyType.DYNAMIC, GameWorld.Instance.getWorldScenes().get(objectCreateMessage.getSGameObject().getScene()));
-                playerObject.setObjectId(objectCreateMessage.getObjectId());
+                EnemyPlayer playerObject = new EnemyPlayer(objectCreateMessage.getObjectId(), objectCreateMessage.getSGameObject().getPosition(), 0.5f, 0.5f, BodyType.DYNAMIC, GameWorld.Instance.getWorldScenes().get(objectCreateMessage.getSGameObject().getScene()));
             }
         }
     };
 
     private NetMessageObserver<ObjectDestroyMessage> objectDestroyObserver = objectDestroyMessage -> {
-        GameWorld.Instance.getCurrentScene().getSceneObjectsDynamic().stream()
-                .filter(gameObject -> gameObject.getObjectId() != null)
-                .filter(gameObject -> gameObject.getObjectId().equals(objectDestroyMessage.getObjectId()))
-                .findFirst()
-                .ifPresent(GameObject::Destroy);
+        GameWorld.Instance.getWorldScenes().forEach((vec2, scene) -> {
+            scene.getSceneObjectsDynamic().stream()
+                    .filter(gameObject -> gameObject.getObjectId() != null)
+                    .filter(gameObject -> gameObject.getObjectId().equals(objectDestroyMessage.getObjectId()))
+                    .findFirst()
+                    .ifPresent(GameObject::Destroy);
+        });
     };
 
     private void renderUpdate() {

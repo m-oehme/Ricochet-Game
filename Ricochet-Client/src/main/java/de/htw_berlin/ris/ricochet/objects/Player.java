@@ -15,7 +15,7 @@ import java.awt.*;
 
 import static org.lwjgl.opengl.GL11.glColor3f;
 
-public class Player extends GameObject {
+public class Player extends EnemyPlayer {
     private int ID;
     public float speed = 1.0f;
     public int health = 5;
@@ -23,18 +23,11 @@ public class Player extends GameObject {
     protected boolean fire;
     public Color playerColor;
 
-    public Player(Vec2 pos, float width, float height, BodyType bodyType, Scene scene) {
-        super(pos, width, height, bodyType,scene);
+    public Player(ObjectId objectId, Vec2 pos, float width, float height, BodyType bodyType, Scene scene) {
+        super(objectId, pos, width, height, bodyType,scene);
         playerColor = new java.awt.Color((float) Math.random() * 0.1f, (float) Math.random() * 0.15f + 0.15f, (float) Math.random() * 0.75f + 0.25f);
         objectColor = playerColor;
         currentWeapon = new MachineGun(this);
-    }
-
-    @Override
-    public void Init() {
-        super.Init();
-
-        body.setFixedRotation(true);
     }
 
     public void handleInput() {
@@ -57,17 +50,6 @@ public class Player extends GameObject {
 
         if(Mouse.isButtonDown(0) )currentWeapon.shoot();
 
-    }
-
-
-    public void shoot(float shotSpeed) {
-        Vec2 playerPosition = new Vec2(body.getPosition().x, body.getPosition().y);
-        Vec2 mousePosition = new Vec2(Mouse.getX(), Mouse.getY()).mul(1 / 30f);
-        Vec2 shotDir = mousePosition.sub(playerPosition);
-        shotDir.normalize();
-        Bullet Bullet = new Bullet(playerPosition.add((shotDir.mul(1.5f))), 0.25f, 0.25f, BodyType.DYNAMIC);
-        shotDir = shotDir.mul(shotSpeed * 10);
-        Bullet.body.applyForce(shotDir, Bullet.body.getPosition());
     }
 
     @Override

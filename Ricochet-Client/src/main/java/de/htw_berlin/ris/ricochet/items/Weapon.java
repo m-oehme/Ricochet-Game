@@ -1,6 +1,14 @@
 package de.htw_berlin.ris.ricochet.items;
 
+import de.htw_berlin.ris.ricochet.net.handler.NetMessageObserver;
+import de.htw_berlin.ris.ricochet.net.manager.ClientNetManager;
+import de.htw_berlin.ris.ricochet.net.message.world.ObjectCreateMessage;
+import de.htw_berlin.ris.ricochet.objects.Bullet;
 import de.htw_berlin.ris.ricochet.objects.Player;
+import de.htw_berlin.ris.ricochet.objects.shared.SBullet;
+import org.jbox2d.common.Vec2;
+import org.jbox2d.dynamics.BodyType;
+import org.lwjgl.input.Mouse;
 
 import java.util.Timer;
 import java.util.TimerTask;
@@ -15,7 +23,13 @@ public class Weapon {
     protected int fireRate;
     protected int bulletsInMagazine;
     protected Timer t = new Timer();
- // TODO :: GUI for bullets etc.
+
+    public Weapon() {
+        ClientNetManager.get().getHandlerFor(ObjectCreateMessage.class).registerObserver(objectCreateObserver);
+
+    }
+
+    // TODO :: GUI for bullets etc.
     public  void shoot(){
         if (bulletsInMagazine<=0){
             reloading = true;
@@ -55,6 +69,18 @@ public class Weapon {
     }
 
 
+    private NetMessageObserver<ObjectCreateMessage> objectCreateObserver = objectCreateMessage -> {
+        if (objectCreateMessage.getSGameObject() instanceof SBullet) {
+            SBullet sBullet = (SBullet) objectCreateMessage.getSGameObject();
 
-
+            Bullet Bullet = new Bullet(
+                    objectCreateMessage.getObjectId(),
+                    sBullet.getPosition().add((sBullet.getShootDirection().mul(1.5f))),
+                    0.25f,
+                    0.25f,
+                    BodyType.DYNAMIC);
+            Vec2 shotDir = sBullet.getShootDirection().mul(shotSpeed * 10);
+            Bullet.shootInDirection(shotDir);
+        }
+    };
 }

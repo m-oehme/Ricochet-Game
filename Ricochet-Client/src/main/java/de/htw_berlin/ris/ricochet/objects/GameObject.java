@@ -9,13 +9,11 @@ import org.jbox2d.dynamics.BodyDef;
 import org.jbox2d.dynamics.BodyType;
 import org.jbox2d.dynamics.FixtureDef;
 
-import java.awt.*;
-
 import static org.lwjgl.opengl.GL11.*;
 import static org.lwjgl.opengl.GL11.glRectf;
 
 public class GameObject {
-    private ObjectId objectId = null;
+    private ObjectId objectId;
     private BodyDef bodyDef;
     public Body body;
     private FixtureDef bodyFixture;
@@ -28,8 +26,8 @@ public class GameObject {
     public Scene myScene;
 
  // TODO DO STUFF THAT LETS ME FLAG WETHER OR NOT TO ADD AS BODY, AND ADD FUNCTION THAT ENABLES REINSTATING PHYSICAL PROPERTIES!!!
-    public GameObject(Vec2 pos, float width, float height, BodyType bodyType, Scene whichScene) {
-
+    public GameObject(ObjectId objectId, Vec2 pos, float width, float height, BodyType bodyType, Scene whichScene) {
+        this.objectId = objectId;
         bodyDef = new BodyDef();
         bodyDef.position.set(pos.x, pos.y);
         bodyDef.type = bodyType;
@@ -52,7 +50,8 @@ public class GameObject {
         GameWorld.Instance.addGameObject(this);
     }
 
-    public GameObject(Vec2 pos, float width, float height, BodyType bodyType, float density, float restitution, Scene whichScene) {
+    public GameObject(ObjectId objectId, Vec2 pos, float width, float height, BodyType bodyType, float density, float restitution, Scene whichScene) {
+        this.objectId = objectId;
         bodyDef = new BodyDef();
         bodyDef.position.set(pos.x, pos.y);
         bodyDef.type = bodyType;
@@ -134,10 +133,6 @@ public class GameObject {
 
     public ObjectId getObjectId() {
         return objectId;
-    }
-
-    public void setObjectId(ObjectId objectId) {
-        this.objectId = objectId;
     }
 
     public void setPositionUpdate(Vec2 positionUpdate) {
