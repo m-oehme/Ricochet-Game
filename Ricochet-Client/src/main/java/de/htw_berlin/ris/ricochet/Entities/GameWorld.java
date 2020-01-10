@@ -5,6 +5,8 @@ import de.htw_berlin.ris.ricochet.objects.*;
 import de.htw_berlin.ris.ricochet.objects.shared.SGameObject;
 import de.htw_berlin.ris.ricochet.objects.shared.SPlayer;
 import de.htw_berlin.ris.ricochet.objects.shared.SWallPrefab;
+import de.htw_berlin.ris.ricochet.objects.GameObject;
+import de.htw_berlin.ris.ricochet.objects.Player;
 import org.jbox2d.common.Vec2;
 import org.jbox2d.dynamics.Body;
 import org.jbox2d.dynamics.BodyType;
@@ -30,7 +32,7 @@ public class GameWorld {
     public static Vec2 covertedSize;
     private Vec2 switchPos;
     private boolean gameOver;
-    private ConcurrentLinkedQueue<GameObject> addObjectQueue = new ConcurrentLinkedQueue<>();
+    public ConcurrentLinkedQueue<GameObject> createObjectQueue = new ConcurrentLinkedQueue<GameObject>();
 
     public enum switchDirection {
         UP,
@@ -117,7 +119,6 @@ public class GameWorld {
     }
 
     public void Reset() {
-
         currentScene.getSceneObjectsDynamic().remove(player);
         destroySceneBodies(currentScene);
         destroyAllDynamicBodies();
@@ -126,7 +127,6 @@ public class GameWorld {
         currentScene.getSceneObjectsDynamic().add(player);
         player.body.setTransform(new Vec2(GameWorld.covertedSize.x/2,  GameWorld.covertedSize.y/2), 0);
         gameOver = false;
-
     }
 
     private void finalizeSceneSwitch() {
@@ -138,7 +138,6 @@ public class GameWorld {
         currentScene.init();
         currentScene.getSceneObjectsDynamic().add(player);
         player.body.setTransform(switchPos, 0);
-        player.myScene = currentScene;
         switchScene = false;
     }
 
@@ -203,14 +202,13 @@ public class GameWorld {
     }
 
     public void updateWorld() {
-        GameObject G = addObjectQueue.poll();
-        while (G != null) {
-            G.Init();
-
-            G = addObjectQueue.poll();
-        }
-
         //TODO:: DO Static objects have to be updated?
+
+       while( createObjectQueue.peek() != null){
+           GameObject G  = createObjectQueue.poll();
+           G.Init();
+       }
+
         for (GameObject O : currentScene.getSceneObjectsDynamic()
         ) {
             O.Update();
@@ -234,6 +232,6 @@ public class GameWorld {
     }
 
     public void addGameObject(GameObject gameObject) {
-        addObjectQueue.offer(gameObject);
+        createObjectQueue.offer(gameObject);
     }
 }

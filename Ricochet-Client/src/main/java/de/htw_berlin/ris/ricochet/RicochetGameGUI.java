@@ -32,8 +32,8 @@ import static org.lwjgl.opengl.GL11.*;
  */
 
 public class RicochetGameGUI {
-    private static Logger log = LogManager.getLogger();
 
+    private static Logger log = LogManager.getLogger();
     private static RicochetGameGUI INSTANCE = null;
     public static RicochetGameGUI get() {
         if( INSTANCE == null ) {
@@ -45,9 +45,7 @@ public class RicochetGameGUI {
     private static final String WINDOW_TITLE = "Ricochet!";
     public static final int[] WINDOW_DIMENSIONS = {1280, 960};
 
-
     private final ContactListener myListener = new ContactListener();
-
 
     private void render() {
         GameWorld.Instance.renderWorld();
@@ -59,6 +57,8 @@ public class RicochetGameGUI {
 
     private void input() {
         // TODO make this nice pls
+
+
         if (GameWorld.Instance.getPlayer() != null) {
             GameWorld.Instance.getPlayer().handleInput();
         }

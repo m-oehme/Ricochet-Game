@@ -29,6 +29,7 @@ public class Player extends EnemyPlayer {
         playerColor = new java.awt.Color((float) Math.random() * 0.1f, (float) Math.random() * 0.15f + 0.15f, (float) Math.random() * 0.75f + 0.25f);
         objectColor = playerColor;
         currentWeapon = new MachineGun(this);
+        name = "PlayerObject";
         currentPosition = pos;
     }
 
@@ -96,6 +97,11 @@ public class Player extends EnemyPlayer {
             currentPosition = playerPosition;
             ClientNetManager.get().sentMessage(new ObjectMoveMessage(ClientNetManager.get().getClientId(), this.getObjectId(), myScene.getLocation(), playerPosition));
         }
+    }
+    @Override
+    public  void Init(){
+        super.Init();
+        body.setFixedRotation(true);
     }
 
 

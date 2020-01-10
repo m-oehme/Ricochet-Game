@@ -33,7 +33,6 @@ public class Weapon {
     public  void shoot(){
         if (bulletsInMagazine<=0){
             reloading = true;
-
             t.schedule(new TimerTask() {
 
                 @Override
@@ -43,7 +42,6 @@ public class Weapon {
             }, reloadTime);
         }else{
             coolDown = true;
-
             t.schedule(new TimerTask() {
 
                 @Override
@@ -51,7 +49,6 @@ public class Weapon {
                     completeCoolDown();
                 }
             }, fireRate);
-
         }
 
 

@@ -22,6 +22,8 @@ public class GameObject {
     public boolean contact;
     public java.awt.Color objectColor;
     protected GameObject colObj;
+    protected String name;
+    protected BodyType type;
 
     public Scene myScene;
 
@@ -39,7 +41,7 @@ public class GameObject {
         bodyFixture = new FixtureDef();
         bodyFixture.density = 0.1f;
         bodyFixture.shape = boxShape;
-
+        type = bodyType;
         contact = false;
         float grayscale  = (float)Math.random() * 0.25f + 0.25f;
         objectColor = new java.awt.Color(grayscale, grayscale, grayscale);
@@ -69,24 +71,21 @@ public class GameObject {
         objectColor = new java.awt.Color(grayscale, grayscale, grayscale);
         // objectColor = new java.awt.Color((float) Math.random(), (float) Math.random(), (float) Math.random());
 
+        type = bodyType;
+
         myScene = whichScene;
 
         GameWorld.Instance.addGameObject(this);
     }
 
     public void Init() {
-        if (bodyDef.type == BodyType.DYNAMIC) {
-            myScene.getSceneObjectsDynamic().add(this);
+        body = GameWorld.Instance.getPhysicsWorld().createBody(bodyDef);
+        body.createFixture(bodyFixture);
+        if (this instanceof Player) {
+            body.setLinearDamping(0.75f);
         }
+        if (type == BodyType.DYNAMIC) myScene.getSceneObjectsDynamic().add(this);
         else  myScene.getSceneObjectsStatic().add(this);
-
-        if (myScene.equals(GameWorld.Instance.getCurrentScene())) {
-            body = GameWorld.Instance.getPhysicsWorld().createBody(bodyDef);
-            body.createFixture(bodyFixture);
-            if (this instanceof Player) {
-                body.setLinearDamping(0.75f);
-            }
-        }
     }
 
     // Game Logic goes here
@@ -98,13 +97,11 @@ public class GameObject {
     }
 
     public void StartContact(GameObject gameObject) {
-
         contact = true;
         this.colObj = gameObject;
     }
 
     public void EndContact(GameObject gameObject) {
-
         contact = false;
         this.colObj = null;
 
