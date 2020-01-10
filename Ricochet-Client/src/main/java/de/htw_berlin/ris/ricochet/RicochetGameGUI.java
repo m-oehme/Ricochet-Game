@@ -82,11 +82,15 @@ public class RicochetGameGUI {
         Keyboard.enableRepeatEvents(true);
     }
 
-    public void setUpWorld(Vec2 worldSize, HashMap<ObjectId, SGameObject> gameObjectList){
+    public void setUpWorld(){
         GameWorld.Instance = new GameWorld(new Vec2(0, 0),WINDOW_DIMENSIONS);
-        GameWorld.Instance.generateWorld((int) worldSize.x, (int) worldSize.y, gameObjectList);
-        GameWorld.Instance.setCurrentScene(new Vec2(0,0));
+        Scene scene = GameWorld.Instance.generateInitWorld();
+        GameWorld.Instance.setCurrentScene(scene.getLocation());
         GameWorld.Instance.getCurrentScene().init();
+    }
+
+    public void generateWorld(Vec2 worldSize, HashMap<ObjectId, SGameObject> gameObjectList) {
+        GameWorld.Instance.generateWorld((int) worldSize.x, (int) worldSize.y, gameObjectList);
     }
 
     void setUpNetworking() {
@@ -165,6 +169,7 @@ public class RicochetGameGUI {
 
     public void init(){
         setUpDisplay();
+        setUpWorld();
         setUpNetworking();
         setUpObjects();
         setUpMatrices();

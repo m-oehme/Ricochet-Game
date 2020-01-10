@@ -74,12 +74,22 @@ public class GameWorld {
         this.gameOver = gameOver;
     }
 
+    public Scene generateInitWorld() {
+        Scene sceneCenter = new Scene(0, new Vec2(0, 0));
+        worldScenes.put(sceneCenter.getLocation(), sceneCenter);
+        return sceneCenter;
+    }
+
     public void generateWorld(int sizeX, int sizeY, HashMap<ObjectId, SGameObject> gameObjectList) {
         int indexer = 0;
         for (int y = -sizeY / 2; y < sizeY / 2; y++) {
             for (int x = -sizeX / 2; x < sizeX / 2; x++) {
-                Scene sceneCenter = new Scene(indexer, new Vec2(x, y));
-                worldScenes.put(sceneCenter.getLocation(), sceneCenter);
+                if (x == 0 && y == 0) {
+                    worldScenes.get(new Vec2(0, 0)).setID(indexer);
+                } else {
+                    Scene sceneCenter = new Scene(indexer, new Vec2(x, y));
+                    worldScenes.put(sceneCenter.getLocation(), sceneCenter);
+                }
                 indexer++;
             }
         }
@@ -90,7 +100,7 @@ public class GameWorld {
                 EnemyPlayer playerObject = new EnemyPlayer(objectId, sGameObject.getPosition(), 0.5f, 0.5f, BodyType.DYNAMIC, scene);
             } else if(sGameObject instanceof SWallPrefab){
                 SWallPrefab sWallPrefab = (SWallPrefab) sGameObject;
-                new WallPrefab(sWallPrefab.getPrefabType(), sWallPrefab.getPrefabPosition(), scene);
+                WallPrefab wall = new WallPrefab(sWallPrefab.getPrefabType(), sWallPrefab.getPrefabPosition(), scene);
             }
         });
     }

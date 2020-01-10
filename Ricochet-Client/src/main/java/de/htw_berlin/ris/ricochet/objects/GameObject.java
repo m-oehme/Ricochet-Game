@@ -79,13 +79,16 @@ public class GameObject {
     }
 
     public void Init() {
-        body = GameWorld.Instance.getPhysicsWorld().createBody(bodyDef);
-        body.createFixture(bodyFixture);
-        if (this instanceof Player) {
-            body.setLinearDamping(0.75f);
-        }
         if (type == BodyType.DYNAMIC) myScene.getSceneObjectsDynamic().add(this);
         else  myScene.getSceneObjectsStatic().add(this);
+
+        if (myScene.equals(GameWorld.Instance.getCurrentScene())) {
+            body = GameWorld.Instance.getPhysicsWorld().createBody(bodyDef);
+            body.createFixture(bodyFixture);
+            if (this instanceof Player) {
+                body.setLinearDamping(0.75f);
+            }
+        }
     }
 
     // Game Logic goes here

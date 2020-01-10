@@ -80,7 +80,7 @@ public class GameWorldComponent implements Runnable, NetMessageObserver<WorldMes
         worldRequestMessage.setGameObjectList(gameObjects);
         worldRequestMessage.setWorldSize(new Vec2(4,4));
 
-        log.debug("Sending World: " + worldRequestMessage.toString());
+        log.debug("Sending World: " + worldRequestMessage.getGameObjectList().toString());
         clientManager.sendMessageToClients(worldRequestMessage);
     }
 
