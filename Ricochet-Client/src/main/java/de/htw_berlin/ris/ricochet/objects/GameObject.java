@@ -52,6 +52,7 @@ public class GameObject {
            GameWorld.Instance.createObjectQueue.add(this);
         }
         myScene = whichScene;
+
     }
 
     public GameObject(Vec2 pos, float width, float height, BodyType bodyType, float density, float restitution, Scene whichScene) {
@@ -71,11 +72,13 @@ public class GameObject {
         float grayscale  = 0.25f;//(float)Math.random() * 0.25f + 0.25f;
         objectColor = new java.awt.Color(grayscale, grayscale, grayscale);
         // objectColor = new java.awt.Color((float) Math.random(), (float) Math.random(), (float) Math.random());
+
         type = bodyType;
         if (whichScene.equals(GameWorld.Instance.getCurrentScene())) {
             GameWorld.Instance.createObjectQueue.add(this);
         }
         myScene = whichScene;
+
     }
 
     public void Init() {

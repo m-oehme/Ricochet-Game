@@ -1,6 +1,8 @@
 package de.htw_berlin.ris.ricochet.items;
 
+import de.htw_berlin.ris.ricochet.objects.Bullet;
 import de.htw_berlin.ris.ricochet.objects.Player;
+import org.jbox2d.dynamics.BodyType;
 
 import java.util.Timer;
 import java.util.TimerTask;
@@ -15,6 +17,7 @@ public class Weapon {
     protected int fireRate;
     protected int bulletsInMagazine;
     protected Timer t = new Timer();
+    protected float  bulletSize;
  // TODO :: GUI for bullets etc.
     public  void shoot(){
         if (bulletsInMagazine<=0){
@@ -38,8 +41,9 @@ public class Weapon {
         }
 
 
-
     }
+
+
 
     private  void completeReload(){
         reloading = false;

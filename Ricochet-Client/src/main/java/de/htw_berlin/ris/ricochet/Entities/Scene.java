@@ -37,7 +37,13 @@ public class Scene {
         WallPrefab rightWall = new WallPrefab(neighbor ? WallPrefab.PrefabType.DoorWall : WallPrefab.PrefabType.FullWall, WallPrefab.PrefabPosition.Right, this);
     }
 
+    public void clearScene(){
+        sceneObjectsStatic.clear();
+        sceneObjectsDynamic.clear();
+    }
+
     public void init() {
+        buildScene();
         for (GameObject G : sceneObjectsStatic) {
             if (!(G instanceof Player)) {
                 G.Init();

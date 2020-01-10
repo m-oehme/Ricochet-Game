@@ -41,7 +41,7 @@ public class GameWorld {
 
     public GameWorld(Vec2 gravity, int[] WINDOW_DIMENSIONS) {
         this.WINDOW_DIMENSIONS = WINDOW_DIMENSIONS;
-        physicsWorld = new World(new Vec2(0, 0), true);
+        physicsWorld = new World(new Vec2(0, 0), false);
         worldScenes = new Hashtable<>();
         covertedSize = new Vec2(WINDOW_DIMENSIONS[0] * unitConversion, WINDOW_DIMENSIONS[1] * unitConversion);
     }
@@ -80,9 +80,7 @@ public class GameWorld {
                 indexer++;
             }
         }
-        for (Map.Entry<Vec2, Scene> Entry : worldScenes.entrySet()) {
-            Entry.getValue().buildScene();
-        }
+
     }
 
     public void switchScene(switchDirection direction) {
@@ -124,6 +122,7 @@ public class GameWorld {
         currentScene.getSceneObjectsDynamic().remove(player);
         destroySceneBodies(currentScene);
         destroyAllDynamicBodies();
+        currentScene.clearScene();
         setCurrentScene(newLocation);
         currentScene.init();
         currentScene.getSceneObjectsDynamic().add(player);

@@ -1,7 +1,8 @@
 package de.htw_berlin.ris.ricochet.items;
 
-import de.htw_berlin.ris.ricochet.objects.Bullet;
-import de.htw_berlin.ris.ricochet.objects.Player;
+import de.htw_berlin.ris.ricochet.net.manager.ClientNetManager;
+import de.htw_berlin.ris.ricochet.net.message.world.ObjectCreateMessage;
+import de.htw_berlin.ris.ricochet.objects.*;
 import org.jbox2d.common.Vec2;
 import org.jbox2d.dynamics.BodyType;
 import org.lwjgl.input.Mouse;
@@ -13,6 +14,7 @@ public class MachineGun extends  Weapon {
         fireRate = 100;
         magazineSize = 10;
         reloadTime = 5000;
+        bulletSize = 0.25f;
         shotSpeed = 10;
         this.player = player;
 
@@ -27,9 +29,12 @@ public class MachineGun extends  Weapon {
         Vec2 mousePosition = new Vec2(Mouse.getX(), Mouse.getY()).mul(1 / 30f);
         Vec2 shotDir = mousePosition.sub(playerPosition);
         shotDir.normalize();
-        Bullet Bullet = new Bullet(playerPosition.add((shotDir.mul(1.5f))), 0.25f, 0.25f, BodyType.DYNAMIC);
+        new Bullet(playerPosition.add((shotDir.mul(1.5f))), bulletSize, bulletSize, BodyType.DYNAMIC);
         shotDir = shotDir.mul(shotSpeed * 10);
-        Bullet.body.applyForce(shotDir, Bullet.body.getPosition());
+        ClientNetManager.get().sentMessage(new ObjectCreateMessage(ClientNetManager.get().getClientId(), null, new SBullet(playerPosition.add((shotDir.mul(1.5f))),shotDir)));
+
+
+
 
     }
 }

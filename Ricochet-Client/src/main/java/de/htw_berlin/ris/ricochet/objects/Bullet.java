@@ -15,6 +15,7 @@ public class Bullet extends GameObject {
     public int lifeTime = 10;
     //TODO make didBounce visually determinable
     public boolean didBounce;
+    public Vec2 shotDir;
 
     public Bullet(Vec2 pos, float width, float height, BodyType bodyType) {
         super(pos, width, height, bodyType, GameWorld.Instance.getCurrentScene());
@@ -31,6 +32,7 @@ public class Bullet extends GameObject {
                 Destroy();
             }
         }, 2000);
+        body.applyForce(shotDir, body.getPosition());
     }
 
 

@@ -9,9 +9,7 @@ import de.htw_berlin.ris.ricochet.net.message.world.ObjectCreateMessage;
 import de.htw_berlin.ris.ricochet.net.message.world.ObjectDestroyMessage;
 import de.htw_berlin.ris.ricochet.net.message.world.ObjectMoveMessage;
 import de.htw_berlin.ris.ricochet.net.message.world.WorldRequestMessage;
-import de.htw_berlin.ris.ricochet.objects.GameObject;
-import de.htw_berlin.ris.ricochet.objects.Player;
-import de.htw_berlin.ris.ricochet.objects.SPlayer;
+import de.htw_berlin.ris.ricochet.objects.*;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.jbox2d.common.Vec2;
@@ -94,7 +92,7 @@ public class RicochetGameGUI {
     }
 
     void setUpObjects() {
-        Vec2 playerPos = new Vec2(GameWorld.covertedSize.x/2,  GameWorld.covertedSize.y/2);
+        Vec2 playerPos = new Vec2((GameWorld.covertedSize.x+(float)Math.random()*2+1)/2,  GameWorld.covertedSize.y/2);
 
         ClientNetManager.get().sentMessage(new ObjectCreateMessage(ClientNetManager.get().getClientId(), null, new SPlayer(ClientNetManager.get().getClientId(), playerPos)));
     }
@@ -135,6 +133,11 @@ public class RicochetGameGUI {
                 GameObject playerObject = new GameObject(objectCreateMessage.getSGameObject().getPosition(), 0.5f, 0.5f, BodyType.DYNAMIC, GameWorld.Instance.getCurrentScene());
                 playerObject.setObjectId(objectCreateMessage.getObjectId());
             }
+        }
+        if (objectCreateMessage.getSGameObject() instanceof SBullet) {
+
+                GameObject BulletObject = new GameObject(objectCreateMessage.getSGameObject().getPosition(), 0.5f, 0.5f, BodyType.DYNAMIC, GameWorld.Instance.getCurrentScene());
+                BulletObject.setObjectId(objectCreateMessage.getObjectId());
         }
     };
 

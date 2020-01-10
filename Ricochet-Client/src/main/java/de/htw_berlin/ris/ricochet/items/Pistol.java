@@ -14,6 +14,7 @@ public class Pistol extends Weapon {
         magazineSize = 6;
         reloadTime = 3000;
         shotSpeed = 10;
+        bulletSize = 0.25f;
         this.player = player;
 
     }
