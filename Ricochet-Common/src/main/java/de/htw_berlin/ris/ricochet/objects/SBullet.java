@@ -10,7 +10,12 @@ public class SBullet extends SGameObject {
         this.shotDir = shotDir;
     }
 
+    public Vec2 getShotDir() {
+        return shotDir;
+    }
 
-
+    public void setShotDir(Vec2 shotDir) {
+        this.shotDir = shotDir;
+    }
 }
 

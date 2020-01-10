@@ -21,7 +21,7 @@ public class Player extends GameObject {
     private int ID;
     public float speed = 1.0f;
     public int health = 5;
-    protected Weapon currentWeapon;
+    public Weapon currentWeapon;
     protected boolean fire;
     public Color playerColor;
 
@@ -55,15 +55,7 @@ public class Player extends GameObject {
     }
 
 
-    public void shoot(float shotSpeed) {
-        Vec2 playerPosition = new Vec2(body.getPosition().x, body.getPosition().y);
-        Vec2 mousePosition = new Vec2(Mouse.getX(), Mouse.getY()).mul(1 / 30f);
-        Vec2 shotDir = mousePosition.sub(playerPosition);
-        shotDir.normalize();
-        Bullet Bullet = new Bullet(playerPosition.add((shotDir.mul(1.5f))), 0.25f, 0.25f, BodyType.DYNAMIC);
-        shotDir = shotDir.mul(shotSpeed * 10);
-        Bullet.body.applyForce(shotDir, Bullet.body.getPosition());
-    }
+
 
     @Override
     public void Render() {

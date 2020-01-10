@@ -136,8 +136,9 @@ public class RicochetGameGUI {
         }
         if (objectCreateMessage.getSGameObject() instanceof SBullet) {
 
-                GameObject BulletObject = new GameObject(objectCreateMessage.getSGameObject().getPosition(), 0.5f, 0.5f, BodyType.DYNAMIC, GameWorld.Instance.getCurrentScene());
+               Bullet BulletObject = GameWorld.Instance.getPlayer().currentWeapon.getBullet(((SBullet) objectCreateMessage.getSGameObject()).getPosition(), GameWorld.Instance.getCurrentScene());
                 BulletObject.setObjectId(objectCreateMessage.getObjectId());
+                BulletObject.shotDir = ((SBullet) objectCreateMessage.getSGameObject()).getShotDir();
         }
     };
 

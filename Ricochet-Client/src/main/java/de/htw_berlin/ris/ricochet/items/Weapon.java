@@ -1,7 +1,9 @@
 package de.htw_berlin.ris.ricochet.items;
 
+import de.htw_berlin.ris.ricochet.Entities.Scene;
 import de.htw_berlin.ris.ricochet.objects.Bullet;
 import de.htw_berlin.ris.ricochet.objects.Player;
+import org.jbox2d.common.Vec2;
 import org.jbox2d.dynamics.BodyType;
 
 import java.util.Timer;
@@ -17,7 +19,7 @@ public class Weapon {
     protected int fireRate;
     protected int bulletsInMagazine;
     protected Timer t = new Timer();
-    protected float  bulletSize;
+    protected float bulletSize;
  // TODO :: GUI for bullets etc.
     public  void shoot(){
         if (bulletsInMagazine<=0){
@@ -43,7 +45,10 @@ public class Weapon {
 
     }
 
+    public  Bullet getBullet(Vec2 position, Scene whichScene){
 
+        return  new Bullet(position, bulletSize, bulletSize, BodyType.DYNAMIC,whichScene);
+    }
 
     private  void completeReload(){
         reloading = false;

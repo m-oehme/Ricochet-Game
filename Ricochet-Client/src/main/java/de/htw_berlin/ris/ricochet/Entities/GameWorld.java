@@ -1,6 +1,7 @@
 package de.htw_berlin.ris.ricochet.Entities;
 
 import de.htw_berlin.ris.ricochet.math.Vector2;
+import de.htw_berlin.ris.ricochet.objects.Bullet;
 import de.htw_berlin.ris.ricochet.objects.GameObject;
 import de.htw_berlin.ris.ricochet.objects.Player;
 import de.htw_berlin.ris.ricochet.objects.SGameObject;
@@ -107,6 +108,7 @@ public class GameWorld {
     }
 
     public void Reset() {
+      /*
         currentScene.getSceneObjectsDynamic().remove(player);
         destroySceneBodies(currentScene);
         destroyAllDynamicBodies();
@@ -114,7 +116,7 @@ public class GameWorld {
         currentScene.init();
         currentScene.getSceneObjectsDynamic().add(player);
         player.body.setTransform(new Vec2(GameWorld.covertedSize.x/2,  GameWorld.covertedSize.y/2), 0);
-        gameOver = false;
+        gameOver = false;*/
     }
 
     private void finalizeSceneSwitch() {
@@ -172,6 +174,9 @@ public class GameWorld {
             glPopMatrix();
         }
         for (GameObject O : currentScene.getSceneObjectsDynamic()) {
+            if(O instanceof Bullet){
+                float blah = 0;
+            }
             glPushMatrix();
             O.Render();
             glPopMatrix();

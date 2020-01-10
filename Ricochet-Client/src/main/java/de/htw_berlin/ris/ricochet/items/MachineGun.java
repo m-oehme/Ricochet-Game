@@ -28,10 +28,10 @@ public class MachineGun extends  Weapon {
         Vec2 playerPosition = new Vec2(player.body.getPosition().x, player.body.getPosition().y);
         Vec2 mousePosition = new Vec2(Mouse.getX(), Mouse.getY()).mul(1 / 30f);
         Vec2 shotDir = mousePosition.sub(playerPosition);
+        Vec2 shotOffset = shotDir;
         shotDir.normalize();
-        new Bullet(playerPosition.add((shotDir.mul(1.5f))), bulletSize, bulletSize, BodyType.DYNAMIC);
         shotDir = shotDir.mul(shotSpeed * 10);
-        ClientNetManager.get().sentMessage(new ObjectCreateMessage(ClientNetManager.get().getClientId(), null, new SBullet(playerPosition.add((shotDir.mul(1.5f))),shotDir)));
+        ClientNetManager.get().sentMessage(new ObjectCreateMessage(ClientNetManager.get().getClientId(), null, new SBullet(playerPosition.add(shotOffset.mul(1.5f)),shotDir)));
 
 
 
