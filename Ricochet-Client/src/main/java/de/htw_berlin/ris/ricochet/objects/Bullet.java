@@ -34,7 +34,7 @@ public class Bullet extends GameObject {
             public void run() {
                 ClientNetManager.get().sentMessage(new ObjectDestroyMessage(ClientNetManager.get().getClientId(), getObjectId()));
             }
-        }, 20000);
+        }, 2000);
     }
 
 

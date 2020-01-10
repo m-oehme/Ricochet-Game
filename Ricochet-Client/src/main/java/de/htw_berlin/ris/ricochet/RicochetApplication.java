@@ -1,22 +1,16 @@
 package de.htw_berlin.ris.ricochet;
 
-import de.htw_berlin.ris.ricochet.Entities.GameWorld;
-import de.htw_berlin.ris.ricochet.net.handler.*;
+import de.htw_berlin.ris.ricochet.net.handler.NetMessageObserver;
 import de.htw_berlin.ris.ricochet.net.manager.ClientNetManager;
 import de.htw_berlin.ris.ricochet.net.message.general.ChatMessage;
 import de.htw_berlin.ris.ricochet.net.message.world.ObjectCreateMessage;
 import de.htw_berlin.ris.ricochet.net.message.world.ObjectDestroyMessage;
 import de.htw_berlin.ris.ricochet.net.message.world.ObjectMoveMessage;
 import de.htw_berlin.ris.ricochet.net.message.world.WorldRequestMessage;
-import de.htw_berlin.ris.ricochet.objects.ObjectId;
-import de.htw_berlin.ris.ricochet.objects.shared.SGameObject;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.jbox2d.common.Vec2;
 
 import java.net.InetAddress;
-import java.util.HashMap;
-import java.util.List;
 import java.util.concurrent.LinkedBlockingQueue;
 
 public class RicochetApplication {

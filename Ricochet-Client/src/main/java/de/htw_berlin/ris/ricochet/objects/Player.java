@@ -98,11 +98,6 @@ public class Player extends EnemyPlayer {
             ClientNetManager.get().sentMessage(new ObjectMoveMessage(ClientNetManager.get().getClientId(), this.getObjectId(), myScene.getLocation(), playerPosition));
         }
     }
-    @Override
-    public  void Init(){
-        super.Init();
-        body.setFixedRotation(true);
-    }
 
 
     public int getID() {
