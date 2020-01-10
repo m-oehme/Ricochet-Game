@@ -29,8 +29,8 @@ import static org.lwjgl.opengl.GL11.*;
  */
 
 public class RicochetGameGUI {
-    private static Logger log = LogManager.getLogger();
 
+    private static Logger log = LogManager.getLogger();
     private static RicochetGameGUI INSTANCE = null;
     public static RicochetGameGUI get() {
         if( INSTANCE == null ) {
@@ -42,9 +42,7 @@ public class RicochetGameGUI {
     private static final String WINDOW_TITLE = "Ricochet!";
     public static final int[] WINDOW_DIMENSIONS = {1280, 960};
 
-
     private final ContactListener myListener = new ContactListener();
-
 
     private void render() {
         GameWorld.Instance.renderWorld();
@@ -56,6 +54,8 @@ public class RicochetGameGUI {
 
     private void input() {
         // TODO make this nice pls
+
+
         if (GameWorld.Instance.getPlayer() != null) {
             GameWorld.Instance.getPlayer().handleInput();
         }
@@ -84,7 +84,6 @@ public class RicochetGameGUI {
         GameWorld.Instance.generateWorld(4,4);
         GameWorld.Instance.setCurrentScene(new Vec2(0,0));
         GameWorld.Instance.getCurrentScene().init();
-
     }
 
     void setUpNetworking() {
@@ -95,10 +94,8 @@ public class RicochetGameGUI {
     }
 
     void setUpObjects() {
-
-
-
         Vec2 playerPos = new Vec2(GameWorld.covertedSize.x/2,  GameWorld.covertedSize.y/2);
+
         ClientNetManager.get().sentMessage(new ObjectCreateMessage(ClientNetManager.get().getClientId(), null, new SPlayer(ClientNetManager.get().getClientId(), playerPos)));
     }
 
@@ -155,9 +152,9 @@ public class RicochetGameGUI {
     void enterGameLoop() {
         // TODO use Threads
         while (!Display.isCloseRequested()) {
-            render();
             logic();
             input();
+            render();
             renderUpdate();
          //   System.out.println(Mouse.getX() + " , "+ Mouse.getY());
         }

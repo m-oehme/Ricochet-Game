@@ -29,8 +29,8 @@ public class Player extends GameObject {
         super(pos, width, height, bodyType,scene);
         playerColor = new java.awt.Color((float) Math.random() * 0.1f, (float) Math.random() * 0.15f + 0.15f, (float) Math.random() * 0.75f + 0.25f);
         objectColor = playerColor;
-        body.setFixedRotation(true);
         currentWeapon = new MachineGun(this);
+        name = "PlayerObject";
     }
 
     public void handleInput() {
@@ -103,6 +103,11 @@ public class Player extends GameObject {
         }
 
         ClientNetManager.get().sentMessage(new ObjectMoveMessage(ClientNetManager.get().getClientId(), this.getObjectId(), playerPosition));
+    }
+    @Override
+    public  void Init(){
+        super.Init();
+        body.setFixedRotation(true);
     }
 
 

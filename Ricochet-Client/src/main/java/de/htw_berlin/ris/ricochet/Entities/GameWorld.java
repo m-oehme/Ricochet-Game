@@ -3,11 +3,13 @@ package de.htw_berlin.ris.ricochet.Entities;
 import de.htw_berlin.ris.ricochet.math.Vector2;
 import de.htw_berlin.ris.ricochet.objects.GameObject;
 import de.htw_berlin.ris.ricochet.objects.Player;
+import de.htw_berlin.ris.ricochet.objects.SGameObject;
 import org.jbox2d.common.Vec2;
 import org.jbox2d.dynamics.Body;
 import org.jbox2d.dynamics.World;
 
 import java.util.*;
+import java.util.concurrent.ConcurrentLinkedQueue;
 
 import static org.lwjgl.opengl.GL11.*;
 
@@ -26,6 +28,7 @@ public class GameWorld {
     public static Vec2 covertedSize;
     private Vec2 switchPos;
     private boolean gameOver;
+    public ConcurrentLinkedQueue<GameObject> createObjectQueue = new ConcurrentLinkedQueue<GameObject>();
 
     public enum switchDirection {
         UP,
@@ -106,7 +109,6 @@ public class GameWorld {
     }
 
     public void Reset() {
-
         currentScene.getSceneObjectsDynamic().remove(player);
         destroySceneBodies(currentScene);
         destroyAllDynamicBodies();
@@ -115,7 +117,6 @@ public class GameWorld {
         currentScene.getSceneObjectsDynamic().add(player);
         player.body.setTransform(new Vec2(GameWorld.covertedSize.x/2,  GameWorld.covertedSize.y/2), 0);
         gameOver = false;
-
     }
 
     private void finalizeSceneSwitch() {
@@ -192,6 +193,14 @@ public class GameWorld {
 
     public void updateWorld() {
         //TODO:: DO Static objects have to be updated?
+
+
+
+       while( createObjectQueue.peek() != null){
+           GameObject G  = createObjectQueue.poll();
+           G.Init();
+       }
+
         for (GameObject O : currentScene.getSceneObjectsDynamic()
         ) {
             O.Update();
