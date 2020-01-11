@@ -5,6 +5,7 @@ import de.htw_berlin.ris.ricochet.net.handler.NetMessageObserver;
 import de.htw_berlin.ris.ricochet.net.manager.ClientId;
 import de.htw_berlin.ris.ricochet.net.message.world.*;
 import de.htw_berlin.ris.ricochet.objects.ObjectId;
+import de.htw_berlin.ris.ricochet.objects.shared.SCompanionAI;
 import de.htw_berlin.ris.ricochet.objects.shared.SGameObject;
 import de.htw_berlin.ris.ricochet.objects.shared.SPlayer;
 import org.apache.logging.log4j.LogManager;
@@ -115,8 +116,16 @@ public class GameWorldComponent implements Runnable, NetMessageObserver<WorldMes
     public void removeAllObjectsForPlayer(ClientId clientId) {
         ObjectId objectId = gameWorld.removePlayerObject(clientId);
 
+        gameWorld.getDynamicGameObjects().entrySet().stream()
+                .filter(entry -> entry.getValue() instanceof SCompanionAI)
+                .filter(entry -> ((SCompanionAI) entry.getValue()).getGuardianPlayer().equals(objectId))
+                .findFirst().ifPresent(entry -> {
+                    clientManager.sendMessageToClients(new ObjectDestroyMessage(clientId, entry.getKey()));
+                });
+
         if (objectId != null) {
             clientManager.sendMessageToClients(new ObjectDestroyMessage(clientId, objectId));
         }
+
     }
 }

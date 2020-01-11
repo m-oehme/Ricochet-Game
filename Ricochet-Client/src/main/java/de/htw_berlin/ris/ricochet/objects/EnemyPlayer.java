@@ -14,8 +14,6 @@ public class EnemyPlayer extends GameObject {
     public void Init() {
         super.Init();
 
-        if (myScene.equals(GameWorld.Instance.getCurrentScene())) {
-            body.setFixedRotation(true);
-        }
+        body.setFixedRotation(true);
     }
 }

@@ -25,7 +25,7 @@ public class GameObject {
     public Body body;
     private FixtureDef bodyFixture;
     protected Vec2 position;
-    private Vec2 positionUpdate;
+    protected Vec2 positionUpdate;
     protected float width, height;
     public boolean contact;
     public java.awt.Color objectColor;
