@@ -10,7 +10,7 @@ public class ObjectDestroyMessage extends WorldMessage implements NetMessage {
     private ObjectId objectId;
 
     public ObjectDestroyMessage(ClientId clientId, ObjectId objectId) {
-        super(clientId, MessageScope.EXCEPT_SELF);
+        super(clientId, MessageScope.EVERYONE);
         this.objectId = objectId;
     }
 

@@ -135,10 +135,8 @@ public class GameWorld {
 
     public void Reset() {
         currentScene.getSceneObjectsDynamic().remove(player);
-        destroySceneBodies(currentScene);
         destroyAllDynamicBodies();
         setCurrentScene(new Vec2(0,0));
-        currentScene.init();
         currentScene.getSceneObjectsDynamic().add(player);
         player.body.setTransform(new Vec2(GameWorld.covertedSize.x/2,  GameWorld.covertedSize.y/2), 0);
         gameOver = false;
@@ -147,11 +145,8 @@ public class GameWorld {
     private void finalizeSceneSwitch() {
 
         currentScene.getSceneObjectsDynamic().remove(player);
-//        destroySceneBodies(currentScene);
         setCurrentScene(newLocation);
-        currentScene.init();
         currentScene.getSceneObjectsDynamic().add(player);
-//        player.body.setTransform(switchPos, 0);
         player.myScene = worldScenes.get(newLocation);
         switchScene = false;
     }
@@ -164,9 +159,9 @@ public class GameWorld {
     }
 
     private void destroyAllDynamicBodies(){
-        for (GameObject G : currentScene.getSceneObjectsDynamic()) {
-            Destroy(G);
-        }
+        worldScenes.values().forEach(scene -> {
+            scene.getSceneObjectsDynamic().forEach(GameObject::Destroy);
+        });
 
     }
 

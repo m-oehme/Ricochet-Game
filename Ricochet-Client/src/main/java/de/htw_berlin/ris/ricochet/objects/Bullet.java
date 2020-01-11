@@ -1,10 +1,6 @@
 package de.htw_berlin.ris.ricochet.objects;
 
-import de.htw_berlin.ris.ricochet.Entities.GameWorld;
 import de.htw_berlin.ris.ricochet.Entities.Scene;
-import de.htw_berlin.ris.ricochet.net.manager.ClientNetManager;
-import de.htw_berlin.ris.ricochet.net.message.world.ObjectDestroyMessage;
-import de.htw_berlin.ris.ricochet.net.message.world.ObjectMoveMessage;
 import org.jbox2d.common.Vec2;
 import org.jbox2d.dynamics.BodyType;
 
@@ -55,7 +51,9 @@ public class Bullet extends GameObject {
                     ((Player) colObj).health--;
                     if (((Player) colObj).health <= 0)((Player) colObj).death();
                 }
-            }else{
+            } else if (colObj instanceof EnemyPlayer) {
+                Destroy();
+            } else {
                 didBounce = true;
             }
 
