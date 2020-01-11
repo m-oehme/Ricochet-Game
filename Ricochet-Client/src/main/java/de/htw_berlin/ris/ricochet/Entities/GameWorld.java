@@ -5,6 +5,7 @@ import de.htw_berlin.ris.ricochet.net.handler.NetMessageObserver;
 import de.htw_berlin.ris.ricochet.net.manager.ClientNetManager;
 import de.htw_berlin.ris.ricochet.net.message.world.ObjectDestroyMessage;
 import de.htw_berlin.ris.ricochet.objects.*;
+import de.htw_berlin.ris.ricochet.objects.shared.SCompanionAI;
 import de.htw_berlin.ris.ricochet.objects.shared.SGameObject;
 import de.htw_berlin.ris.ricochet.objects.shared.SPlayer;
 import de.htw_berlin.ris.ricochet.objects.shared.SWallPrefab;
@@ -103,10 +104,12 @@ public class GameWorld {
             Vec2 sceneOffset = new Vec2(scene.getLocation().x * GameWorld.covertedSize.x, scene.getLocation().y * GameWorld.covertedSize.y);
             if (sGameObject instanceof SPlayer) {
                 EnemyPlayer playerObject = new EnemyPlayer(objectId, sGameObject.getPosition().add(sceneOffset), 0.5f, 0.5f, BodyType.DYNAMIC, scene);
+            } else if (sGameObject instanceof SCompanionAI) {
+                EnemyCompanionAI playerObject = new EnemyCompanionAI(objectId, sGameObject.getPosition().add(sceneOffset), 0.5f, 0.5f, scene);
             } else if(sGameObject instanceof SWallPrefab){
                 SWallPrefab sWallPrefab = (SWallPrefab) sGameObject;
                 WallPrefab wall = new WallPrefab(sWallPrefab.getPrefabType(), sWallPrefab.getPrefabPosition(), scene);
-            }else{
+            } else {
                 GameObject cellWall = WallPrefab.simpleWall(WallPrefabConfig.PrefabType.CellWall,sGameObject.getPosition().add(sceneOffset),sGameObject.getWidth(),sGameObject.getHeight(),scene);
             }
         });
