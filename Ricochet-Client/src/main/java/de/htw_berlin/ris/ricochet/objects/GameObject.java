@@ -2,6 +2,8 @@ package de.htw_berlin.ris.ricochet.objects;
 
 import de.htw_berlin.ris.ricochet.Entities.GameWorld;
 import de.htw_berlin.ris.ricochet.Entities.Scene;
+import de.htw_berlin.ris.ricochet.net.manager.ClientNetManager;
+import de.htw_berlin.ris.ricochet.net.message.world.ObjectMoveMessage;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.jbox2d.collision.shapes.PolygonShape;

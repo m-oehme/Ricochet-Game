@@ -10,6 +10,7 @@ import de.htw_berlin.ris.ricochet.net.message.world.ObjectDestroyMessage;
 import de.htw_berlin.ris.ricochet.net.message.world.ObjectMoveMessage;
 import de.htw_berlin.ris.ricochet.net.message.world.WorldRequestMessage;
 import de.htw_berlin.ris.ricochet.objects.*;
+import de.htw_berlin.ris.ricochet.objects.shared.SCompanionAI;
 import de.htw_berlin.ris.ricochet.objects.shared.SGameObject;
 import de.htw_berlin.ris.ricochet.objects.shared.SPlayer;
 import de.htw_berlin.ris.ricochet.objects.shared.SWallPrefab;
@@ -114,13 +115,26 @@ public class RicochetGameGUI {
 
     private NetMessageObserver<ObjectCreateMessage> objectCreateObserver = objectCreateMessage -> {
         log.debug("Object Create - Type: " + objectCreateMessage.getSGameObject().getClass().getSimpleName() + " ID: " + objectCreateMessage.getObjectId());
+        SGameObject sGameObject = objectCreateMessage.getSGameObject();
 
-        if (objectCreateMessage.getSGameObject() instanceof SPlayer) {
+        if (sGameObject instanceof SPlayer) {
             if (GameWorld.Instance.getPlayer() == null) {
                 Player playerObject = new Player(objectCreateMessage.getObjectId(), objectCreateMessage.getSGameObject().getPosition(), 0.5f, 0.5f, BodyType.DYNAMIC, GameWorld.Instance.getWorldScenes().get(objectCreateMessage.getSGameObject().getScene()));
                 GameWorld.Instance.setPlayer(playerObject);
+
+                ClientNetManager.get().sentMessage(new ObjectCreateMessage(
+                        ClientNetManager.get().getClientId(),
+                        null,
+                        new SCompanionAI(playerObject.myScene.getLocation(), objectCreateMessage.getSGameObject().getPosition().add(new Vec2(5,5)), 0.5f, 0.5f, playerObject.getObjectId())
+                        ));
             } else {
                 EnemyPlayer playerObject = new EnemyPlayer(objectCreateMessage.getObjectId(), objectCreateMessage.getSGameObject().getPosition(), 0.5f, 0.5f, BodyType.DYNAMIC, GameWorld.Instance.getWorldScenes().get(objectCreateMessage.getSGameObject().getScene()));
+            }
+        } else if (sGameObject instanceof SCompanionAI) {
+            if (((SCompanionAI) sGameObject).getGuardianPlayer().equals(GameWorld.Instance.getPlayer().getObjectId())){
+                new CompanionAI(objectCreateMessage.getObjectId(), objectCreateMessage.getSGameObject().getPosition(), 0.5f, 0.5f, GameWorld.Instance.getWorldScenes().get(objectCreateMessage.getSGameObject().getScene()), GameWorld.Instance.getPlayer());
+            } else {
+                EnemyCompanionAI playerObject = new EnemyCompanionAI(objectCreateMessage.getObjectId(), objectCreateMessage.getSGameObject().getPosition(), 0.5f, 0.5f, GameWorld.Instance.getWorldScenes().get(objectCreateMessage.getSGameObject().getScene()));
             }
         }
     };
