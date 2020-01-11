@@ -32,7 +32,7 @@ public class Bullet extends GameObject {
 
             @Override
             public void run() {
-                ClientNetManager.get().sentMessage(new ObjectDestroyMessage(ClientNetManager.get().getClientId(), getObjectId()));
+                Destroy();
             }
         }, 2000);
     }
@@ -48,7 +48,7 @@ public class Bullet extends GameObject {
         if (contact) {
             if (colObj == null ) return;
             if (colObj instanceof Player) {
-                ClientNetManager.get().sentMessage(new ObjectDestroyMessage(ClientNetManager.get().getClientId(), getObjectId()));
+                Destroy();
                 if(didBounce){
                     ((Player) colObj).health--;
                     if (((Player) colObj).health <= 0)((Player) colObj).death();

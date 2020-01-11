@@ -1,6 +1,9 @@
 package de.htw_berlin.ris.ricochet.Entities;
 
 import de.htw_berlin.ris.ricochet.math.Vector2;
+import de.htw_berlin.ris.ricochet.net.handler.NetMessageObserver;
+import de.htw_berlin.ris.ricochet.net.manager.ClientNetManager;
+import de.htw_berlin.ris.ricochet.net.message.world.ObjectDestroyMessage;
 import de.htw_berlin.ris.ricochet.objects.*;
 import de.htw_berlin.ris.ricochet.objects.shared.SGameObject;
 import de.htw_berlin.ris.ricochet.objects.shared.SPlayer;
@@ -48,6 +51,8 @@ public class GameWorld {
         physicsWorld = new World(new Vec2(0, 0), true);
         worldScenes = new Hashtable<>();
         covertedSize = new Vec2(WINDOW_DIMENSIONS[0] * unitConversion, WINDOW_DIMENSIONS[1] * unitConversion);
+
+        ClientNetManager.get().getHandlerFor(ObjectDestroyMessage.class).registerObserver(objectDestroyObserver);
     }
 
     public Map<Vec2, Scene> getWorldScenes() {
@@ -208,8 +213,18 @@ public class GameWorld {
     }
 
     public void Destroy(GameObject G) {
-        objectsToBeDestroyed.add(G);
+        ClientNetManager.get().sentMessage(new ObjectDestroyMessage(ClientNetManager.get().getClientId(), G.getObjectId()));
     }
+
+    private NetMessageObserver<ObjectDestroyMessage> objectDestroyObserver = objectDestroyMessage -> {
+        GameWorld.Instance.getWorldScenes().forEach((vec2, scene) -> {
+            scene.getSceneObjectsDynamic().stream()
+                    .filter(gameObject -> gameObject.getObjectId() != null)
+                    .filter(gameObject -> gameObject.getObjectId().equals(objectDestroyMessage.getObjectId()))
+                    .findFirst()
+                    .ifPresent(gameObject -> objectsToBeDestroyed.add(gameObject));
+        });
+    };
 
     public void updateWorld() {
         //TODO:: DO Static objects have to be updated?

@@ -96,7 +96,6 @@ public class RicochetGameGUI {
     void setUpNetworking() {
         ClientNetManager.get().getHandlerFor(ObjectCreateMessage.class).registerObserver(objectCreateObserver);
         ClientNetManager.get().getHandlerFor(ObjectMoveMessage.class).registerObserver(objectMoveObserver);
-        ClientNetManager.get().getHandlerFor(ObjectDestroyMessage.class).registerObserver(objectDestroyObserver);
     }
 
     void setUpObjects() {
@@ -128,16 +127,6 @@ public class RicochetGameGUI {
                 EnemyPlayer playerObject = new EnemyPlayer(objectCreateMessage.getObjectId(), objectCreateMessage.getSGameObject().getPosition(), 0.5f, 0.5f, BodyType.DYNAMIC, GameWorld.Instance.getWorldScenes().get(objectCreateMessage.getSGameObject().getScene()));
             }
         }
-    };
-
-    private NetMessageObserver<ObjectDestroyMessage> objectDestroyObserver = objectDestroyMessage -> {
-        GameWorld.Instance.getWorldScenes().forEach((vec2, scene) -> {
-            scene.getSceneObjectsDynamic().stream()
-                    .filter(gameObject -> gameObject.getObjectId() != null)
-                    .filter(gameObject -> gameObject.getObjectId().equals(objectDestroyMessage.getObjectId()))
-                    .findFirst()
-                    .ifPresent(GameObject::Destroy);
-        });
     };
 
     private void renderUpdate() {
