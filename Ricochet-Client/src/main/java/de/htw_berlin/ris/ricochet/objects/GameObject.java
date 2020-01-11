@@ -34,12 +34,11 @@ public class GameObject {
     final short GROUP_PLAYER = -1;
     final short GROUP_OTHERPLAYER = -1;
     final short GROUP_BULLETS = -1;
-    final short GROUP_SENSOR = -2;
+    final short GROUP_SENSOR = 1;
     final short GROUP_SCENE = 1;
 
     public Scene myScene;
 
-    // TODO DO STUFF THAT LETS ME FLAG WETHER OR NOT TO ADD AS BODY, AND ADD FUNCTION THAT ENABLES REINSTATING PHYSICAL PROPERTIES!!!
     public GameObject(ObjectId objectId, Vec2 pos, float width, float height, BodyType bodyType, Scene whichScene) {
         this.position = pos;
         this.objectId = objectId;
@@ -53,24 +52,24 @@ public class GameObject {
         bodyFixture = new FixtureDef();
         bodyFixture.density = 0.1f;
         bodyFixture.shape = boxShape;
+        PolygonShape boxShapeSensor = new PolygonShape();
+        boxShapeSensor.setAsBox(width+(width*0.01f), height+(height*0.01f));
+        sensorFixture =new FixtureDef();
+        sensorFixture.density = 0.1f;
+        sensorFixture.shape = boxShapeSensor;
+        sensorFixture.isSensor = true;
 
         if (this instanceof Player) {
-            sensorFixture =new FixtureDef();
-            sensorFixture.density = 0.1f;
-            sensorFixture.shape = boxShape;
-            sensorFixture.isSensor = true;
             bodyFixture.filter.groupIndex = GROUP_PLAYER;
             sensorFixture.filter.groupIndex = GROUP_SENSOR;
         } else if (this instanceof EnemyPlayer) {
-            sensorFixture =new FixtureDef();
-            sensorFixture.density = 0.1f;
-            sensorFixture.shape = boxShape;
-            sensorFixture.isSensor = true;
             bodyFixture.filter.groupIndex = GROUP_OTHERPLAYER;
             sensorFixture.filter.groupIndex = GROUP_SENSOR;
         } else if (this instanceof Bullet) {
+            bodyFixture.filter.groupIndex = GROUP_BULLETS;
+        } else{
             bodyFixture.filter.groupIndex = GROUP_SCENE;
-        } else bodyFixture.filter.groupIndex = GROUP_SCENE;
+        }
 
         type = bodyType;
         contact = false;
@@ -94,37 +93,35 @@ public class GameObject {
         this.height = height;
         boxShape.setAsBox(width, height);
         bodyFixture = new FixtureDef();
-        bodyFixture.density = 0.1f;
+        bodyFixture.density = density;
         bodyFixture.shape = boxShape;
-
-
+        bodyFixture.restitution = restitution;
+        PolygonShape boxShapeSensor = new PolygonShape();
+        boxShapeSensor.setAsBox(width+(width*0.1f), height+(height*0.1f));
+        sensorFixture =new FixtureDef();
+        sensorFixture.density = 0.1f;
+        sensorFixture.shape = boxShapeSensor;
+        sensorFixture.isSensor = true;
 
         if (this instanceof Player) {
-            sensorFixture =new FixtureDef();
-            sensorFixture.density = 0.1f;
-            sensorFixture.shape = boxShape;
-            sensorFixture.isSensor = true;
-
             bodyFixture.filter.groupIndex = GROUP_PLAYER;
             sensorFixture.filter.groupIndex = GROUP_SENSOR;
         } else if (this instanceof EnemyPlayer) {
-            sensorFixture =new FixtureDef();
-            sensorFixture.density = 0.1f;
-            sensorFixture.shape = boxShape;
-            sensorFixture.isSensor = true;
+
             bodyFixture.filter.groupIndex = GROUP_OTHERPLAYER;
             sensorFixture.filter.groupIndex = GROUP_SENSOR;
         } else if (this instanceof Bullet) {
-            bodyFixture.filter.groupIndex = GROUP_SCENE;
+            bodyFixture.filter.groupIndex = GROUP_BULLETS;
         } else{
             bodyFixture.filter.groupIndex = GROUP_SCENE;
         }
 
         contact = false;
+        type = bodyType;
         float grayscale = 0.25f;//(float)Math.random() * 0.25f + 0.25f;
         objectColor = new java.awt.Color(grayscale, grayscale, grayscale);
 
-        type = bodyType;
+
 
         myScene = whichScene;
 
@@ -139,9 +136,9 @@ public class GameObject {
         body = GameWorld.Instance.getPhysicsWorld().createBody(bodyDef);
         body.createFixture(bodyFixture);
 
-        if (this instanceof Player) {
+        if (this instanceof Player|| this instanceof EnemyPlayer) {
             body.setLinearDamping(0.75f);
-         //   body.createFixture(sensorFixture);
+            body.createFixture(sensorFixture);
         }
     }
 
