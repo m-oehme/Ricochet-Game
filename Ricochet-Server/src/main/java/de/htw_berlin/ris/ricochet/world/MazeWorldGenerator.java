@@ -10,7 +10,6 @@ import java.util.List;
 import java.util.Stack;
 
 public class MazeWorldGenerator implements WorldGenerator {
-
     private static Cell[][] myCells;
     private Vec2 tileSize;
     int totalCellsX, totalCellsY;
@@ -22,8 +21,6 @@ public class MazeWorldGenerator implements WorldGenerator {
     public MazeWorldGenerator(int totalCellsX, int totalCellsY) {
         this.totalCellsX = totalCellsX;
         this.totalCellsY = totalCellsY;
-
-
     }
 
     @Override
@@ -79,10 +76,14 @@ public class MazeWorldGenerator implements WorldGenerator {
                 Vec2 cellPos = new Vec2(x * tileSize.x, y * tileSize.y);
                 cell.upperWallPos = new Vec2(cellPos.x + (tileSize.x / 2), cellPos.y + tileSize.y);
                 cell.rightWallPos = new Vec2(cellPos.x + tileSize.x, cellPos.y + (tileSize.y / 2));
-                cell.upperWall = new SGameObject(whichScene, cell.upperWallPos, tileSize.x, wallThickness);
-                cellWalls.add(cell.upperWall);
-                cell.rightWall = new SGameObject(whichScene, cell.rightWallPos, wallThickness, tileSize.y);
-                cellWalls.add(cell.rightWall);
+                cell.upperWall = new SGameObject(whichScene, cell.upperWallPos, tileSize.x/2, wallThickness);
+                if (y != totalCellsY-1){
+                    cellWalls.add(cell.upperWall);
+                }
+                cell.rightWall = new SGameObject(whichScene, cell.rightWallPos, wallThickness, tileSize.y/2);
+                if (x != totalCellsX-1){
+                    cellWalls.add(cell.rightWall);
+                }
                 myCells[x][y] = cell;
             }
         }
@@ -109,19 +110,12 @@ public class MazeWorldGenerator implements WorldGenerator {
                 stackCells.push(curCell);
                 if (cache.x > curCell.x) {
                     mazeWalls.remove(curCell.rightWall);
-
                 } else if (cache.y > curCell.y) {
-
                     mazeWalls.remove(curCell.upperWall);
-
                 } else if (cache.y < curCell.y) {
-
                     mazeWalls.remove(cache.upperWall);
-
                 } else if (cache.x < curCell.x) {
-
                     mazeWalls.remove(cache.rightWall);
-
                 }
                 curCell = cache;
                 curCell.visited = true;

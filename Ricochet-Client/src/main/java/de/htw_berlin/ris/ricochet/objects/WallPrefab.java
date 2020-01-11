@@ -17,21 +17,17 @@ public class WallPrefab {
 
         switch (type) {
 
-
             case FullWall:
 
                 switch (position){
                     case Left:
-
                         Postion1 = new Vec2 (0,GameWorld.covertedSize.y/2);
                         break;
 
                     case Right:
-
                         Postion1 = new Vec2 (GameWorld.covertedSize.x,GameWorld.covertedSize.y/2);
                         break;
                     case Top:
-
                         Postion1 = new Vec2 (GameWorld.covertedSize.x/2,GameWorld.covertedSize.y);
                         horizontal = true;
                         break;
@@ -50,19 +46,17 @@ public class WallPrefab {
 
 
                 switch (position){
-                    case Left:
 
+                    case Left:
                         Postion1 = new Vec2 (0,(GameWorld.covertedSize.y/6));
                         Postion2 = new Vec2 (0, (GameWorld.covertedSize.y/6)*5);
                         break;
 
                     case Right:
-
                         Postion1 = new Vec2 (GameWorld.covertedSize.x,(GameWorld.covertedSize.y/6));
                         Postion2 = new Vec2 (GameWorld.covertedSize.x, (GameWorld.covertedSize.y/6)*5);
                         break;
                     case Top:
-
                         Postion1 = new Vec2 (GameWorld.covertedSize.x/6,GameWorld.covertedSize.y);
                         Postion2 = new Vec2 (GameWorld.covertedSize.x/6*5, GameWorld.covertedSize.y);
                         horizontal = true;
@@ -77,8 +71,6 @@ public class WallPrefab {
                 GameObject wallBottom =  new GameObject(null, Postion1, (horizontal) ? GameWorld.covertedSize.x/6 :GameWorld.covertedSize.x/30,  (horizontal) ? GameWorld.covertedSize.y/30 : GameWorld.covertedSize.y/6,BodyType.STATIC, 1f, 0.5f,whichScene );
                 GameObject wallTop =  new GameObject(null, Postion2, (horizontal) ? GameWorld.covertedSize.x/6:GameWorld.covertedSize.x/30,  (horizontal) ? GameWorld.covertedSize.y/30 : GameWorld.covertedSize.y/6,BodyType.STATIC, 1f, 0.5f,whichScene );
                 break;
-
-
 
         }
 
