@@ -21,7 +21,7 @@ public class GameObject {
     private ObjectId objectId;
     private BodyDef bodyDef;
     public Body body;
-    private FixtureDef bodyFixture;
+    private FixtureDef bodyFixture, sensorFixture;
     protected Vec2 position;
     private Vec2 positionUpdate;
     protected float width, height;
@@ -31,9 +31,15 @@ public class GameObject {
     protected String name;
     protected BodyType type;
 
+    final short GROUP_PLAYER = -1;
+    final short GROUP_OTHERPLAYER = -1;
+    final short GROUP_BULLETS = -1;
+    final short GROUP_SENSOR = -2;
+    final short GROUP_SCENE = 1;
+
     public Scene myScene;
 
- // TODO DO STUFF THAT LETS ME FLAG WETHER OR NOT TO ADD AS BODY, AND ADD FUNCTION THAT ENABLES REINSTATING PHYSICAL PROPERTIES!!!
+    // TODO DO STUFF THAT LETS ME FLAG WETHER OR NOT TO ADD AS BODY, AND ADD FUNCTION THAT ENABLES REINSTATING PHYSICAL PROPERTIES!!!
     public GameObject(ObjectId objectId, Vec2 pos, float width, float height, BodyType bodyType, Scene whichScene) {
         this.position = pos;
         this.objectId = objectId;
@@ -47,9 +53,28 @@ public class GameObject {
         bodyFixture = new FixtureDef();
         bodyFixture.density = 0.1f;
         bodyFixture.shape = boxShape;
+
+        if (this instanceof Player) {
+            sensorFixture =new FixtureDef();
+            sensorFixture.density = 0.1f;
+            sensorFixture.shape = boxShape;
+            sensorFixture.isSensor = true;
+            bodyFixture.filter.groupIndex = GROUP_PLAYER;
+            sensorFixture.filter.groupIndex = GROUP_SENSOR;
+        } else if (this instanceof EnemyPlayer) {
+            sensorFixture =new FixtureDef();
+            sensorFixture.density = 0.1f;
+            sensorFixture.shape = boxShape;
+            sensorFixture.isSensor = true;
+            bodyFixture.filter.groupIndex = GROUP_OTHERPLAYER;
+            sensorFixture.filter.groupIndex = GROUP_SENSOR;
+        } else if (this instanceof Bullet) {
+            bodyFixture.filter.groupIndex = GROUP_SCENE;
+        } else bodyFixture.filter.groupIndex = GROUP_SCENE;
+
         type = bodyType;
         contact = false;
-        float grayscale  = (float)Math.random() * 0.25f + 0.25f;
+        float grayscale = (float) Math.random() * 0.25f + 0.25f;
         objectColor = new java.awt.Color(grayscale, grayscale, grayscale);
         //  objectColor = new java.awt.Color((float) Math.random() * 0.1f, (float) Math.random() * 0.5f + 0.5f, (float) Math.random() * 0.75f + 0.25f);
 
@@ -69,13 +94,35 @@ public class GameObject {
         this.height = height;
         boxShape.setAsBox(width, height);
         bodyFixture = new FixtureDef();
-        bodyFixture.density = density;
+        bodyFixture.density = 0.1f;
         bodyFixture.shape = boxShape;
-        bodyFixture.restitution = restitution;
+
+
+
+        if (this instanceof Player) {
+            sensorFixture =new FixtureDef();
+            sensorFixture.density = 0.1f;
+            sensorFixture.shape = boxShape;
+            sensorFixture.isSensor = true;
+
+            bodyFixture.filter.groupIndex = GROUP_PLAYER;
+            sensorFixture.filter.groupIndex = GROUP_SENSOR;
+        } else if (this instanceof EnemyPlayer) {
+            sensorFixture =new FixtureDef();
+            sensorFixture.density = 0.1f;
+            sensorFixture.shape = boxShape;
+            sensorFixture.isSensor = true;
+            bodyFixture.filter.groupIndex = GROUP_OTHERPLAYER;
+            sensorFixture.filter.groupIndex = GROUP_SENSOR;
+        } else if (this instanceof Bullet) {
+            bodyFixture.filter.groupIndex = GROUP_SCENE;
+        } else{
+            bodyFixture.filter.groupIndex = GROUP_SCENE;
+        }
+
         contact = false;
-        float grayscale  = 0.25f;//(float)Math.random() * 0.25f + 0.25f;
+        float grayscale = 0.25f;//(float)Math.random() * 0.25f + 0.25f;
         objectColor = new java.awt.Color(grayscale, grayscale, grayscale);
-        // objectColor = new java.awt.Color((float) Math.random(), (float) Math.random(), (float) Math.random());
 
         type = bodyType;
 
@@ -86,13 +133,15 @@ public class GameObject {
 
     public void Init() {
         if (type == BodyType.DYNAMIC) myScene.getSceneObjectsDynamic().add(this);
-        else  myScene.getSceneObjectsStatic().add(this);
+        else myScene.getSceneObjectsStatic().add(this);
 
         bodyDef.position.set(this.position);
         body = GameWorld.Instance.getPhysicsWorld().createBody(bodyDef);
         body.createFixture(bodyFixture);
+
         if (this instanceof Player) {
             body.setLinearDamping(0.75f);
+         //   body.createFixture(sensorFixture);
         }
     }
 
@@ -121,7 +170,7 @@ public class GameObject {
     // Code for drawing the objects
     public void Render() {
 // TODO :: rethink rendering now its always 2x width & height
-        if (!(this instanceof Player) &&!(this instanceof Bullet)) {
+        if (!(this instanceof Player) && !(this instanceof Bullet)) {
             float[] rgbVal = new float[4];
             objectColor.getRGBColorComponents(rgbVal);
             glColor3f(rgbVal[0], rgbVal[1], rgbVal[3]);
