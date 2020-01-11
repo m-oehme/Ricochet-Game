@@ -1,5 +1,7 @@
 package de.htw_berlin.ris.ricochet.items;
 
+import de.htw_berlin.ris.ricochet.Entities.GameWorld;
+import de.htw_berlin.ris.ricochet.Entities.Scene;
 import de.htw_berlin.ris.ricochet.net.handler.NetMessageObserver;
 import de.htw_berlin.ris.ricochet.net.manager.ClientNetManager;
 import de.htw_berlin.ris.ricochet.net.message.world.ObjectCreateMessage;
@@ -69,13 +71,15 @@ public class Weapon {
     private NetMessageObserver<ObjectCreateMessage> objectCreateObserver = objectCreateMessage -> {
         if (objectCreateMessage.getSGameObject() instanceof SBullet) {
             SBullet sBullet = (SBullet) objectCreateMessage.getSGameObject();
+            Scene scene = GameWorld.Instance.getWorldScenes().get(sBullet.getScene());
 
             Bullet Bullet = new Bullet(
                     objectCreateMessage.getObjectId(),
                     sBullet.getPosition().add((sBullet.getShootDirection().mul(1.5f))),
                     0.25f,
                     0.25f,
-                    BodyType.DYNAMIC);
+                    BodyType.DYNAMIC,
+                    scene);
             Vec2 shotDir = sBullet.getShootDirection().mul(shotSpeed * 10);
             Bullet.shootInDirection(shotDir);
         }

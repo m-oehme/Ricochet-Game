@@ -71,31 +71,34 @@ public class Player extends EnemyPlayer {
     @Override
     public void Update() {
         super.Update();
-        Vec2 playerPosition = new Vec2(body.getPosition().x, body.getPosition().y);
-
-        if (playerPosition.x > GameWorld.covertedSize.x) {
-            System.out.println("Outta here");
-            GameWorld.Instance.switchScene(GameWorld.switchDirection.RIGHT);
-        }
-
-        if (playerPosition.x < 0) {
-            System.out.println("Outta here");
-            GameWorld.Instance.switchScene(GameWorld.switchDirection.LEFT);
-        }
-        if (playerPosition.y > GameWorld.covertedSize.y) {
-            System.out.println("Outta here");
-            GameWorld.Instance.switchScene(GameWorld.switchDirection.UP);
-        }
-        if (playerPosition.y < 0) {
-            System.out.println("Outta here");
-            GameWorld.Instance.switchScene(GameWorld.switchDirection.DOWN);
-        }
 
 //        if (!position.equals(playerPosition)) {
 //        }
-        ClientNetManager.get().sentMessage(new ObjectMoveMessage(ClientNetManager.get().getClientId(), this.getObjectId(), myScene.getLocation(), playerPosition));
+        ClientNetManager.get().sentMessage(new ObjectMoveMessage(ClientNetManager.get().getClientId(), this.getObjectId(), myScene.getLocation(), this.position));
     }
 
+    @Override
+    public void switchScene(Vec2 position) {
+        Vec2 sceneOffset = new Vec2(myScene.getLocation().x * GameWorld.covertedSize.x, myScene.getLocation().y * GameWorld.covertedSize.y);
+
+        if (position.sub(sceneOffset).x > GameWorld.covertedSize.x) {
+            log.debug("Player Scene switch to RIGHT");
+            GameWorld.Instance.switchScene(GameWorld.switchDirection.RIGHT);
+        }
+
+        if (position.sub(sceneOffset).x < 0) {
+            log.debug("Player Scene switch to LEFT");
+            GameWorld.Instance.switchScene(GameWorld.switchDirection.LEFT);
+        }
+        if (position.sub(sceneOffset).y > GameWorld.covertedSize.y) {
+            log.debug("Player Scene switch to UP");
+            GameWorld.Instance.switchScene(GameWorld.switchDirection.UP);
+        }
+        if (position.sub(sceneOffset).y < 0) {
+            log.debug("Player Scene switch to DOWN");
+            GameWorld.Instance.switchScene(GameWorld.switchDirection.DOWN);
+        }
+    }
 
     public int getID() {
         return ID;
