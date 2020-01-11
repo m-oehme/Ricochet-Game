@@ -7,7 +7,6 @@ import java.util.ArrayList;
 
 public class Cell {
     Vec2 upperWallPos, rightWallPos;
-    public float tileSize = 2;
 
     int x, y;
 

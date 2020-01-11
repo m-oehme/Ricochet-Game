@@ -12,16 +12,16 @@ import java.util.Stack;
 public class MazeWorldGenerator implements WorldGenerator {
     private static Cell[][] myCells;
     private Vec2 tileSize;
-    int totalCellsX, totalCellsY;
+    //int totalCellsX, totalCellsY;
     static final int[] WINDOW_DIMENSIONS = {1280, 960};
     public static final float unitConversion = 1 / 30f;
     static final Vec2 convertedSize = new Vec2(WINDOW_DIMENSIONS[0] * unitConversion, WINDOW_DIMENSIONS[1] * unitConversion);
     static float wallThickness = 0.2f;
 
-    public MazeWorldGenerator(int totalCellsX, int totalCellsY) {
+   /* public MazeWorldGenerator(int totalCellsX, int totalCellsY) {
         this.totalCellsX = totalCellsX;
         this.totalCellsY = totalCellsY;
-    }
+    }*/
 
     @Override
     public List<SGameObject> generateWorld(int width, int height) {
@@ -45,6 +45,8 @@ public class MazeWorldGenerator implements WorldGenerator {
 
         for (Vec2 sceneLocation : scenes) {
 
+            int totalCellsX = (int) (Math.random() * 6)+2;
+            int totalCellsY = (int) (Math.random() * 6)+2;
             boolean neighbor = scenes.contains(sceneLocation.add(new Vec2(0, -1)));
             walls.add(new SWallPrefab(sceneLocation, WallPrefabConfig.PrefabPosition.Bottom, neighbor ? WallPrefabConfig.PrefabType.DoorWall : WallPrefabConfig.PrefabType.FullWall));
 
@@ -64,6 +66,7 @@ public class MazeWorldGenerator implements WorldGenerator {
 
 
     private List<SGameObject> CreateCells(Vec2 whichScene, int totalCellsX, int totalCellsY) {
+
         myCells = new Cell[totalCellsX][totalCellsY];
 
         ArrayList<SGameObject> cellWalls = new ArrayList<>();
@@ -72,40 +75,36 @@ public class MazeWorldGenerator implements WorldGenerator {
 
         for (int y = 0; y < totalCellsY; y++) {
             for (int x = 0; x < totalCellsX; x++) {
-                Cell cell = new Cell(x , y );
+                Cell cell = new Cell(x, y);
                 Vec2 cellPos = new Vec2(x * tileSize.x, y * tileSize.y);
                 cell.upperWallPos = new Vec2(cellPos.x + (tileSize.x / 2), cellPos.y + tileSize.y);
                 cell.rightWallPos = new Vec2(cellPos.x + tileSize.x, cellPos.y + (tileSize.y / 2));
-                cell.upperWall = new SGameObject(whichScene, cell.upperWallPos, tileSize.x/2, wallThickness);
-                if (y != totalCellsY-1){
+                cell.upperWall = new SGameObject(whichScene, cell.upperWallPos, tileSize.x / 2, wallThickness);
+                if (y != totalCellsY - 1) {
                     cellWalls.add(cell.upperWall);
                 }
-                cell.rightWall = new SGameObject(whichScene, cell.rightWallPos, wallThickness, tileSize.y/2);
-                if (x != totalCellsX-1){
+                cell.rightWall = new SGameObject(whichScene, cell.rightWallPos, wallThickness, tileSize.y / 2);
+                if (x != totalCellsX - 1) {
                     cellWalls.add(cell.rightWall);
                 }
                 myCells[x][y] = cell;
             }
         }
-
-        ArrayList<SGameObject> mazeWalls = CreateMaze(cellWalls);
+        ArrayList<SGameObject> mazeWalls = CreateMaze(cellWalls, totalCellsX, totalCellsY);
         return mazeWalls;
     }
 
 
-    public ArrayList<SGameObject> CreateMaze(ArrayList<SGameObject> cellWalls) {
+    public ArrayList<SGameObject> CreateMaze(ArrayList<SGameObject> cellWalls, int totalCellsX, int totalCellsY) {
         ArrayList<SGameObject> mazeWalls = cellWalls;
-
         Stack<Cell> stackCells = new Stack<Cell>();
-
         Cell curCell = myCells[0][0];
-
         curCell.visited = true;
         int visited = 1;
 
         while (visited < totalCellsX * totalCellsY) {
 
-            Cell cache = curCell.getRandomNeighbor(totalCellsX, totalCellsY,myCells);
+            Cell cache = curCell.getRandomNeighbor(totalCellsX, totalCellsY, myCells);
             if (!(cache == null)) {
                 stackCells.push(curCell);
                 if (cache.x > curCell.x) {
@@ -123,12 +122,9 @@ public class MazeWorldGenerator implements WorldGenerator {
             } else if (stackCells.size() > 0) {
                 curCell = stackCells.pop();
             }
-
         }
         return mazeWalls;
     }
-
-
 
 
 }
