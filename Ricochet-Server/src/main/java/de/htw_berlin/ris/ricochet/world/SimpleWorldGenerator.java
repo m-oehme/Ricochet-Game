@@ -49,4 +49,7 @@ public class SimpleWorldGenerator implements WorldGenerator {
 
         return walls;
     }
+
+
+
 }

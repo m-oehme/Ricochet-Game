@@ -6,7 +6,8 @@ public abstract class WallPrefabConfig {
         FullWall,
         HalfWall,
         DoorWall,
-        QuarterWall
+        QuarterWall,
+        CellWall
     }
 
     public enum PrefabPosition{

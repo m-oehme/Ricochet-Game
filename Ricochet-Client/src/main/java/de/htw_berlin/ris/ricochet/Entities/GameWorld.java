@@ -106,6 +106,8 @@ public class GameWorld {
             } else if(sGameObject instanceof SWallPrefab){
                 SWallPrefab sWallPrefab = (SWallPrefab) sGameObject;
                 WallPrefab wall = new WallPrefab(sWallPrefab.getPrefabType(), sWallPrefab.getPrefabPosition(), scene);
+            }else{
+                GameObject cellWall = WallPrefab.simpleWall(WallPrefabConfig.PrefabType.CellWall,sGameObject.getPosition(),sGameObject.getWidth(),sGameObject.getHeight(),scene);
             }
         });
     }

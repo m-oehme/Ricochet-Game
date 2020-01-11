@@ -57,14 +57,10 @@ public class RicochetGameGUI {
 
     private void input() {
         // TODO make this nice pls
-
-
         if (GameWorld.Instance.getPlayer() != null) {
             GameWorld.Instance.getPlayer().handleInput();
         }
     }
-
-
     void cleanUp(boolean asCrash) {
         Display.destroy();
         System.exit(asCrash ? 1 : 0);

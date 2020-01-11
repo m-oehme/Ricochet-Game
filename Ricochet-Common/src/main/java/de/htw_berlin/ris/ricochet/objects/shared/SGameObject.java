@@ -7,12 +7,35 @@ import java.io.Serializable;
 public class SGameObject implements Serializable {
     private Vec2 scene;
     private Vec2 position;
+    private float width, height;
 
     public SGameObject(Vec2 scene, Vec2 position) {
         this.scene = scene;
         this.position = position;
     }
 
+    public SGameObject(Vec2 scene, Vec2 position,float width, float height) {
+        this.scene = scene;
+        this.position = position;
+        this.width = width;
+        this.height = height;
+    }
+
+    public float getWidth() {
+        return width;
+    }
+
+    public void setWidth(float width) {
+        this.width = width;
+    }
+
+    public float getHeight() {
+        return height;
+    }
+
+    public void setHeight(float height) {
+        this.height = height;
+    }
 
     public Vec2 getPosition() {
         return position;

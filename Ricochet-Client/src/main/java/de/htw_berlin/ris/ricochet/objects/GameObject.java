@@ -131,7 +131,6 @@ public class GameObject {
     public void Destroy() {
 
         GameWorld.Instance.Destroy(this);
-
     }
 
     public ObjectId getObjectId() {

@@ -85,5 +85,18 @@ public class WallPrefab {
 
     }
 
+    public static GameObject simpleWall(WallPrefabConfig.PrefabType type , Vec2 position, float sizeX, float sizeY, Scene whichScene) {
+
+        switch (type) {
+
+            case CellWall:
+                GameObject Wall =  new GameObject(null,position, sizeX, sizeY ,BodyType.STATIC, 1f, 0.5f,whichScene );
+                return Wall;
+        }
+
+        return null;
+
+    }
+
 
 }
