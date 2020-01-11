@@ -78,6 +78,7 @@ public class GameWorldComponent implements Runnable, NetMessageObserver<WorldMes
 
         HashMap<ObjectId, SGameObject> gameObjects = new HashMap<>(gameWorld.getStaticGameObjects());
         gameObjects.putAll(playerMap);
+        gameObjects.putAll(gameWorld.getDynamicGameObjects());
         worldRequestMessage.setGameObjectList(gameObjects);
         worldRequestMessage.setWorldSize(new Vec2(4,4));
 

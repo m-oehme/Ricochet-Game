@@ -8,7 +8,7 @@ import org.jbox2d.dynamics.BodyType;
 public class EnemyCompanionAI extends GameObject {
 
     public EnemyCompanionAI(ObjectId objectId, Vec2 pos, float width, float height, Scene whichScene) {
-        super(objectId, pos, width, height, BodyType.DYNAMIC, whichScene);
+        super(objectId, pos, width, height, BodyType.KINEMATIC, whichScene);
     }
 
     @Override
