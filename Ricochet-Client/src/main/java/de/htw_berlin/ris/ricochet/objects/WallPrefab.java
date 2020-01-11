@@ -16,7 +16,8 @@ public class WallPrefab {
         FullWall,
         HalfWall,
         DoorWall,
-        QuarterWall
+        QuarterWall,
+        CellWall
     }
 
     public enum PrefabPosition{
@@ -96,9 +97,23 @@ public class WallPrefab {
                 break;
 
 
+        }
+
+
+    }
+    public static GameObject simpleWall(PrefabType type, Vec2 position, float sizeX, float sizeY, Scene whichScene) {
+
+        switch (type) {
+
+
+            case CellWall:
+
+                GameObject Wall =  new GameObject(position, sizeX, sizeY ,BodyType.STATIC, 1f, 0.5f,whichScene );
+                return Wall;
 
         }
 
+        return null;
 
     }
 
