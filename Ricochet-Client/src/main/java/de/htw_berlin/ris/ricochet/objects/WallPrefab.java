@@ -28,24 +28,20 @@ public class WallPrefab {
                 switch (position){
                     case Left:
                         Postion1 = new Vec2 (0,GameWorld.covertedSize.y/2);
-                        log.debug("LEFT Scene: " + whichScene.getLocation() + " Pos: " + Postion1 +  " Offset: " + sceneOffset + " NewPos: " + Postion1.add(sceneOffset));
                         break;
 
                     case Right:
                         Postion1 = new Vec2 (GameWorld.covertedSize.x,GameWorld.covertedSize.y/2);
-                        log.debug("RIGHT Scene: " + whichScene.getLocation() + " Pos: " + Postion1 +  " Offset: " + sceneOffset + " NewPos: " + Postion1.add(sceneOffset));
                         break;
                     case Top:
                         Postion1 = new Vec2 (GameWorld.covertedSize.x/2,GameWorld.covertedSize.y);
                         horizontal = true;
-                        log.debug("TOP Scene: " + whichScene.getLocation() + " Pos: " + Postion1 +  " Offset: " + sceneOffset + " NewPos: " + Postion1.add(sceneOffset));
 
                         break;
 
                     case Bottom:
                         Postion1 = new Vec2 (GameWorld.covertedSize.x/2,0);
                         horizontal = true;
-                        log.debug("BOTTOM Scene: " + whichScene.getLocation() + " Pos: " + Postion1 +  " Offset: " + sceneOffset);
                         break;
                 }
 

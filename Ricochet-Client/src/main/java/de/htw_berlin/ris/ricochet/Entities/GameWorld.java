@@ -9,7 +9,6 @@ import de.htw_berlin.ris.ricochet.objects.shared.SGameObject;
 import de.htw_berlin.ris.ricochet.objects.shared.SPlayer;
 import de.htw_berlin.ris.ricochet.objects.shared.SWallPrefab;
 import de.htw_berlin.ris.ricochet.objects.GameObject;
-import de.htw_berlin.ris.ricochet.objects.Player;
 import org.jbox2d.common.Vec2;
 import org.jbox2d.dynamics.Body;
 import org.jbox2d.dynamics.BodyType;
@@ -101,13 +100,14 @@ public class GameWorld {
 
         gameObjectList.forEach((objectId, sGameObject) -> {
             Scene scene = worldScenes.get(sGameObject.getScene());
+            Vec2 sceneOffset = new Vec2(scene.getLocation().x * GameWorld.covertedSize.x, scene.getLocation().y * GameWorld.covertedSize.y);
             if (sGameObject instanceof SPlayer) {
-                EnemyPlayer playerObject = new EnemyPlayer(objectId, sGameObject.getPosition(), 0.5f, 0.5f, BodyType.DYNAMIC, scene);
+                EnemyPlayer playerObject = new EnemyPlayer(objectId, sGameObject.getPosition().add(sceneOffset), 0.5f, 0.5f, BodyType.DYNAMIC, scene);
             } else if(sGameObject instanceof SWallPrefab){
                 SWallPrefab sWallPrefab = (SWallPrefab) sGameObject;
                 WallPrefab wall = new WallPrefab(sWallPrefab.getPrefabType(), sWallPrefab.getPrefabPosition(), scene);
             }else{
-                GameObject cellWall = WallPrefab.simpleWall(WallPrefabConfig.PrefabType.CellWall,sGameObject.getPosition(),sGameObject.getWidth(),sGameObject.getHeight(),scene);
+                GameObject cellWall = WallPrefab.simpleWall(WallPrefabConfig.PrefabType.CellWall,sGameObject.getPosition().add(sceneOffset),sGameObject.getWidth(),sGameObject.getHeight(),scene);
             }
         });
     }
