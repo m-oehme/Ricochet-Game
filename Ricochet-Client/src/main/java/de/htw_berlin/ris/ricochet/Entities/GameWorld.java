@@ -147,11 +147,11 @@ public class GameWorld {
     private void finalizeSceneSwitch() {
 
         currentScene.getSceneObjectsDynamic().remove(player);
-        destroySceneBodies(currentScene);
+//        destroySceneBodies(currentScene);
         setCurrentScene(newLocation);
         currentScene.init();
         currentScene.getSceneObjectsDynamic().add(player);
-        player.body.setTransform(switchPos, 0);
+//        player.body.setTransform(switchPos, 0);
         player.myScene = worldScenes.get(newLocation);
         switchScene = false;
     }
@@ -234,14 +234,10 @@ public class GameWorld {
            G.Init();
        }
 
-        for (GameObject O : currentScene.getSceneObjectsDynamic()
-        ) {
-            O.Update();
-        }
-        for (GameObject O : currentScene.getSceneObjectsStatic()
-        ) {
-            O.Update();
-        }
+       worldScenes.values().forEach(scene -> {
+           scene.getSceneObjectsDynamic().forEach(GameObject::Update);
+       });
+
         physicsWorld.step(timeStep, 4, 3);
         if (switchScene) finalizeSceneSwitch();
         if (gameOver) Reset();

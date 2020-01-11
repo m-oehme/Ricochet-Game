@@ -1,5 +1,6 @@
 package de.htw_berlin.ris.ricochet.items;
 
+import de.htw_berlin.ris.ricochet.Entities.GameWorld;
 import de.htw_berlin.ris.ricochet.net.manager.ClientNetManager;
 import de.htw_berlin.ris.ricochet.net.message.world.ObjectCreateMessage;
 import de.htw_berlin.ris.ricochet.objects.Player;
@@ -29,7 +30,7 @@ public class Pistol extends Weapon {
         Vec2 shotDir = mousePosition.sub(playerPosition);
         shotDir.normalize();
 
-        ClientNetManager.get().sentMessage(new ObjectCreateMessage(ClientNetManager.get().getClientId(), null, new SBullet(player.myScene.getLocation(), playerPosition, shotDir)));
+        ClientNetManager.get().sentMessage(new ObjectCreateMessage(ClientNetManager.get().getClientId(), null, new SBullet(GameWorld.Instance.getCurrentScene().getLocation(), playerPosition, shotDir)));
 
 
     }

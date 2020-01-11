@@ -1,5 +1,6 @@
 package de.htw_berlin.ris.ricochet.items;
 
+import de.htw_berlin.ris.ricochet.Entities.GameWorld;
 import de.htw_berlin.ris.ricochet.net.manager.ClientNetManager;
 import de.htw_berlin.ris.ricochet.net.message.world.ObjectCreateMessage;
 import de.htw_berlin.ris.ricochet.objects.Player;
@@ -33,7 +34,7 @@ public class MachineGun extends  Weapon {
         ClientNetManager.get().sentMessage(new ObjectCreateMessage(
                 ClientNetManager.get().getClientId(),
                 null,
-                new SBullet(player.myScene.getLocation(), playerPosition, shotDir))
+                new SBullet(GameWorld.Instance.getCurrentScene().getLocation(), playerPosition, shotDir))
         );
 
 

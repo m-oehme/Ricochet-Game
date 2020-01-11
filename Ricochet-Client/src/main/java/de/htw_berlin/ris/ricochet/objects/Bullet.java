@@ -1,6 +1,7 @@
 package de.htw_berlin.ris.ricochet.objects;
 
 import de.htw_berlin.ris.ricochet.Entities.GameWorld;
+import de.htw_berlin.ris.ricochet.Entities.Scene;
 import de.htw_berlin.ris.ricochet.net.manager.ClientNetManager;
 import de.htw_berlin.ris.ricochet.net.message.world.ObjectDestroyMessage;
 import de.htw_berlin.ris.ricochet.net.message.world.ObjectMoveMessage;
@@ -20,8 +21,8 @@ public class Bullet extends GameObject {
     public boolean didBounce;
     private Vec2 shootDir = null;
 
-    public Bullet(ObjectId objectId, Vec2 pos, float width, float height, BodyType bodyType) {
-        super(objectId, pos, width, height, bodyType, GameWorld.Instance.getCurrentScene());
+    public Bullet(ObjectId objectId, Vec2 pos, float width, float height, BodyType bodyType, Scene whichScene) {
+        super(objectId, pos, width, height, bodyType, whichScene);
     }
 
     @Override
@@ -40,6 +41,7 @@ public class Bullet extends GameObject {
 
     @Override
     public void Update() {
+        super.Update();
         if (shootDir != null) {
             body.applyForce(shootDir, body.getPosition());
 

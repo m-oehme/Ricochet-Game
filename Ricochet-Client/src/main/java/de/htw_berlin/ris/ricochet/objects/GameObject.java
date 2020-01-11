@@ -2,6 +2,8 @@ package de.htw_berlin.ris.ricochet.objects;
 
 import de.htw_berlin.ris.ricochet.Entities.GameWorld;
 import de.htw_berlin.ris.ricochet.Entities.Scene;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.jbox2d.collision.shapes.PolygonShape;
 import org.jbox2d.common.Vec2;
 import org.jbox2d.dynamics.Body;
@@ -9,10 +11,13 @@ import org.jbox2d.dynamics.BodyDef;
 import org.jbox2d.dynamics.BodyType;
 import org.jbox2d.dynamics.FixtureDef;
 
+import static de.htw_berlin.ris.ricochet.Entities.GameWorld.covertedSize;
 import static org.lwjgl.opengl.GL11.*;
 import static org.lwjgl.opengl.GL11.glRectf;
 
 public class GameObject {
+    protected static Logger log = LogManager.getLogger();
+
     private ObjectId objectId;
     private BodyDef bodyDef;
     public Body body;
@@ -83,14 +88,14 @@ public class GameObject {
         if (type == BodyType.DYNAMIC) myScene.getSceneObjectsDynamic().add(this);
         else  myScene.getSceneObjectsStatic().add(this);
 
-        if (myScene.equals(GameWorld.Instance.getCurrentScene())) {
-            bodyDef.position.set(this.position);
-            body = GameWorld.Instance.getPhysicsWorld().createBody(bodyDef);
-            body.createFixture(bodyFixture);
-            if (this instanceof Player) {
-                body.setLinearDamping(0.75f);
-            }
+        bodyDef.position.set(this.position);
+        body = GameWorld.Instance.getPhysicsWorld().createBody(bodyDef);
+        body.createFixture(bodyFixture);
+        if (this instanceof Player) {
+            body.setLinearDamping(0.75f);
         }
+//        if (myScene.equals(GameWorld.Instance.getCurrentScene())) {
+//        }
     }
 
     // Game Logic goes here
@@ -99,7 +104,9 @@ public class GameObject {
             body.setTransform(positionUpdate, 0);
             positionUpdate = null;
         }
-        this.position = body.getPosition();
+        this.position = new Vec2(body.getPosition().x, body.getPosition().y);
+
+        switchScene(this.position);
     }
 
     public void StartContact(GameObject gameObject) {
@@ -121,7 +128,8 @@ public class GameObject {
             objectColor.getRGBColorComponents(rgbVal);
             glColor3f(rgbVal[0], rgbVal[1], rgbVal[3]);
         }
-        Vec2 bodyPosition = body.getPosition().mul(30);
+        Vec2 sceneOffset = new Vec2(myScene.getLocation().x * GameWorld.covertedSize.x, myScene.getLocation().y * GameWorld.covertedSize.y);
+        Vec2 bodyPosition = body.getPosition().sub(sceneOffset).mul(30);
         glTranslatef(bodyPosition.x, bodyPosition.y, 0);
         glRotated(Math.toDegrees(body.getAngle()), 0, 0, 1);
         glRectf(-width * 30, -height * 30, width * 30, height * 30);
@@ -129,9 +137,46 @@ public class GameObject {
 
     // code to destroy Objects
     public void Destroy() {
-
         GameWorld.Instance.Destroy(this);
+    }
 
+    public void switchScene(Vec2 position) {
+        Vec2 sceneOffset = new Vec2(myScene.getLocation().x * GameWorld.covertedSize.x, myScene.getLocation().y * GameWorld.covertedSize.y);
+
+        if (position.sub(sceneOffset).x > covertedSize.x) {
+            log.debug("Scene switch to RIGHT");
+            Vec2 newScenePosition = myScene.getLocation().add(new Vec2(1, 0));
+            Vec2 entrancePos = new Vec2(0 + 0.5f, position.y);
+            finalizeSceneSwitch(newScenePosition, entrancePos);
+        }
+        if (position.sub(sceneOffset).x < 0) {
+            log.debug("Scene switch to LEFT");
+            Vec2 newScenePosition = myScene.getLocation().add(new Vec2(-1, 0));
+            Vec2 entrancePos = new Vec2(covertedSize.x - 0.5f, position.y);
+            finalizeSceneSwitch(newScenePosition, entrancePos);
+        }
+        if (position.sub(sceneOffset).y > covertedSize.y) {
+            log.debug("Scene switch to UP");
+            Vec2 newScenePosition = myScene.getLocation().add(new Vec2(0, 1));
+            Vec2 entrancePos = new Vec2(position.x, 0 + 0.5f);
+            finalizeSceneSwitch(newScenePosition, entrancePos);
+        }
+        if (position.sub(sceneOffset).y < 0) {
+            log.debug("Scene switch to DOWN");
+            Vec2 newScenePosition = myScene.getLocation().add(new Vec2(0, -1));
+            Vec2 entrancePos = new Vec2(position.x, covertedSize.y - 0.5f);
+            finalizeSceneSwitch(newScenePosition, entrancePos);
+        }
+    }
+
+    private void finalizeSceneSwitch(Vec2 newScenePosition, Vec2 entrancePos) {
+        if (GameWorld.Instance.getWorldScenes().containsKey(newScenePosition)) {
+            myScene.getSceneObjectsDynamic().remove(this);
+
+            myScene = GameWorld.Instance.getWorldScenes().get(newScenePosition);
+            myScene.getSceneObjectsDynamic().add(this);
+//            this.setPositionUpdate(entrancePos);
+        }
     }
 
     public ObjectId getObjectId() {
