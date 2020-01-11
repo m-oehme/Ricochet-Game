@@ -27,7 +27,9 @@ public class Pistol extends Weapon {
 
         Vec2 playerPosition = new Vec2(player.body.getPosition().x, player.body.getPosition().y);
         Vec2 mousePosition = new Vec2(Mouse.getX(), Mouse.getY()).mul(1 / 30f);
-        Vec2 shotDir = mousePosition.sub(playerPosition);
+
+        Vec2 sceneOffset = new Vec2(player.myScene.getLocation().x * GameWorld.covertedSize.x, player.myScene.getLocation().y * GameWorld.covertedSize.y);
+        Vec2 shotDir = mousePosition.add(sceneOffset).sub(playerPosition);
         shotDir.normalize();
 
         ClientNetManager.get().sentMessage(new ObjectCreateMessage(ClientNetManager.get().getClientId(), null, new SBullet(GameWorld.Instance.getCurrentScene().getLocation(), playerPosition, shotDir)));
