@@ -22,7 +22,6 @@ public class Player extends EnemyPlayer {
     protected Weapon currentWeapon;
     protected boolean fire;
     public Color playerColor;
-    public Vec2 currentPosition;
 
     public Player(ObjectId objectId, Vec2 pos, float width, float height, BodyType bodyType, Scene scene) {
         super(objectId, pos, width, height, bodyType,scene);
@@ -30,7 +29,6 @@ public class Player extends EnemyPlayer {
         objectColor = playerColor;
         currentWeapon = new MachineGun(this);
         name = "PlayerObject";
-        currentPosition = pos;
     }
 
     public void handleInput() {
@@ -93,10 +91,9 @@ public class Player extends EnemyPlayer {
             GameWorld.Instance.switchScene(GameWorld.switchDirection.DOWN);
         }
 
-        if (!currentPosition.equals(playerPosition)) {
-            currentPosition = playerPosition;
-            ClientNetManager.get().sentMessage(new ObjectMoveMessage(ClientNetManager.get().getClientId(), this.getObjectId(), myScene.getLocation(), playerPosition));
-        }
+//        if (!position.equals(playerPosition)) {
+//        }
+        ClientNetManager.get().sentMessage(new ObjectMoveMessage(ClientNetManager.get().getClientId(), this.getObjectId(), myScene.getLocation(), playerPosition));
     }
 
 

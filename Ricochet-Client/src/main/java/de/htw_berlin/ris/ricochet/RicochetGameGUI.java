@@ -106,13 +106,15 @@ public class RicochetGameGUI {
     }
 
     private NetMessageObserver<ObjectMoveMessage> objectMoveObserver = objectMoveMessage -> {
-        GameWorld.Instance.getWorldScenes().get(objectMoveMessage.getScene()).getSceneObjectsDynamic().stream()
-                .filter(gameObject -> gameObject.getObjectId() != null)
-                .filter(gameObject -> gameObject.getObjectId().equals(objectMoveMessage.getObjectId()))
-                .findFirst()
-                .ifPresent(gameObject -> {
-                    gameObject.setPositionUpdate(objectMoveMessage.getPosition());
-                });
+        if (GameWorld.Instance.getWorldScenes().containsKey(objectMoveMessage.getScene())) {
+            GameWorld.Instance.getWorldScenes().get(objectMoveMessage.getScene()).getSceneObjectsDynamic().stream()
+                    .filter(gameObject -> gameObject.getObjectId() != null)
+                    .filter(gameObject -> gameObject.getObjectId().equals(objectMoveMessage.getObjectId()))
+                    .findFirst()
+                    .ifPresent(gameObject -> {
+                        gameObject.setPositionUpdate(objectMoveMessage.getPosition());
+                    });
+        }
     };
 
     private NetMessageObserver<ObjectCreateMessage> objectCreateObserver = objectCreateMessage -> {

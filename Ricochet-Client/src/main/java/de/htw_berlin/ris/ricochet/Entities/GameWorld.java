@@ -143,11 +143,11 @@ public class GameWorld {
 
         currentScene.getSceneObjectsDynamic().remove(player);
         destroySceneBodies(currentScene);
-        destroyAllDynamicBodies();
         setCurrentScene(newLocation);
         currentScene.init();
         currentScene.getSceneObjectsDynamic().add(player);
         player.body.setTransform(switchPos, 0);
+        player.myScene = worldScenes.get(newLocation);
         switchScene = false;
     }
 

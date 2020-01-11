@@ -17,6 +17,7 @@ public class GameObject {
     private BodyDef bodyDef;
     public Body body;
     private FixtureDef bodyFixture;
+    protected Vec2 position;
     private Vec2 positionUpdate;
     protected float width, height;
     public boolean contact;
@@ -29,9 +30,9 @@ public class GameObject {
 
  // TODO DO STUFF THAT LETS ME FLAG WETHER OR NOT TO ADD AS BODY, AND ADD FUNCTION THAT ENABLES REINSTATING PHYSICAL PROPERTIES!!!
     public GameObject(ObjectId objectId, Vec2 pos, float width, float height, BodyType bodyType, Scene whichScene) {
+        this.position = pos;
         this.objectId = objectId;
         bodyDef = new BodyDef();
-        bodyDef.position.set(pos.x, pos.y);
         bodyDef.type = bodyType;
         bodyDef.userData = this;
         PolygonShape boxShape = new PolygonShape();
@@ -54,8 +55,8 @@ public class GameObject {
 
     public GameObject(ObjectId objectId, Vec2 pos, float width, float height, BodyType bodyType, float density, float restitution, Scene whichScene) {
         this.objectId = objectId;
+        this.position = pos;
         bodyDef = new BodyDef();
-        bodyDef.position.set(pos.x, pos.y);
         bodyDef.type = bodyType;
         bodyDef.userData = this;
         PolygonShape boxShape = new PolygonShape();
@@ -83,6 +84,7 @@ public class GameObject {
         else  myScene.getSceneObjectsStatic().add(this);
 
         if (myScene.equals(GameWorld.Instance.getCurrentScene())) {
+            bodyDef.position.set(this.position);
             body = GameWorld.Instance.getPhysicsWorld().createBody(bodyDef);
             body.createFixture(bodyFixture);
             if (this instanceof Player) {
@@ -97,6 +99,7 @@ public class GameObject {
             body.setTransform(positionUpdate, 0);
             positionUpdate = null;
         }
+        this.position = body.getPosition();
     }
 
     public void StartContact(GameObject gameObject) {
