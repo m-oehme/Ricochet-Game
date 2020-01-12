@@ -25,8 +25,7 @@ public class EnemyIndicator extends GameObject{
     }
 
     @Override
-    public void Render() {
-        super.Render();
-
+    protected void renderAtLocalPosition(Vec2 position) {
+        renderSphere(position, 5f);
     }
 }

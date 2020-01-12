@@ -1,5 +1,6 @@
 package de.htw_berlin.ris.ricochet.objects;
 
+import de.htw_berlin.ris.ricochet.Entities.GameWorld;
 import de.htw_berlin.ris.ricochet.Entities.Scene;
 import org.jbox2d.common.Vec2;
 import org.jbox2d.dynamics.BodyType;
@@ -74,6 +75,11 @@ public class Bullet extends GameObject {
 
         glColor3f(rgbVal[0], rgbVal[1], rgbVal[3]);
         super.Render();
+    }
+
+    @Override
+    protected void renderAtLocalPosition(Vec2 position) {
+        renderSphere(position, 10f);
     }
 
     public void shootInDirection(Vec2 shootDir) {

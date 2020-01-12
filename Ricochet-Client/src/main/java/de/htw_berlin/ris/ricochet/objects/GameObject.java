@@ -204,28 +204,16 @@ public class GameObject {
             glColor3f(rgbVal[0], rgbVal[1], rgbVal[3]);
         }
         Vec2 bodyPosition = GameWorld.getLocalCoordinates(position, myScene.getLocation()).mul(30);
-
-        if (this instanceof Bullet) {
-           // DrawCircle(bodyPosition, 5f, 10);
-            renderSphere(bodyPosition, 10f);
-        } else if (this instanceof CompanionAI || this instanceof EnemyCompanionAI){
-            ((CompanionAI) this).debugRay();
-            glTranslatef(bodyPosition.x, bodyPosition.y, 0);
-            glRotated(Math.toDegrees(body.getAngle()), 0, 0, 1);
-
-            renderTriangle(-width/2 * 30,   width/2 *30,  height * 30);
-        } else if (this instanceof EnemyIndicator) {
-            renderSphere(bodyPosition, 5f);
-        }
-        else {
-            glTranslatef(bodyPosition.x, bodyPosition.y, 0);
-            glRotated(Math.toDegrees(body.getAngle()), 0, 0, 1);
-            glRectf(-width * 30, -height * 30, width * 30, height * 30);
-
-        }
-
+        renderAtLocalPosition(bodyPosition);
     }
-    private void renderTriangle(float x1, float x2, float y1){
+
+    protected void renderAtLocalPosition(Vec2 position) {
+        glTranslatef(position.x, position.y, 0);
+        glRotated(Math.toDegrees(body.getAngle()), 0, 0, 1);
+        glRectf(-width * 30, -height * 30, width * 30, height * 30);
+    }
+
+    protected void renderTriangle(float x1, float x2, float y1){
 
         glBegin(GL_TRIANGLES);
 
@@ -258,7 +246,7 @@ public class GameObject {
     }
 
 
-    private void DrawCircle(Vec2 center, float r, int num_segments) {
+    protected void DrawCircle(Vec2 center, float r, int num_segments) {
         float theta = 2 * 3.1415926f / (float) (num_segments);
         float c = (float) Math.cos(theta);//precalculate the sine and cosine
         float s = (float) Math.sin(theta);

@@ -175,7 +175,7 @@ public class Player extends EnemyPlayer implements Runnable{
             enemyDirection = new EnemyIndicator(position, myScene);
             enemyDirection.Init();
 
-            RicochetGameGUI.get().getMainThreadPool().execute(this);
+            RicochetGameGUI.get().getMainGUIThreadPool().execute(this);
         }
     }
 }
