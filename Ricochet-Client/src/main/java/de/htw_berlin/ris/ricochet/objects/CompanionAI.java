@@ -52,42 +52,14 @@ public class CompanionAI extends EnemyCompanionAI implements Runnable {
     @Override
     public void Update() {
         super.Update();
+        calculateAndCorrectCollision();
     }
 
     private float ConvertToBoxCoordinate(float x) {
         return x * 0.01f;
     }
 
-/*    private void CalculateRaycast(Vec2 Origin) {
-        if (GameWorld.Instance.getPhysicsWorld() == null) return;
-        raycasts.clear();
-        raycastBodies.clear();
-        //START WITH 0 Degree
-        direction.set(1, 0);
-        float rotateAngle = 360 / RAY_COUNT;
 
-        for (int i = 0; i < RAY_COUNT; i++) {
-            float x1 = ConvertToBoxCoordinate(Origin.x);
-            float y1 = ConvertToBoxCoordinate(Origin.y);
-            float x2 = x1 + ConvertToBoxCoordinate(direction.x);
-            float y2 = y1 + ConvertToBoxCoordinate(direction.y);
-            Vec2 endPoint = new Vec2(x2, y2).sub(new Vec2(x1, y1));
-            endPoint = endPoint.mul(endPoint.normalize());
-            endPoint = endPoint.add(new Vec2(x1, y1));
-            MyRayCastCallback ray = new MyRayCastCallback(raycastBodies, endPoint);
-            GameWorld.Instance.getPhysicsWorld().raycast(ray, new Vec2(x1, y1), new Vec2(endPoint));
-            raycasts.add(ray);
-            Vector2 dir = new Vector2(direction.x, direction.y);
-            dir.rotate(rotateAngle);
-            direction.x = dir.x;
-            direction.y = dir.y;
-            //world.rayCast(callback,new Vector2(x,y),new Vector2(x2,y2));
-        }
-        if (raycastBodies.size() > 0) {
-            System.out.println("bleh");
-        }
-
-    }*/
 
     protected void calculateAndCorrectCollision() {
 
@@ -205,7 +177,6 @@ public class CompanionAI extends EnemyCompanionAI implements Runnable {
 
                 glVertex2f(finalDir.x, finalDir.y);
             }
-
             glEnd();
         }
 
@@ -248,7 +219,7 @@ public class CompanionAI extends EnemyCompanionAI implements Runnable {
     @Override
     public void run() {
         while (isAlive) {
-            calculateAndCorrectCollision();
+            //calculateAndCorrectCollision();
 
             try {
                 Thread.sleep(50);

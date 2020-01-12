@@ -57,7 +57,6 @@ public class Bullet extends GameObject {
             } else {
                 didBounce = true;
             }
-
         }
 
 //        if (body != null) {
