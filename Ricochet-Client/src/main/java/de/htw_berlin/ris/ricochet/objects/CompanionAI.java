@@ -144,24 +144,8 @@ public class CompanionAI extends EnemyCompanionAI implements Runnable {
 
     }
 
+
     public void debugRay() {
-       /*for (Vec2 collisionPoint:collisionPoints ) {
-            Vec2 sceneOffset = new Vec2(myScene.getLocation().x * GameWorld.covertedSize.x, myScene.getLocation().y * GameWorld.covertedSize.y);
-            Vec2 myPosition = body.getPosition().sub(sceneOffset).mul(30);
-            Vec2 PlayerPos = guardianPlayer.body.getPosition().sub(sceneOffset).mul(30);
-         //   Vec2 castDir = PlayerPos.sub(myPosition);
-         //   castDir = castDir.mul(castDir.normalize()).add(myPosition);
-
-            Vec2 colPoint = collisionPoint.sub(sceneOffset).mul(30);
-
-            glBegin(GL_LINES);
-            glVertex2f( myPosition.x ,myPosition.y );
-
-            glVertex2f(colPoint.x ,colPoint.y  );
-
-
-            glEnd();
-        }*/
 
         for (MyRayCastCallback ray : rayCasts) {
             Vec2 sceneOffset = new Vec2(myScene.getLocation().x * GameWorld.covertedSize.x, myScene.getLocation().y * GameWorld.covertedSize.y);
@@ -182,7 +166,6 @@ public class CompanionAI extends EnemyCompanionAI implements Runnable {
 
 
     }
-
     boolean CastRay(Vec2 origin, Vec2 direction) {
 
         World b2dWorld = body.getWorld();
@@ -227,6 +210,13 @@ public class CompanionAI extends EnemyCompanionAI implements Runnable {
                 log.error(e.getMessage(), e);
             }
         }
+    }
+
+    @Override
+    protected void renderAtLocalPosition(Vec2 position) {
+        this.debugRay();
+        super.renderAtLocalPosition(position);
+
     }
 
     @Override

@@ -23,10 +23,12 @@ public class EnemyCompanionAI extends GameObject {
 
     @Override
     protected void renderAtLocalPosition(Vec2 position) {
-        ((CompanionAI) this).debugRay();
+        //this.debugRay();
 //        glTranslatef(position.x, position.y, 0);
 //        glRotated(Math.toDegrees(body.getAngle()), 0, 0, 1);
 
         renderSphere(position,   17f);
     }
+
+
 }
