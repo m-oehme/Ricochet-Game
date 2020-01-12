@@ -39,6 +39,18 @@ public class Scene {
         }
     }
 
+    public void unloadScene() {
+        sceneObjectsDynamic.forEach(gameObject -> {
+            GameWorld.Instance.getPhysicsWorld().destroyBody(gameObject.body);
+        });
+
+        sceneObjectsStatic.forEach(gameObject -> {
+            GameWorld.Instance.getPhysicsWorld().destroyBody(gameObject.body);
+        });
+        sceneObjectsDynamic.clear();
+        sceneObjectsStatic.clear();
+    }
+
     public int getID() {
         return ID;
     }

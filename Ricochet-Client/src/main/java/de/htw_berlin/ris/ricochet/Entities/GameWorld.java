@@ -19,14 +19,18 @@ import org.jbox2d.dynamics.BodyType;
 import org.jbox2d.dynamics.World;
 
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.stream.Collector;
+import java.util.stream.Collectors;
 
 import static org.lwjgl.opengl.GL11.*;
 
 public class GameWorld {
     private static Logger log = LogManager.getLogger();
     // TODO MAKE DELTA TIME FUNCTION!!
-    private Map<Vec2, Scene> worldScenes;
+    private ConcurrentHashMap<Vec2, Scene> worldScenes;
+    private ArrayList<Vec2> loadedScenes = new ArrayList<>();
     private Player player;
     public static GameWorld Instance;
     private World physicsWorld;
@@ -53,7 +57,7 @@ public class GameWorld {
     public GameWorld(Vec2 gravity, int[] WINDOW_DIMENSIONS) {
         this.WINDOW_DIMENSIONS = WINDOW_DIMENSIONS;
         physicsWorld = new World(new Vec2(0, 0), true);
-        worldScenes = new Hashtable<>();
+        worldScenes = new ConcurrentHashMap<>();
         covertedSize = new Vec2(WINDOW_DIMENSIONS[0] * unitConversion, WINDOW_DIMENSIONS[1] * unitConversion);
 
         ClientNetManager.get().getHandlerFor(ObjectDestroyMessage.class).registerObserver(objectDestroyObserver);
@@ -84,6 +88,48 @@ public class GameWorld {
         this.gameOver = gameOver;
     }
 
+    public void loadSceneChunk(Vec2 chunkCenterScene) {
+        ArrayList<Vec2> sceneList = new ArrayList<>();
+
+        for (int y = -1; y <= 1; y++) {
+            for (int x = -1; x <= 1; x++) {
+                Vec2 sceneLoc = chunkCenterScene.add(new Vec2(x, y));
+
+                if (!loadedScenes.contains(sceneLoc)) {
+                    sceneList.add(sceneLoc);
+                }
+            }
+        }
+
+        ClientNetManager.get().sentMessage(new WorldRequestScenesMessage(
+                ClientNetManager.get().getClientId(),
+                sceneList
+        ));
+    }
+
+    public void unloadSceneChunks(Vec2 chunkCenterScene) {
+        ArrayList<Vec2> sceneList = new ArrayList<>();
+
+        for (int y = -2; y <= 2; y++) {
+            for (int x = -2; x <= 2; x++) {
+                Vec2 sceneLoc = chunkCenterScene.add(new Vec2(x, y));
+
+                if (loadedScenes.contains(sceneLoc)) {
+                    sceneList.add(sceneLoc);
+                }
+            }
+        }
+
+        List<Vec2> collect = loadedScenes.stream()
+                .filter(sceneEntry -> !sceneList.contains(sceneEntry) && worldScenes.containsKey(sceneEntry))
+                .collect(Collectors.toList());
+
+        collect.forEach(vec2 -> worldScenes.get(vec2).unloadScene());
+
+        log.debug("Unload Scenes: " + collect.toString());
+        loadedScenes.removeAll(collect);
+    }
+
     public Scene generateInitWorld() {
         Scene sceneCenter = new Scene(0, new Vec2((int) Math.random() * 2, (int) Math.random() * 2));
         worldScenes.put(sceneCenter.getLocation(), sceneCenter);
@@ -109,16 +155,16 @@ public class GameWorld {
     public void generateWorldObjects(HashMap<ObjectId, SGameObject> gameObjectList) {
         gameObjectList.forEach((objectId, sGameObject) -> {
             Scene scene = worldScenes.get(sGameObject.getScene());
-            Vec2 sceneOffset = new Vec2(scene.getLocation().x * GameWorld.covertedSize.x, scene.getLocation().y * GameWorld.covertedSize.y);
+
             if (sGameObject instanceof SPlayer) {
-                EnemyPlayer playerObject = new EnemyPlayer(objectId, sGameObject.getPosition().add(sceneOffset), 0.5f, 0.5f, BodyType.DYNAMIC, scene);
+                EnemyPlayer playerObject = new EnemyPlayer(objectId, GameWorld.getGlobalCoordinates(sGameObject.getPosition(), scene.getLocation()), 0.5f, 0.5f, BodyType.DYNAMIC, scene);
             } else if (sGameObject instanceof SCompanionAI) {
-                EnemyCompanionAI playerObject = new EnemyCompanionAI(objectId, sGameObject.getPosition().add(sceneOffset), 0.5f, 0.5f, scene);
+                EnemyCompanionAI playerObject = new EnemyCompanionAI(objectId, GameWorld.getGlobalCoordinates(sGameObject.getPosition(), scene.getLocation()), 0.5f, 0.5f, scene);
             } else if (sGameObject instanceof SWallPrefab) {
                 SWallPrefab sWallPrefab = (SWallPrefab) sGameObject;
                 WallPrefab wall = new WallPrefab(sWallPrefab.getPrefabType(), sWallPrefab.getPrefabPosition(), scene);
             } else {
-                GameObject cellWall = WallPrefab.simpleWall(WallPrefabConfig.PrefabType.CellWall, sGameObject.getPosition().add(sceneOffset), sGameObject.getWidth(), sGameObject.getHeight(), scene);
+                GameObject cellWall = WallPrefab.simpleWall(WallPrefabConfig.PrefabType.CellWall, GameWorld.getGlobalCoordinates(sGameObject.getPosition(), scene.getLocation()), sGameObject.getWidth(), sGameObject.getHeight(), scene);
             }
         });
     }
@@ -155,20 +201,15 @@ public class GameWorld {
         gameOver = false;
     }
 
-    private void finalizeSceneSwitch() {
 
+
+    private void finalizeSceneSwitch() {
         currentScene.getSceneObjectsDynamic().remove(player);
         setCurrentScene(newLocation);
         currentScene.getSceneObjectsDynamic().add(player);
         player.myScene = worldScenes.get(newLocation);
+        loadSceneChunk(currentScene.getLocation());
         switchScene = false;
-    }
-
-    private void destroyAllBodies() {
-        Body b;
-        for (b = physicsWorld.getBodyList(); b != null; b = b.getNext()) {
-            physicsWorld.destroyBody(b);
-        }
     }
 
     private void destroyAllDynamicBodies() {
@@ -176,20 +217,6 @@ public class GameWorld {
             scene.getSceneObjectsDynamic().forEach(GameObject::Destroy);
         });
 
-    }
-
-    private void destroySceneBodies(Scene scene) {
-        for (GameObject G : scene.getSceneObjectsStatic()) {
-
-            physicsWorld.destroyBody(G.body);
-
-        }
-
-        for (GameObject G : scene.getSceneObjectsDynamic()) {
-            if (!(G instanceof Player)) {
-                physicsWorld.destroyBody(G.body);
-            }
-        }
     }
 
 
@@ -235,8 +262,11 @@ public class GameWorld {
     };
 
     private NetMessageObserver<WorldRequestScenesMessage> worldRequestScenesObserver = worldRequestScenesMessage -> {
-        log.debug("Received Chunk Objects: " + worldRequestScenesMessage.getWorldSize());
-        generateWorldObjects(worldRequestScenesMessage.getGameObjectList());
+        log.debug("Received Chunk Objects: " + worldRequestScenesMessage.getSceneList().size());
+        loadedScenes.addAll(worldRequestScenesMessage.getSceneList());
+        GameWorld.Instance.generateWorldObjects(worldRequestScenesMessage.getGameObjectList());
+
+        GameWorld.Instance.unloadSceneChunks(currentScene.getLocation());
     };
 
     public void updateWorld() {

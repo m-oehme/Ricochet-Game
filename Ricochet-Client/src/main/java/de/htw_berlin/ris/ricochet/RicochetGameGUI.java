@@ -94,24 +94,7 @@ public class RicochetGameGUI {
     }
 
     public void loadSceneChunk(Vec2 chunkCenterScene) {
-        ArrayList<Vec2> sceneList = new ArrayList<>();
-
-        sceneList.add(chunkCenterScene.sub(new Vec2(1, 1)));
-        sceneList.add(chunkCenterScene.sub(new Vec2(1, 0)));
-        sceneList.add(chunkCenterScene.sub(new Vec2(1, -1)));
-
-        sceneList.add(chunkCenterScene.sub(new Vec2(0, 1)));
-        sceneList.add(chunkCenterScene.sub(new Vec2(0, 0)));
-        sceneList.add(chunkCenterScene.sub(new Vec2(0, -1)));
-
-        sceneList.add(chunkCenterScene.sub(new Vec2(-1, 1)));
-        sceneList.add(chunkCenterScene.sub(new Vec2(-1, 0)));
-        sceneList.add(chunkCenterScene.sub(new Vec2(-1, -1)));
-
-        ClientNetManager.get().sentMessage(new WorldRequestScenesMessage(
-                ClientNetManager.get().getClientId(),
-                sceneList
-        ));
+        GameWorld.Instance.loadSceneChunk(chunkCenterScene);
     }
 
     void setUpNetworking() {
