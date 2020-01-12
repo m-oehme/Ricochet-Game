@@ -70,18 +70,20 @@ public class Weapon {
 
     private NetMessageObserver<ObjectCreateMessage> objectCreateObserver = objectCreateMessage -> {
         if (objectCreateMessage.getSGameObject() instanceof SBullet) {
-            SBullet sBullet = (SBullet) objectCreateMessage.getSGameObject();
-            Scene scene = GameWorld.Instance.getWorldScenes().get(sBullet.getScene());
+            if (GameWorld.Instance.getLoadedScenes().contains(objectCreateMessage.getSGameObject().getScene())) {
+                SBullet sBullet = (SBullet) objectCreateMessage.getSGameObject();
+                Scene scene = GameWorld.Instance.getWorldScenes().get(sBullet.getScene());
 
-            Bullet Bullet = new Bullet(
-                    objectCreateMessage.getObjectId(),
-                    sBullet.getPosition().add((sBullet.getShootDirection().mul(1.5f))),
-                    0.25f,
-                    0.25f,
-                    BodyType.DYNAMIC,
-                    scene);
-            Vec2 shotDir = sBullet.getShootDirection().mul(shotSpeed * 10);
-            Bullet.shootInDirection(shotDir);
+                Bullet Bullet = new Bullet(
+                        objectCreateMessage.getObjectId(),
+                        sBullet.getPosition().add((sBullet.getShootDirection().mul(1.5f))),
+                        0.25f,
+                        0.25f,
+                        BodyType.DYNAMIC,
+                        scene);
+                Vec2 shotDir = sBullet.getShootDirection().mul(shotSpeed * 10);
+                Bullet.shootInDirection(shotDir);
+            }
         }
     };
 }

@@ -121,7 +121,6 @@ public class GameWorld {
 
             staticGameObjects.put(objectId, sGameObject);
         }
-
     }
 
     public Vec2 getWorldSize() {

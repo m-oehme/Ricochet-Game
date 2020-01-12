@@ -64,8 +64,8 @@ public class GameWorldComponent implements Runnable, NetMessageObserver<WorldMes
     }
 
     private void initialize() {
-        gameWorld.generateStaticWorld(4,4);
-        log.info("New World of size "+ 4 +" generated!");
+        gameWorld.generateStaticWorld(100,100);
+        log.info("New World of size "+ gameWorld.getWorldSize() +" generated!");
     }
 
     @Override

@@ -308,4 +308,8 @@ public class GameWorld {
         Vec2 sceneOffset = new Vec2(scene.x * GameWorld.covertedSize.x, scene.y * GameWorld.covertedSize.y);
         return position.add(sceneOffset);
     }
+
+    public ArrayList<Vec2> getLoadedScenes() {
+        return loadedScenes;
+    }
 }

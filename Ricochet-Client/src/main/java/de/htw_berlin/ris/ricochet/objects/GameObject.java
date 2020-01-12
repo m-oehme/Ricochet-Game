@@ -286,36 +286,31 @@ public class GameObject {
         if (convertedPos.x > covertedSize.x) {
 //            log.debug("Scene switch to RIGHT");
             Vec2 newScenePosition = myScene.getLocation().add(new Vec2(1, 0));
-            Vec2 entrancePos = new Vec2(0 + 0.5f, position.y);
-            finalizeSceneSwitch(newScenePosition, entrancePos);
+            finalizeSceneSwitch(newScenePosition);
         }
         if (convertedPos.x < 0) {
 //            log.debug("Scene switch to LEFT");
             Vec2 newScenePosition = myScene.getLocation().add(new Vec2(-1, 0));
-            Vec2 entrancePos = new Vec2(covertedSize.x - 0.5f, position.y);
-            finalizeSceneSwitch(newScenePosition, entrancePos);
+            finalizeSceneSwitch(newScenePosition);
         }
         if (convertedPos.y > covertedSize.y) {
 //            log.debug("Scene switch to UP");
             Vec2 newScenePosition = myScene.getLocation().add(new Vec2(0, 1));
-            Vec2 entrancePos = new Vec2(position.x, 0 + 0.5f);
-            finalizeSceneSwitch(newScenePosition, entrancePos);
+            finalizeSceneSwitch(newScenePosition);
         }
         if (convertedPos.y < 0) {
 //            log.debug("Scene switch to DOWN");
             Vec2 newScenePosition = myScene.getLocation().add(new Vec2(0, -1));
-            Vec2 entrancePos = new Vec2(position.x, covertedSize.y - 0.5f);
-            finalizeSceneSwitch(newScenePosition, entrancePos);
+            finalizeSceneSwitch(newScenePosition);
         }
     }
 
-    private void finalizeSceneSwitch(Vec2 newScenePosition, Vec2 entrancePos) {
+    private void finalizeSceneSwitch(Vec2 newScenePosition) {
         if (GameWorld.Instance.getWorldScenes().containsKey(newScenePosition)) {
             myScene.getSceneObjectsDynamic().remove(this);
 
             myScene = GameWorld.Instance.getWorldScenes().get(newScenePosition);
             myScene.getSceneObjectsDynamic().add(this);
-//            this.setPositionUpdate(entrancePos);
         }
     }
 
