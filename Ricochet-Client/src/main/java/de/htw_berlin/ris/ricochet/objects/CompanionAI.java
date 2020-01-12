@@ -36,6 +36,7 @@ public class CompanionAI extends EnemyCompanionAI implements Runnable {
     private boolean traveling, waiting;
     Vec2 originalPos;
     float totalDist;
+    int lonelyCounter = 1 ;
 
     public CompanionAI(ObjectId objectId, Vec2 pos, float width, float height, Scene whichScene, Player guardianPlayer) {
         super(objectId, pos, width, height, whichScene);
@@ -78,7 +79,6 @@ public class CompanionAI extends EnemyCompanionAI implements Runnable {
             float speedFac = playerDist / totalDist;
 
             if (playerDist <= 3) {
-
                 speedFac = 0.01f;
                 traveling = false;
                 waiting = true;
@@ -91,7 +91,6 @@ public class CompanionAI extends EnemyCompanionAI implements Runnable {
                 waiting = false;
             }
         }
-
 
         // Distance from other Objects
         Vec2 weightCollision = new Vec2(0, 0);
@@ -129,7 +128,7 @@ public class CompanionAI extends EnemyCompanionAI implements Runnable {
                 float weightFac = 0;
                 float weightFacCol = 1 - (dist / radius);
                 if (dist < 1) {
-                    System.out.println("too close");
+                   // System.out.println("too close");
                     weightGuardian = weightGuardian.mul(weightFac);
 
                 }
@@ -137,8 +136,31 @@ public class CompanionAI extends EnemyCompanionAI implements Runnable {
             }
         }
 
+
+
         Vec2 finalVel = weightGuardian.add(weightCollision);
         body.setLinearVelocity(finalVel);
+
+
+        if  (playerDist > 5){
+
+            lonelyCounter ++;
+
+        }else{
+            lonelyCounter = 1;
+        }
+
+        if (lonelyCounter %500 == 0){
+            if (myScene == guardianPlayer.myScene){
+                setPositionUpdate(guardianPlayer.position.add(distance));
+
+            }else{
+                setPositionUpdate(guardianPlayer.position.add(distance),guardianPlayer.myScene.getLocation());
+            }
+            lonelyCounter = 1 ;
+        }
+
+
 
         ClientNetManager.get().sentMessage(new ObjectMoveMessage(ClientNetManager.get().getClientId(), this.getObjectId(), myScene.getLocation(), this.position));
 
