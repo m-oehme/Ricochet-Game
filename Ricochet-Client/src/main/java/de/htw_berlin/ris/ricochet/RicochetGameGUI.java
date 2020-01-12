@@ -6,10 +6,7 @@ import de.htw_berlin.ris.ricochet.Entities.Scene;
 import de.htw_berlin.ris.ricochet.math.Vector2;
 import de.htw_berlin.ris.ricochet.net.handler.NetMessageObserver;
 import de.htw_berlin.ris.ricochet.net.manager.ClientNetManager;
-import de.htw_berlin.ris.ricochet.net.message.world.ObjectCreateMessage;
-import de.htw_berlin.ris.ricochet.net.message.world.ObjectDestroyMessage;
-import de.htw_berlin.ris.ricochet.net.message.world.ObjectMoveMessage;
-import de.htw_berlin.ris.ricochet.net.message.world.WorldRequestMessage;
+import de.htw_berlin.ris.ricochet.net.message.world.*;
 import de.htw_berlin.ris.ricochet.objects.*;
 import de.htw_berlin.ris.ricochet.objects.shared.SCompanionAI;
 import de.htw_berlin.ris.ricochet.objects.shared.SGameObject;
@@ -88,12 +85,33 @@ public class RicochetGameGUI {
         GameWorld.Instance.getCurrentScene().init();
     }
 
-    public void generateWorld(Vec2 worldSize, HashMap<ObjectId, SGameObject> gameObjectList) {
-        GameWorld.Instance.generateWorld((int) worldSize.x, (int) worldSize.y, gameObjectList);
+    public void generateWorldScenes(Vec2 worldSize) {
+        GameWorld.Instance.generateWorldScenes((int) worldSize.x, (int) worldSize.y);
         ArrayList<Vec2> vec2Set = new ArrayList<>(GameWorld.Instance.getWorldScenes().keySet());
         int r  = (int) (Math.random() * vec2Set.size());
         GameWorld.Instance.setCurrentScene(vec2Set.get(r));
         GameWorld.Instance.getCurrentScene().init();
+    }
+
+    public void loadSceneChunk(Vec2 chunkCenterScene) {
+        ArrayList<Vec2> sceneList = new ArrayList<>();
+
+        sceneList.add(chunkCenterScene.sub(new Vec2(1, 1)));
+        sceneList.add(chunkCenterScene.sub(new Vec2(1, 0)));
+        sceneList.add(chunkCenterScene.sub(new Vec2(1, -1)));
+
+        sceneList.add(chunkCenterScene.sub(new Vec2(0, 1)));
+        sceneList.add(chunkCenterScene.sub(new Vec2(0, 0)));
+        sceneList.add(chunkCenterScene.sub(new Vec2(0, -1)));
+
+        sceneList.add(chunkCenterScene.sub(new Vec2(-1, 1)));
+        sceneList.add(chunkCenterScene.sub(new Vec2(-1, 0)));
+        sceneList.add(chunkCenterScene.sub(new Vec2(-1, -1)));
+
+        ClientNetManager.get().sentMessage(new WorldRequestScenesMessage(
+                ClientNetManager.get().getClientId(),
+                sceneList
+        ));
     }
 
     void setUpNetworking() {
@@ -101,7 +119,7 @@ public class RicochetGameGUI {
         ClientNetManager.get().getHandlerFor(ObjectMoveMessage.class).registerObserver(objectMoveObserver);
     }
 
-    void setUpObjects() {
+    Vec2 setUpPlayerObject() {
 
         Vec2 playerPos = new Vec2(GameWorld.covertedSize.x/2,  GameWorld.covertedSize.y/2);
         Vec2 startingScene = GameWorld.Instance.getCurrentScene().getLocation();
@@ -111,6 +129,8 @@ public class RicochetGameGUI {
                 ClientNetManager.get().getClientId(),
                 startingScene,
                 convertedPos)));
+
+        return startingScene;
     }
 
     private NetMessageObserver<ObjectMoveMessage> objectMoveObserver = objectMoveMessage -> {

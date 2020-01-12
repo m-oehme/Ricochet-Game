@@ -3,12 +3,10 @@ package de.htw_berlin.ris.ricochet;
 import de.htw_berlin.ris.ricochet.net.handler.NetMessageObserver;
 import de.htw_berlin.ris.ricochet.net.manager.ClientNetManager;
 import de.htw_berlin.ris.ricochet.net.message.general.ChatMessage;
-import de.htw_berlin.ris.ricochet.net.message.world.ObjectCreateMessage;
-import de.htw_berlin.ris.ricochet.net.message.world.ObjectDestroyMessage;
-import de.htw_berlin.ris.ricochet.net.message.world.ObjectMoveMessage;
-import de.htw_berlin.ris.ricochet.net.message.world.WorldRequestMessage;
+import de.htw_berlin.ris.ricochet.net.message.world.*;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.jbox2d.common.Vec2;
 
 import java.net.InetAddress;
 import java.util.concurrent.LinkedBlockingQueue;
@@ -58,9 +56,11 @@ public class RicochetApplication {
     }
 
     private NetMessageObserver<WorldRequestMessage> worldRequestMessageObserver = worldRequestMessage -> {
-        log.debug("Received: " + worldRequestMessage.getGameObjectList().toString());
-        RicochetGameGUI.get().generateWorld(worldRequestMessage.getWorldSize(), worldRequestMessage.getGameObjectList());
-        RicochetGameGUI.get().setUpObjects();
+        log.debug("Received World of size: " + worldRequestMessage.getWorldSize());
+        RicochetGameGUI.get().generateWorldScenes(worldRequestMessage.getWorldSize());
+        Vec2 playerPos = RicochetGameGUI.get().setUpPlayerObject();
+
+        RicochetGameGUI.get().loadSceneChunk(playerPos);
     };
 
     private void setUpMessageHandler() {
@@ -71,6 +71,7 @@ public class RicochetApplication {
         ClientNetManager.get().registerHandler(ObjectMoveMessage.class);
 
         ClientNetManager.get().registerHandler(WorldRequestMessage.class);
+        ClientNetManager.get().registerHandler(WorldRequestScenesMessage.class);
 
         log.debug("SetUp and Registered Network Message Handlers");
     }

@@ -13,6 +13,7 @@ import org.jbox2d.common.Vec2;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.stream.Collectors;
 
@@ -47,6 +48,8 @@ public class GameWorldComponent implements Runnable, NetMessageObserver<WorldMes
 
                 if (msg instanceof WorldRequestMessage) {
                     onRequestWorld((WorldRequestMessage) msg);
+                } else if (msg instanceof WorldRequestScenesMessage) {
+                    onRequestWorldScenes((WorldRequestScenesMessage) msg);
                 } else if (msg instanceof ObjectCreateMessage) {
                     onCreateObject((ObjectCreateMessage) msg);
                 } else if (msg instanceof ObjectMoveMessage) {
@@ -71,19 +74,24 @@ public class GameWorldComponent implements Runnable, NetMessageObserver<WorldMes
     }
 
     private void onRequestWorld(WorldRequestMessage worldRequestMessage) {
+        worldRequestMessage.setWorldSize(gameWorld.getWorldSize());
 
-        Map<ObjectId, SPlayer> playerMap = gameWorld.getPlayerObjects().entrySet().stream()
-                .filter(map -> !worldRequestMessage.getClientId().equals(map.getValue().getClientId()))
-                .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
-
-        HashMap<ObjectId, SGameObject> gameObjects = new HashMap<>(gameWorld.getStaticGameObjects());
-        gameObjects.putAll(playerMap);
-        gameObjects.putAll(gameWorld.getDynamicGameObjects());
-        worldRequestMessage.setGameObjectList(gameObjects);
-        worldRequestMessage.setWorldSize(new Vec2(4,4));
-
-        log.debug("Sending World: " + worldRequestMessage.getGameObjectList().toString());
+        log.debug("Sending World Size: " + gameWorld.getWorldSize());
         clientManager.sendMessageToClients(worldRequestMessage);
+    }
+
+    private void onRequestWorldScenes(WorldRequestScenesMessage worldRequestScenesMessage) {
+        HashMap<ObjectId, SGameObject> gameObjectHashMap = new HashMap<>();
+        worldRequestScenesMessage.getSceneList().forEach(vec2 -> {
+            gameObjectHashMap.putAll(gameWorld.getGameObjectsForScene(vec2));
+        });
+
+        worldRequestScenesMessage.setGameObjectList(gameObjectHashMap);
+        worldRequestScenesMessage.setWorldSize(gameWorld.getWorldSize());
+
+
+        log.debug("Sending World " + worldRequestScenesMessage.getSceneList().size() + "Scenes");
+        clientManager.sendMessageToClients(worldRequestScenesMessage);
     }
 
     private void onCreateObject(ObjectCreateMessage objectCreateMessage) {

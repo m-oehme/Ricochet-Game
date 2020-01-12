@@ -4,12 +4,15 @@ import de.htw_berlin.ris.ricochet.math.Vector2;
 import de.htw_berlin.ris.ricochet.net.handler.NetMessageObserver;
 import de.htw_berlin.ris.ricochet.net.manager.ClientNetManager;
 import de.htw_berlin.ris.ricochet.net.message.world.ObjectDestroyMessage;
+import de.htw_berlin.ris.ricochet.net.message.world.WorldRequestScenesMessage;
 import de.htw_berlin.ris.ricochet.objects.*;
 import de.htw_berlin.ris.ricochet.objects.shared.SCompanionAI;
 import de.htw_berlin.ris.ricochet.objects.shared.SGameObject;
 import de.htw_berlin.ris.ricochet.objects.shared.SPlayer;
 import de.htw_berlin.ris.ricochet.objects.shared.SWallPrefab;
 import de.htw_berlin.ris.ricochet.objects.GameObject;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.jbox2d.common.Vec2;
 import org.jbox2d.dynamics.Body;
 import org.jbox2d.dynamics.BodyType;
@@ -21,6 +24,7 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 import static org.lwjgl.opengl.GL11.*;
 
 public class GameWorld {
+    private static Logger log = LogManager.getLogger();
     // TODO MAKE DELTA TIME FUNCTION!!
     private Map<Vec2, Scene> worldScenes;
     private Player player;
@@ -53,6 +57,7 @@ public class GameWorld {
         covertedSize = new Vec2(WINDOW_DIMENSIONS[0] * unitConversion, WINDOW_DIMENSIONS[1] * unitConversion);
 
         ClientNetManager.get().getHandlerFor(ObjectDestroyMessage.class).registerObserver(objectDestroyObserver);
+        ClientNetManager.get().getHandlerFor(WorldRequestScenesMessage.class).registerObserver(worldRequestScenesObserver);
     }
 
     public Map<Vec2, Scene> getWorldScenes() {
@@ -85,7 +90,7 @@ public class GameWorld {
         return sceneCenter;
     }
 
-    public void generateWorld(int sizeX, int sizeY, HashMap<ObjectId, SGameObject> gameObjectList) {
+    public void generateWorldScenes(int sizeX, int sizeY) {
         int indexer = 0;
         for (int y = -sizeY / 2; y < sizeY / 2; y++) {
             for (int x = -sizeX / 2; x < sizeX / 2; x++) {
@@ -99,7 +104,9 @@ public class GameWorld {
                 indexer++;
             }
         }
+    }
 
+    public void generateWorldObjects(HashMap<ObjectId, SGameObject> gameObjectList) {
         gameObjectList.forEach((objectId, sGameObject) -> {
             Scene scene = worldScenes.get(sGameObject.getScene());
             Vec2 sceneOffset = new Vec2(scene.getLocation().x * GameWorld.covertedSize.x, scene.getLocation().y * GameWorld.covertedSize.y);
@@ -225,6 +232,11 @@ public class GameWorld {
                     .findFirst()
                     .ifPresent(gameObject -> objectsToBeDestroyed.add(gameObject));
         });
+    };
+
+    private NetMessageObserver<WorldRequestScenesMessage> worldRequestScenesObserver = worldRequestScenesMessage -> {
+        log.debug("Received Chunk Objects: " + worldRequestScenesMessage.getWorldSize());
+        generateWorldObjects(worldRequestScenesMessage.getGameObjectList());
     };
 
     public void updateWorld() {

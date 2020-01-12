@@ -4,6 +4,8 @@ import de.htw_berlin.ris.ricochet.net.manager.ClientId;
 import de.htw_berlin.ris.ricochet.objects.shared.SGameObject;
 import de.htw_berlin.ris.ricochet.objects.ObjectId;
 import de.htw_berlin.ris.ricochet.objects.shared.SPlayer;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.jbox2d.common.Vec2;
 
 import java.util.HashMap;
@@ -11,12 +13,17 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.stream.Collectors;
 
 public class GameWorld {
+    private static Logger log = LogManager.getLogger();
+
     private WorldGenerator worldGenerator = new MazeWorldGenerator();
     private ConcurrentHashMap<ObjectId, SPlayer> playerObjects = new ConcurrentHashMap<>();
     private ConcurrentHashMap<ObjectId, SGameObject> dynamicGameObjects = new ConcurrentHashMap<>();
     private ConcurrentHashMap<ObjectId, SGameObject> staticGameObjects = new ConcurrentHashMap<>();
+
+    private Vec2 worldSize;
 
     public ObjectId addGameObject(SGameObject gameObject) {
 
@@ -74,16 +81,36 @@ public class GameWorld {
     public ConcurrentHashMap<ObjectId, SPlayer> getPlayerObjects() {
         return playerObjects;
     }
-
-    public HashMap<ObjectId, SGameObject> getDynamicGameObjects() {
-        return new HashMap<>(dynamicGameObjects);
+    public ConcurrentHashMap<ObjectId, SGameObject> getDynamicGameObjects() {
+        return dynamicGameObjects;
     }
-
     public ConcurrentHashMap<ObjectId, SGameObject> getStaticGameObjects() {
         return staticGameObjects;
     }
 
+    public HashMap<ObjectId, SGameObject> getGameObjectsForScene(Vec2 scene) {
+        Map<ObjectId, SGameObject> staticGameObjects = this.staticGameObjects.entrySet().stream()
+                .filter(objectIdSGameObjectEntry -> objectIdSGameObjectEntry.getValue().getScene().equals(scene))
+                .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
+
+        Map<ObjectId, SGameObject> dynamicGameObjects = this.dynamicGameObjects.entrySet().stream()
+                .filter(objectIdSGameObjectEntry -> objectIdSGameObjectEntry.getValue().getScene().equals(scene))
+                .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
+
+
+        Map<ObjectId, SGameObject> playerGameObjects = this.playerObjects.entrySet().stream()
+                .filter(objectIdSGameObjectEntry -> objectIdSGameObjectEntry.getValue().getScene().equals(scene))
+                .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
+
+        HashMap<ObjectId, SGameObject> gameObjects = new HashMap<>(staticGameObjects);
+        gameObjects.putAll(dynamicGameObjects);
+        gameObjects.putAll(playerGameObjects);
+
+        return gameObjects;
+    }
+
     public void generateStaticWorld(int sizeX, int sizeY) {
+        worldSize = new Vec2(sizeX, sizeY);
         List<SGameObject> sGameObjects = worldGenerator.generateWorld(sizeX, sizeY);
 
         for (SGameObject sGameObject : sGameObjects) {
@@ -95,5 +122,9 @@ public class GameWorld {
             staticGameObjects.put(objectId, sGameObject);
         }
 
+    }
+
+    public Vec2 getWorldSize() {
+        return worldSize;
     }
 }
