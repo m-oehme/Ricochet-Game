@@ -23,18 +23,19 @@ import java.awt.geom.Arc2D;
 import java.lang.reflect.Array;
 import java.util.*;
 import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 import static org.lwjgl.opengl.GL11.*;
 
 public class CompanionAI extends EnemyCompanionAI implements Runnable {
     protected Player guardianPlayer;
     private boolean isAlive = true;
-    protected ArrayList<MyRayCastCallback> rayCasts = new ArrayList<>();
-    protected ArrayList<Vec2> rayDirs = new ArrayList<>();
-    Fixture closestFixture;
+    protected CopyOnWriteArrayList<MyRayCastCallback> rayCasts = new CopyOnWriteArrayList<>();
     boolean hitShit;
-
-
+    float speed = 10.0f;
+    private boolean traveling,waiting;
+    Vec2 originalPos;
+    float totalDist;
     public CompanionAI(ObjectId objectId, Vec2 pos, float width, float height, Scene whichScene, Player guardianPlayer) {
         super(objectId, pos, width, height, whichScene);
         this.guardianPlayer = guardianPlayer;
@@ -90,35 +91,46 @@ public class CompanionAI extends EnemyCompanionAI implements Runnable {
     protected void calculateAndCorrectCollision() {
 
         // Distance from Guardian Player
+        Vec2 weightGuardian = new Vec2(0,0);
+        if (!traveling && !waiting){
+            originalPos = position;
+            traveling = true;
+        }
+        totalDist = guardianPlayer.position.sub(originalPos).length();
         Vec2 distance = guardianPlayer.position.sub(position);
-        Vec2 weightGuardian = body.getLinearVelocity();
+        float playerDist = distance.length();
+        distance.normalize();
+        if (traveling && ! waiting){
 
-        if (distance.lengthSquared() > 27) {
-            weightGuardian = distance;
-        } else if (distance.lengthSquared() < 9.0) {
-            weightGuardian = distance.negate().mul(0.5f);
-        } else if (distance.lengthSquared() < 12.0 || distance.lengthSquared() > 25) {
-            weightGuardian = new Vec2(0, 0);
+            float speedFac =  playerDist/totalDist;
+
+            if (playerDist <= 3){
+
+                 speedFac =  0.01f;
+                traveling = false;
+                waiting = true;
+            }
+            weightGuardian  = distance.mul(speed*speedFac);
         }
 
-        // collisionPoint  = distance.mul(30);
+        if ( waiting ){
+           if( playerDist >= 5){
+               waiting = false;
+           }
+        }
+
 
         // Distance from other Objects
         Vec2 weightCollision = new Vec2(0, 0);
 
 
-
-        Vec2 sceneOffset = new Vec2(myScene.getLocation().x * GameWorld.covertedSize.x, myScene.getLocation().y * GameWorld.covertedSize.y);
-        Vec2 myPosition = body.getPosition().sub(sceneOffset).mul(30);
-        Vec2 PlayerPos =guardianPlayer.body.getPosition().sub(sceneOffset).mul(30);
-
         float radius = 5;
         float numRays = 12;
-        rayDirs.clear();
+
         rayCasts.clear();
 
-        ArrayList<Vec2> tempDir = new ArrayList<>();
-        ArrayList<MyRayCastCallback> tempRays = new ArrayList<>();
+
+
 
         double angle = 0;
         double angleIncrement = 2 * Math.PI / numRays;
@@ -128,37 +140,37 @@ public class CompanionAI extends EnemyCompanionAI implements Runnable {
             double y = radius * Math.sin(angle);
             Vec2 castDir = new Vec2((float)(x + position.x), (float)(y + position.y));
             hitShit =  CastRay(position, castDir);
-            tempDir.add(castDir);
         }
      /*   Vec2 castDir = PlayerPos.sub(myPosition);
         castDir = castDir.mul(castDir.normalize());*/
 
 
        /* Vec2 castDir = PlayerPos.sub(myPosition);
-        castDir = castDir.mul(castDir.normalize());
+        castDir = castDir.mul(castDir.normalize());*/
 
 
+        for (MyRayCastCallback ray:rayCasts ) {
 
 
-        //  System.out.println(closestFixture.getBody().getUserData().getClass().toString());
-       /* if (hitStuff){
-            Vec2 distanceCollision = body.getPosition().sub(collisionPoint);
+            if (ray.didHit) {
+                Vec2 distanceCollision = body.getPosition().sub(ray.collisionPoint);
+                float dist = distanceCollision.lengthSquared();
+                float weightFac = 0;
+                float weightFacCol = 1*( 1/dist);
+                if (distanceCollision.lengthSquared() < 2) {
+                    System.out.println("too close");
+                //    weightGuardian = weightGuardian.mul(weightFac);
 
-            if (distanceCollision.lengthSquared() < 2) {
-                weightCollision = distanceCollision.negate();
-                float distScale = 10/distanceCollision.lengthSquared();
-                weightCollision.mul(distScale);
-
-            } else {
-                weightCollision = new Vec2(1/distanceCollision.x, 1/distanceCollision.y);
+                }
+                weightCollision =  weightCollision.add(distanceCollision.mul(weightFacCol));
             }
-        }*/
+        }
 
-
-        body.setLinearVelocity(weightGuardian);
+        Vec2 finalVel = weightGuardian;//.add(weightCollision);
+        body.setLinearVelocity(finalVel);
 
         ClientNetManager.get().sentMessage(new ObjectMoveMessage(ClientNetManager.get().getClientId(), this.getObjectId(), myScene.getLocation(), this.position));
-        rayDirs = tempDir;
+
     }
 
     public void debugRay (){
