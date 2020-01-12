@@ -22,6 +22,7 @@ import org.lwjgl.LWJGLException;
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.opengl.Display;
 import org.lwjgl.opengl.DisplayMode;
+import org.lwjgl.util.glu.GLU;
 
 import java.util.HashMap;
 
@@ -132,9 +133,9 @@ public class RicochetGameGUI {
             }
         } else if (sGameObject instanceof SCompanionAI) {
             if (((SCompanionAI) sGameObject).getGuardianPlayer().equals(GameWorld.Instance.getPlayer().getObjectId())){
-                new CompanionAI(objectCreateMessage.getObjectId(), objectCreateMessage.getSGameObject().getPosition(), 0.5f, 0.5f, GameWorld.Instance.getWorldScenes().get(objectCreateMessage.getSGameObject().getScene()), GameWorld.Instance.getPlayer());
+                new CompanionAI(objectCreateMessage.getObjectId(), objectCreateMessage.getSGameObject().getPosition(), 1f, 1f, GameWorld.Instance.getWorldScenes().get(objectCreateMessage.getSGameObject().getScene()), GameWorld.Instance.getPlayer());
             } else {
-                EnemyCompanionAI playerObject = new EnemyCompanionAI(objectCreateMessage.getObjectId(), objectCreateMessage.getSGameObject().getPosition(), 0.5f, 0.5f, GameWorld.Instance.getWorldScenes().get(objectCreateMessage.getSGameObject().getScene()));
+                EnemyCompanionAI playerObject = new EnemyCompanionAI(objectCreateMessage.getObjectId(), objectCreateMessage.getSGameObject().getPosition(), 1f, 1f, GameWorld.Instance.getWorldScenes().get(objectCreateMessage.getSGameObject().getScene()));
             }
         }
     };
