@@ -52,14 +52,15 @@ public class RicochetApplication {
 
         log.info("Requesting GameWorld from Server");
         ClientNetManager.get().sentMessage(new WorldRequestMessage(ClientNetManager.get().getClientId()));
-
         log.info("GUI starting");
         RicochetGameGUI.get().Run();
+
     }
 
     private NetMessageObserver<WorldRequestMessage> worldRequestMessageObserver = worldRequestMessage -> {
         log.debug("Received: " + worldRequestMessage.getGameObjectList().toString());
         RicochetGameGUI.get().generateWorld(worldRequestMessage.getWorldSize(), worldRequestMessage.getGameObjectList());
+        RicochetGameGUI.get().setUpObjects();
     };
 
     private void setUpMessageHandler() {

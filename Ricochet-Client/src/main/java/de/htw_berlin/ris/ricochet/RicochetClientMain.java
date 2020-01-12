@@ -13,7 +13,6 @@ public class RicochetClientMain {
     public static void main(String[] args) throws IOException {
         InetAddress serverAddress = InetAddress.getByName(args[0]);
         int serverPort = Integer.parseInt(args[1]);
-
         RicochetApplication.initialize(serverAddress, serverPort);
     }
 }

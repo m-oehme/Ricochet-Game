@@ -3,6 +3,7 @@ package de.htw_berlin.ris.ricochet;
 import de.htw_berlin.ris.ricochet.Entities.ContactListener;
 import de.htw_berlin.ris.ricochet.Entities.GameWorld;
 import de.htw_berlin.ris.ricochet.Entities.Scene;
+import de.htw_berlin.ris.ricochet.math.Vector2;
 import de.htw_berlin.ris.ricochet.net.handler.NetMessageObserver;
 import de.htw_berlin.ris.ricochet.net.manager.ClientNetManager;
 import de.htw_berlin.ris.ricochet.net.message.world.ObjectCreateMessage;
@@ -24,7 +25,7 @@ import org.lwjgl.opengl.Display;
 import org.lwjgl.opengl.DisplayMode;
 import org.lwjgl.util.glu.GLU;
 
-import java.util.HashMap;
+import java.util.*;
 
 import static org.lwjgl.opengl.GL11.*;
 /*
@@ -82,13 +83,15 @@ public class RicochetGameGUI {
 
     public void setUpWorld(){
         GameWorld.Instance = new GameWorld(new Vec2(0, 0),WINDOW_DIMENSIONS);
-        Scene scene = GameWorld.Instance.generateInitWorld();
-        GameWorld.Instance.setCurrentScene(scene.getLocation());
-        GameWorld.Instance.getCurrentScene().init();
+
     }
 
     public void generateWorld(Vec2 worldSize, HashMap<ObjectId, SGameObject> gameObjectList) {
         GameWorld.Instance.generateWorld((int) worldSize.x, (int) worldSize.y, gameObjectList);
+        ArrayList<Vec2> vec2Set = new ArrayList<>(GameWorld.Instance.getWorldScenes().keySet());
+        int r  = (int) (Math.random() * vec2Set.size());
+        GameWorld.Instance.setCurrentScene(vec2Set.get(r));
+        GameWorld.Instance.getCurrentScene().init();
     }
 
     void setUpNetworking() {
@@ -99,7 +102,7 @@ public class RicochetGameGUI {
     void setUpObjects() {
 
         Vec2 playerPos = new Vec2(GameWorld.covertedSize.x/2,  GameWorld.covertedSize.y/2);
-        ClientNetManager.get().sentMessage(new ObjectCreateMessage(ClientNetManager.get().getClientId(), null, new SPlayer(ClientNetManager.get().getClientId(), new Vec2(0,0), playerPos)));
+        ClientNetManager.get().sentMessage(new ObjectCreateMessage(ClientNetManager.get().getClientId(), null, new SPlayer(ClientNetManager.get().getClientId(), GameWorld.Instance.getCurrentScene().getLocation(), playerPos)));
     }
 
     private NetMessageObserver<ObjectMoveMessage> objectMoveObserver = objectMoveMessage -> {
@@ -173,11 +176,14 @@ public class RicochetGameGUI {
         setUpDisplay();
         setUpWorld();
         setUpNetworking();
-        setUpObjects();
+      //  setUpObjects();
         setUpMatrices();
         setUpListeners();
     }
     public void Run() {
+        while (GameWorld.Instance.getCurrentScene() == null){
+
+        }
         enterGameLoop();
         cleanUp(false);
     }

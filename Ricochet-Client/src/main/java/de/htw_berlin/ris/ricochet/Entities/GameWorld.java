@@ -75,12 +75,12 @@ public class GameWorld {
         return currentScene;
     }
 
-    public void setGameOver(boolean gameOver){
+    public void setGameOver(boolean gameOver) {
         this.gameOver = gameOver;
     }
 
     public Scene generateInitWorld() {
-        Scene sceneCenter = new Scene(0, new Vec2(0, 0));
+        Scene sceneCenter = new Scene(0, new Vec2((int) Math.random() * 2, (int) Math.random() * 2));
         worldScenes.put(sceneCenter.getLocation(), sceneCenter);
         return sceneCenter;
     }
@@ -89,12 +89,10 @@ public class GameWorld {
         int indexer = 0;
         for (int y = -sizeY / 2; y < sizeY / 2; y++) {
             for (int x = -sizeX / 2; x < sizeX / 2; x++) {
-                if (x == 0 && y == 0) {
-                    worldScenes.get(new Vec2(0, 0)).setID(indexer);
-                } else {
-                    Scene sceneCenter = new Scene(indexer, new Vec2(x, y));
-                    worldScenes.put(sceneCenter.getLocation(), sceneCenter);
-                }
+
+                Scene sceneCenter = new Scene(indexer, new Vec2(x, y));
+                worldScenes.put(sceneCenter.getLocation(), sceneCenter);
+
                 indexer++;
             }
         }
@@ -106,11 +104,11 @@ public class GameWorld {
                 EnemyPlayer playerObject = new EnemyPlayer(objectId, sGameObject.getPosition().add(sceneOffset), 0.5f, 0.5f, BodyType.DYNAMIC, scene);
             } else if (sGameObject instanceof SCompanionAI) {
                 EnemyCompanionAI playerObject = new EnemyCompanionAI(objectId, sGameObject.getPosition().add(sceneOffset), 0.5f, 0.5f, scene);
-            } else if(sGameObject instanceof SWallPrefab){
+            } else if (sGameObject instanceof SWallPrefab) {
                 SWallPrefab sWallPrefab = (SWallPrefab) sGameObject;
                 WallPrefab wall = new WallPrefab(sWallPrefab.getPrefabType(), sWallPrefab.getPrefabPosition(), scene);
             } else {
-                GameObject cellWall = WallPrefab.simpleWall(WallPrefabConfig.PrefabType.CellWall,sGameObject.getPosition().add(sceneOffset),sGameObject.getWidth(),sGameObject.getHeight(),scene);
+                GameObject cellWall = WallPrefab.simpleWall(WallPrefabConfig.PrefabType.CellWall, sGameObject.getPosition().add(sceneOffset), sGameObject.getWidth(), sGameObject.getHeight(), scene);
             }
         });
     }
@@ -141,9 +139,9 @@ public class GameWorld {
     public void Reset() {
         currentScene.getSceneObjectsDynamic().remove(player);
         destroyAllDynamicBodies();
-        setCurrentScene(new Vec2(0,0));
+        setCurrentScene(new Vec2(0, 0));
         currentScene.getSceneObjectsDynamic().add(player);
-        player.body.setTransform(new Vec2(GameWorld.covertedSize.x/2,  GameWorld.covertedSize.y/2), 0);
+        player.body.setTransform(new Vec2(GameWorld.covertedSize.x / 2, GameWorld.covertedSize.y / 2), 0);
         gameOver = false;
     }
 
@@ -163,7 +161,7 @@ public class GameWorld {
         }
     }
 
-    private void destroyAllDynamicBodies(){
+    private void destroyAllDynamicBodies() {
         worldScenes.values().forEach(scene -> {
             scene.getSceneObjectsDynamic().forEach(GameObject::Destroy);
         });
@@ -229,14 +227,14 @@ public class GameWorld {
     public void updateWorld() {
         //TODO:: DO Static objects have to be updated?
 
-       while( createObjectQueue.peek() != null){
-           GameObject G  = createObjectQueue.poll();
-           G.Init();
-       }
+        while (createObjectQueue.peek() != null) {
+            GameObject G = createObjectQueue.poll();
+            G.Init();
+        }
 
-       worldScenes.values().forEach(scene -> {
-           scene.getSceneObjectsDynamic().forEach(GameObject::Update);
-       });
+        worldScenes.values().forEach(scene -> {
+            scene.getSceneObjectsDynamic().forEach(GameObject::Update);
+        });
 
         physicsWorld.step(timeStep, 4, 3);
         if (switchScene) finalizeSceneSwitch();
