@@ -24,6 +24,8 @@ import org.lwjgl.opengl.Display;
 import org.lwjgl.opengl.DisplayMode;
 
 import java.util.HashMap;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 import static org.lwjgl.opengl.GL11.*;
 /*
@@ -46,6 +48,7 @@ public class RicochetGameGUI {
     private static final String WINDOW_TITLE = "Ricochet!";
     public static final int[] WINDOW_DIMENSIONS = {1280, 960};
 
+    private final ExecutorService mainGUIThreadPool = Executors.newCachedThreadPool();
     private final ContactListener myListener = new ContactListener();
 
     private void render() {
@@ -132,7 +135,7 @@ public class RicochetGameGUI {
             }
         } else if (sGameObject instanceof SCompanionAI) {
             if (((SCompanionAI) sGameObject).getGuardianPlayer().equals(GameWorld.Instance.getPlayer().getObjectId())){
-                new CompanionAI(objectCreateMessage.getObjectId(), objectCreateMessage.getSGameObject().getPosition(), 0.5f, 0.5f, GameWorld.Instance.getWorldScenes().get(objectCreateMessage.getSGameObject().getScene()), GameWorld.Instance.getPlayer());
+                CompanionAI companionAI = new CompanionAI(objectCreateMessage.getObjectId(), objectCreateMessage.getSGameObject().getPosition(), 0.5f, 0.5f, GameWorld.Instance.getWorldScenes().get(objectCreateMessage.getSGameObject().getScene()), GameWorld.Instance.getPlayer());
             } else {
                 EnemyCompanionAI playerObject = new EnemyCompanionAI(objectCreateMessage.getObjectId(), objectCreateMessage.getSGameObject().getPosition(), 0.5f, 0.5f, GameWorld.Instance.getWorldScenes().get(objectCreateMessage.getSGameObject().getScene()));
             }
@@ -182,6 +185,10 @@ public class RicochetGameGUI {
     }
     public void exit(){
         cleanUp(false);
+    }
+
+    public ExecutorService getMainGUIThreadPool() {
+        return mainGUIThreadPool;
     }
 }
 
