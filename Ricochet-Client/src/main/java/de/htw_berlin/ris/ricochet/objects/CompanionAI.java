@@ -4,25 +4,11 @@ import de.htw_berlin.ris.ricochet.Entities.GameWorld;
 import de.htw_berlin.ris.ricochet.Entities.MyRayCastCallback;
 import de.htw_berlin.ris.ricochet.Entities.Scene;
 import de.htw_berlin.ris.ricochet.RicochetGameGUI;
-import de.htw_berlin.ris.ricochet.math.Vector2;
 import de.htw_berlin.ris.ricochet.net.manager.ClientNetManager;
 import de.htw_berlin.ris.ricochet.net.message.world.ObjectMoveMessage;
-import org.apache.logging.log4j.util.PropertySource;
-import org.jbox2d.callbacks.DebugDraw;
-import org.jbox2d.callbacks.RayCastCallback;
-import org.jbox2d.collision.RayCastInput;
 import org.jbox2d.common.Vec2;
-import org.jbox2d.dynamics.Body;
-import org.jbox2d.dynamics.BodyType;
-import org.jbox2d.dynamics.Fixture;
 import org.jbox2d.dynamics.World;
-import org.lwjgl.Sys;
 
-import java.awt.*;
-import java.awt.geom.Arc2D;
-import java.lang.reflect.Array;
-import java.util.*;
-import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 import static org.lwjgl.opengl.GL11.*;

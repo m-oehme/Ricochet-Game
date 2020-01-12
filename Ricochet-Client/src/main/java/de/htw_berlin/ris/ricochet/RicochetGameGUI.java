@@ -95,7 +95,7 @@ public class RicochetGameGUI {
         GameWorld.Instance.generateWorldScenes((int) worldSize.x, (int) worldSize.y);
         ArrayList<Vec2> vec2Set = new ArrayList<>(GameWorld.Instance.getWorldScenes().keySet());
         int r  = (int) (Math.random() * vec2Set.size());
-        GameWorld.Instance.setCurrentScene(vec2Set.get(r));
+        GameWorld.Instance.setCurrentScene(new Vec2(0,0));
         GameWorld.Instance.getCurrentScene().init();
 
         GameWorld.Instance.addPlayersToWorld(playerList);
@@ -157,10 +157,19 @@ public class RicochetGameGUI {
         } else if (sGameObject instanceof SCompanionAI) {
             if (((SCompanionAI) sGameObject).getGuardianPlayer().equals(GameWorld.Instance.getPlayer().getObjectId())){
                 log.debug("CompanionAI object created at Scene: " + objectCreateMessage.getSGameObject().getScene());
-                new CompanionAI(objectCreateMessage.getObjectId(), objectCreateMessage.getSGameObject().getPosition(), 1f, 1f, GameWorld.Instance.getWorldScenes().get(objectCreateMessage.getSGameObject().getScene()), GameWorld.Instance.getPlayer());
+                new CompanionAI(
+                        objectCreateMessage.getObjectId(),
+                        objectCreateMessage.getSGameObject().getPosition(),
+                        1f, 1f,
+                        GameWorld.Instance.getWorldScenes().get(objectCreateMessage.getSGameObject().getScene()),
+                        GameWorld.Instance.getPlayer());
             } else {
                 log.debug("EnemyCompanionAI object created at Scene: " + objectCreateMessage.getSGameObject().getScene());
-                EnemyCompanionAI playerObject = new EnemyCompanionAI(objectCreateMessage.getObjectId(), objectCreateMessage.getSGameObject().getPosition(), 1f, 1f, GameWorld.Instance.getWorldScenes().get(objectCreateMessage.getSGameObject().getScene()));
+                EnemyCompanionAI playerObject = new EnemyCompanionAI(
+                        objectCreateMessage.getObjectId(),
+                        objectCreateMessage.getSGameObject().getPosition(),
+                        1f, 1f,
+                        GameWorld.Instance.getWorldScenes().get(objectCreateMessage.getSGameObject().getScene()));
             }
         }
     };

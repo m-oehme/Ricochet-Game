@@ -318,8 +318,10 @@ public class GameObject {
     public void setPositionUpdate(Vec2 positionUpdate, Vec2 scene) {
         this.positionUpdate = positionUpdate;
 
-        if (!scene.equals(myScene.getLocation())) {
-            finalizeSceneSwitch(scene);
-        }
+//        if (!scene.equals(myScene.getLocation())) {
+//            finalizeSceneSwitch(scene);
+//        }
+
+//        switchScene(positionUpdate);
     }
 }

@@ -1,8 +1,6 @@
 package de.htw_berlin.ris.ricochet.objects;
 
-import de.htw_berlin.ris.ricochet.Entities.GameWorld;
 import de.htw_berlin.ris.ricochet.Entities.Scene;
-import de.htw_berlin.ris.ricochet.RicochetGameGUI;
 import org.jbox2d.common.Vec2;
 import org.jbox2d.dynamics.BodyType;
 
