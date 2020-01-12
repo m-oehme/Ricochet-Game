@@ -8,15 +8,13 @@ import org.jbox2d.dynamics.BodyType;
 public class EnemyCompanionAI extends GameObject {
 
     public EnemyCompanionAI(ObjectId objectId, Vec2 pos, float width, float height, Scene whichScene) {
-        super(objectId, pos, width, height, BodyType.KINEMATIC, whichScene);
+        super(objectId, pos, width, height, BodyType.DYNAMIC, whichScene);
     }
 
     @Override
     public void Init() {
         super.Init();
 
-        if (myScene.equals(GameWorld.Instance.getCurrentScene())) {
-            body.setFixedRotation(true);
-        }
+        body.setFixedRotation(true);
     }
 }

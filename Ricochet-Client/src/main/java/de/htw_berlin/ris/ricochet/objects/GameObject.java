@@ -28,7 +28,7 @@ public class GameObject {
     public Body body;
     private FixtureDef bodyFixture, sensorFixture;
     protected Vec2 position;
-    private Vec2 positionUpdate;
+    protected Vec2 positionUpdate;
     protected float width, height;
     public boolean contact;
     public java.awt.Color objectColor;
@@ -45,6 +45,7 @@ public class GameObject {
     public Scene myScene;
 
     public GameObject(ObjectId objectId, Vec2 pos, float width, float height, BodyType bodyType, Scene whichScene) {
+        this.name = "dynamicObject";
         this.position = pos;
         this.objectId = objectId;
         bodyDef = new BodyDef();
@@ -112,6 +113,7 @@ public class GameObject {
     }
 
     public GameObject(ObjectId objectId, Vec2 pos, float width, float height, BodyType bodyType, float density, float restitution, Scene whichScene) {
+        this.name = "WallObject";
         this.objectId = objectId;
         this.position = pos;
         bodyDef = new BodyDef();
@@ -149,6 +151,7 @@ public class GameObject {
         type = bodyType;
         float grayscale = 0.25f;//(float)Math.random() * 0.25f + 0.25f;
         objectColor = new java.awt.Color(grayscale, grayscale, grayscale);
+
 
 
         myScene = whichScene;
@@ -207,6 +210,7 @@ public class GameObject {
            // DrawCircle(bodyPosition, 5f, 10);
             renderSphere(bodyPosition, 10f);
         } else if (this instanceof CompanionAI || this instanceof EnemyCompanionAI){
+            ((CompanionAI) this).debugRay();
             glTranslatef(bodyPosition.x, bodyPosition.y, 0);
             glRotated(Math.toDegrees(body.getAngle()), 0, 0, 1);
 
