@@ -64,7 +64,7 @@ public class GameWorldComponent implements Runnable, NetMessageObserver<WorldMes
     }
 
     private void initialize() {
-        gameWorld.generateStaticWorld(100,100);
+        gameWorld.generateStaticWorld(4,4);
         log.info("New World of size "+ gameWorld.getWorldSize() +" generated!");
     }
 
@@ -74,7 +74,12 @@ public class GameWorldComponent implements Runnable, NetMessageObserver<WorldMes
     }
 
     private void onRequestWorld(WorldRequestMessage worldRequestMessage) {
+        Map<ObjectId, SPlayer> playerMap = gameWorld.getPlayerObjects().entrySet().stream()
+                .filter(map -> !worldRequestMessage.getClientId().equals(map.getValue().getClientId()))
+                .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
+
         worldRequestMessage.setWorldSize(gameWorld.getWorldSize());
+        worldRequestMessage.setPlayerList(new HashMap<>(playerMap));
 
         log.debug("Sending World Size: " + gameWorld.getWorldSize());
         clientManager.sendMessageToClients(worldRequestMessage);

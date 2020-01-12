@@ -98,13 +98,8 @@ public class GameWorld {
                 .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
 
 
-        Map<ObjectId, SGameObject> playerGameObjects = this.playerObjects.entrySet().stream()
-                .filter(objectIdSGameObjectEntry -> objectIdSGameObjectEntry.getValue().getScene().equals(scene))
-                .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
-
         HashMap<ObjectId, SGameObject> gameObjects = new HashMap<>(staticGameObjects);
         gameObjects.putAll(dynamicGameObjects);
-        gameObjects.putAll(playerGameObjects);
 
         return gameObjects;
     }

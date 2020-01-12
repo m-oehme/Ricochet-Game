@@ -26,7 +26,7 @@ public class GameObject {
     private ObjectId objectId;
     private BodyDef bodyDef;
     public Body body;
-    private FixtureDef bodyFixture, sensorFixture;
+    protected FixtureDef bodyFixture, sensorFixture;
     protected Vec2 position;
     private Vec2 positionUpdate;
     protected float width, height;
@@ -200,8 +200,7 @@ public class GameObject {
             objectColor.getRGBColorComponents(rgbVal);
             glColor3f(rgbVal[0], rgbVal[1], rgbVal[3]);
         }
-        Vec2 sceneOffset = new Vec2(myScene.getLocation().x * GameWorld.covertedSize.x, myScene.getLocation().y * GameWorld.covertedSize.y);
-        Vec2 bodyPosition = body.getPosition().sub(sceneOffset).mul(30);
+        Vec2 bodyPosition = GameWorld.getLocalCoordinates(position, myScene.getLocation()).mul(30);
 
         if (this instanceof Bullet) {
            // DrawCircle(bodyPosition, 5f, 10);
@@ -211,6 +210,8 @@ public class GameObject {
             glRotated(Math.toDegrees(body.getAngle()), 0, 0, 1);
 
             renderTriangle(-width/2 * 30,   width/2 *30,  height * 30);
+        } else if (this instanceof EnemyIndicator) {
+            renderSphere(bodyPosition, 5f);
         }
         else {
             glTranslatef(bodyPosition.x, bodyPosition.y, 0);
@@ -236,7 +237,7 @@ public class GameObject {
     }
 
 
-    private void renderSphere(Vec2 position, float radius) {
+    protected void renderSphere(Vec2 position, float radius) {
         int numVertices = 20;
           glBegin(GL_POLYGON);
         {
@@ -320,5 +321,13 @@ public class GameObject {
 
     public void setPositionUpdate(Vec2 positionUpdate) {
         this.positionUpdate = positionUpdate;
+    }
+
+    public void setPositionUpdate(Vec2 positionUpdate, Vec2 scene) {
+        this.positionUpdate = positionUpdate;
+
+        if (!scene.equals(myScene.getLocation())) {
+            finalizeSceneSwitch(scene);
+        }
     }
 }

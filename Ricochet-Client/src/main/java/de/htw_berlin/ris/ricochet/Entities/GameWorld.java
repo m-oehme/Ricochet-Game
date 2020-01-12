@@ -4,6 +4,7 @@ import de.htw_berlin.ris.ricochet.math.Vector2;
 import de.htw_berlin.ris.ricochet.net.handler.NetMessageObserver;
 import de.htw_berlin.ris.ricochet.net.manager.ClientNetManager;
 import de.htw_berlin.ris.ricochet.net.message.world.ObjectDestroyMessage;
+import de.htw_berlin.ris.ricochet.net.message.world.ObjectMoveMessage;
 import de.htw_berlin.ris.ricochet.net.message.world.WorldRequestScenesMessage;
 import de.htw_berlin.ris.ricochet.objects.*;
 import de.htw_berlin.ris.ricochet.objects.shared.SCompanionAI;
@@ -52,7 +53,7 @@ public class GameWorld {
         RIGHT
     }
 
-    private Set<GameObject> objectsToBeDestroyed = new HashSet<GameObject>();
+    private Set<GameObject> objectsToBeDestroyed = ConcurrentHashMap.newKeySet();
 
     public GameWorld(Vec2 gravity, int[] WINDOW_DIMENSIONS) {
         this.WINDOW_DIMENSIONS = WINDOW_DIMENSIONS;
@@ -152,13 +153,21 @@ public class GameWorld {
         }
     }
 
-    public void generateWorldObjects(HashMap<ObjectId, SGameObject> gameObjectList) {
-        gameObjectList.forEach((objectId, sGameObject) -> {
+    public void addPlayersToWorld(HashMap<ObjectId, SGameObject> playerList) {
+        playerList.forEach((objectId, sGameObject) -> {
             Scene scene = worldScenes.get(sGameObject.getScene());
 
             if (sGameObject instanceof SPlayer) {
                 EnemyPlayer playerObject = new EnemyPlayer(objectId, GameWorld.getGlobalCoordinates(sGameObject.getPosition(), scene.getLocation()), 0.5f, 0.5f, BodyType.DYNAMIC, scene);
-            } else if (sGameObject instanceof SCompanionAI) {
+            }
+        });
+    }
+
+    public void generateWorldObjects(HashMap<ObjectId, SGameObject> gameObjectList) {
+        gameObjectList.forEach((objectId, sGameObject) -> {
+            Scene scene = worldScenes.get(sGameObject.getScene());
+
+            if (sGameObject instanceof SCompanionAI) {
                 EnemyCompanionAI playerObject = new EnemyCompanionAI(objectId, GameWorld.getGlobalCoordinates(sGameObject.getPosition(), scene.getLocation()), 0.5f, 0.5f, scene);
             } else if (sGameObject instanceof SWallPrefab) {
                 SWallPrefab sWallPrefab = (SWallPrefab) sGameObject;
@@ -193,11 +202,19 @@ public class GameWorld {
     }
 
     public void Reset() {
+        ArrayList<Vec2> vec2Set = new ArrayList<>(GameWorld.Instance.getWorldScenes().keySet());
+        int r  = (int) (Math.random() * vec2Set.size());
+
         currentScene.getSceneObjectsDynamic().remove(player);
         destroyAllDynamicBodies();
-        setCurrentScene(new Vec2(0, 0));
+        setCurrentScene(vec2Set.get(r));
         currentScene.getSceneObjectsDynamic().add(player);
-        player.body.setTransform(new Vec2(GameWorld.covertedSize.x / 2, GameWorld.covertedSize.y / 2), 0);
+
+        Vec2 newPosition = new Vec2(GameWorld.covertedSize.x / 2, GameWorld.covertedSize.y / 2);
+
+        player.setPositionUpdate(GameWorld.getGlobalCoordinates(newPosition, currentScene.getLocation()), currentScene.getLocation());
+        player.setEnemyIndicatorAlive();
+        loadSceneChunk(currentScene.getLocation());
         gameOver = false;
     }
 
@@ -214,7 +231,9 @@ public class GameWorld {
 
     private void destroyAllDynamicBodies() {
         worldScenes.values().forEach(scene -> {
-            scene.getSceneObjectsDynamic().forEach(GameObject::Destroy);
+            scene.getSceneObjectsDynamic().stream()
+                    .filter(gameObject -> gameObject instanceof Bullet)
+                    .forEach(GameObject::Destroy);
         });
 
     }

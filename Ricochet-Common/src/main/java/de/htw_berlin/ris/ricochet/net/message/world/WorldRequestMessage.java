@@ -12,6 +12,7 @@ import java.util.List;
 
 public class WorldRequestMessage extends WorldMessage implements NetMessage {
     private Vec2 worldSize;
+    private HashMap<ObjectId, SGameObject> playerList;
 
     public WorldRequestMessage(ClientId clientId) {
         super(clientId, MessageScope.SELF);
@@ -23,5 +24,13 @@ public class WorldRequestMessage extends WorldMessage implements NetMessage {
 
     public void setWorldSize(Vec2 worldSize) {
         this.worldSize = worldSize;
+    }
+
+    public HashMap<ObjectId, SGameObject> getPlayerList() {
+        return playerList;
+    }
+
+    public void setPlayerList(HashMap<ObjectId, SGameObject> playerList) {
+        this.playerList = playerList;
     }
 }

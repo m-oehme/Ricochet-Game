@@ -23,6 +23,8 @@ import org.lwjgl.opengl.DisplayMode;
 import org.lwjgl.util.glu.GLU;
 
 import java.util.*;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 import static org.lwjgl.opengl.GL11.*;
 /*
@@ -46,6 +48,7 @@ public class RicochetGameGUI {
     public static final int[] WINDOW_DIMENSIONS = {1280, 960};
 
     private final ContactListener myListener = new ContactListener();
+    private ExecutorService mainThreadPool = Executors.newCachedThreadPool();
 
     private void render() {
         GameWorld.Instance.renderWorld();
@@ -85,12 +88,14 @@ public class RicochetGameGUI {
         GameWorld.Instance.getCurrentScene().init();
     }
 
-    public void generateWorldScenes(Vec2 worldSize) {
+    public void generateWorldScenes(Vec2 worldSize, HashMap<ObjectId, SGameObject> playerList) {
         GameWorld.Instance.generateWorldScenes((int) worldSize.x, (int) worldSize.y);
         ArrayList<Vec2> vec2Set = new ArrayList<>(GameWorld.Instance.getWorldScenes().keySet());
         int r  = (int) (Math.random() * vec2Set.size());
         GameWorld.Instance.setCurrentScene(vec2Set.get(r));
         GameWorld.Instance.getCurrentScene().init();
+
+        GameWorld.Instance.addPlayersToWorld(playerList);
     }
 
     public void loadSceneChunk(Vec2 chunkCenterScene) {
@@ -123,7 +128,7 @@ public class RicochetGameGUI {
                     .filter(gameObject -> gameObject.getObjectId().equals(objectMoveMessage.getObjectId()))
                     .findFirst()
                     .ifPresent(gameObject -> {
-                        gameObject.setPositionUpdate(objectMoveMessage.getPosition());
+                        gameObject.setPositionUpdate(objectMoveMessage.getPosition(), objectMoveMessage.getScene());
                     });
         }
     };
@@ -200,6 +205,10 @@ public class RicochetGameGUI {
     }
     public void exit(){
         cleanUp(false);
+    }
+
+    public ExecutorService getMainThreadPool() {
+        return mainThreadPool;
     }
 }
 

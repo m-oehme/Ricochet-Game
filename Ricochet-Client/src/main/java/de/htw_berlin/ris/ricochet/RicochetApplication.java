@@ -57,7 +57,7 @@ public class RicochetApplication {
 
     private NetMessageObserver<WorldRequestMessage> worldRequestMessageObserver = worldRequestMessage -> {
         log.debug("Received World of size: " + worldRequestMessage.getWorldSize());
-        RicochetGameGUI.get().generateWorldScenes(worldRequestMessage.getWorldSize());
+        RicochetGameGUI.get().generateWorldScenes(worldRequestMessage.getWorldSize(), worldRequestMessage.getPlayerList());
         Vec2 playerPos = RicochetGameGUI.get().setUpPlayerObject();
 
         RicochetGameGUI.get().loadSceneChunk(playerPos);
