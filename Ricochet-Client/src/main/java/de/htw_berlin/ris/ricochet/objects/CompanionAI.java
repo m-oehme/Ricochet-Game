@@ -30,6 +30,7 @@ public class CompanionAI extends EnemyCompanionAI implements Runnable {
     protected Player guardianPlayer;
     private boolean isAlive = true;
     protected ArrayList<Vec2> collisionPoints = new ArrayList<>();
+    protected ArrayList<Vec2> rayDirs = new ArrayList<>();
     Fixture closestFixture;
     boolean hitShit;
 
@@ -110,10 +111,29 @@ public class CompanionAI extends EnemyCompanionAI implements Runnable {
         Vec2 sceneOffset = new Vec2(myScene.getLocation().x * GameWorld.covertedSize.x, myScene.getLocation().y * GameWorld.covertedSize.y);
         Vec2 myPosition = body.getPosition().sub(sceneOffset).mul(30);
         Vec2 PlayerPos =guardianPlayer.body.getPosition().sub(sceneOffset).mul(30);
-        Vec2 castDir = PlayerPos.sub(myPosition);
-        castDir = castDir.mul(castDir.normalize());
 
-        hitShit =  CastRay(position, castDir);
+        float radius = 5;
+        float numRays = 12;
+        rayDirs.clear();
+        collisionPoints.clear();
+
+        ArrayList<Vec2> tempDir = new ArrayList<>();
+        ArrayList<Vec2> tempPoints = new ArrayList<>();
+
+        double angle = 0;
+        double angleIncrement = 2 * Math.PI / numRays;
+        for (int i = 0; i < numRays; i++) {
+            angle = i * angleIncrement;
+            double x = radius * Math.cos(angle);
+            double y = radius * Math.sin(angle);
+            Vec2 castDir = new Vec2((float)(x + position.x), (float)(y + position.y));
+            hitShit =  CastRay(position, castDir);
+            tempDir.add(castDir);
+        }
+     /*   Vec2 castDir = PlayerPos.sub(myPosition);
+        castDir = castDir.mul(castDir.normalize());*/
+
+
        /* Vec2 castDir = PlayerPos.sub(myPosition);
         castDir = castDir.mul(castDir.normalize());
 
@@ -138,25 +158,38 @@ public class CompanionAI extends EnemyCompanionAI implements Runnable {
         body.setLinearVelocity(weightGuardian);
 
         ClientNetManager.get().sentMessage(new ObjectMoveMessage(ClientNetManager.get().getClientId(), this.getObjectId(), myScene.getLocation(), this.position));
+        rayDirs = tempDir;
     }
 
     public void debugRay (){
-        for (Vec2 collisionPoint:collisionPoints
-             ) {
+       /*for (Vec2 collisionPoint:collisionPoints ) {
             Vec2 sceneOffset = new Vec2(myScene.getLocation().x * GameWorld.covertedSize.x, myScene.getLocation().y * GameWorld.covertedSize.y);
             Vec2 myPosition = body.getPosition().sub(sceneOffset).mul(30);
             Vec2 PlayerPos = guardianPlayer.body.getPosition().sub(sceneOffset).mul(30);
-            Vec2 castDir = PlayerPos.sub(myPosition);
-            castDir = castDir.mul(castDir.normalize()).add(myPosition);
+         //   Vec2 castDir = PlayerPos.sub(myPosition);
+         //   castDir = castDir.mul(castDir.normalize()).add(myPosition);
+
+            Vec2 colPoint = collisionPoint.sub(sceneOffset).mul(30);
+
             glBegin(GL_LINES);
             glVertex2f( myPosition.x ,myPosition.y );
-            Vec2 colPoint = collisionPoint.sub(sceneOffset).mul(30);
-            if (hitShit){
-                glVertex2f(colPoint.x ,colPoint.y  );
-            }else{
-                glVertex2f(castDir.x ,castDir.y  );
-            }
 
+            glVertex2f(colPoint.x ,colPoint.y  );
+
+
+            glEnd();
+        }*/
+
+
+        for (Vec2 rayDir :rayDirs
+        ) {
+            Vec2 sceneOffset = new Vec2(myScene.getLocation().x * GameWorld.covertedSize.x, myScene.getLocation().y * GameWorld.covertedSize.y);
+            Vec2 myPosition = body.getPosition().sub(sceneOffset).mul(30);
+            Vec2 PlayerPos = guardianPlayer.body.getPosition().sub(sceneOffset).mul(30);
+            glBegin(GL_LINES);
+            glVertex2f( myPosition.x ,myPosition.y );
+            Vec2 finalDir = rayDir.sub(sceneOffset).mul(30);
+            glVertex2f(finalDir.x ,finalDir.y  );
             glEnd();
         }
 
