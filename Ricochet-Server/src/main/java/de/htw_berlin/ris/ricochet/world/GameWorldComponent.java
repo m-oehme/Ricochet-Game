@@ -120,6 +120,7 @@ public class GameWorldComponent implements Runnable, NetMessageObserver<WorldMes
                 .filter(entry -> entry.getValue() instanceof SCompanionAI)
                 .filter(entry -> ((SCompanionAI) entry.getValue()).getGuardianPlayer().equals(objectId))
                 .findFirst().ifPresent(entry -> {
+                    gameWorld.removeGameObject(entry.getKey());
                     clientManager.sendMessageToClients(new ObjectDestroyMessage(clientId, entry.getKey()));
                 });
 
