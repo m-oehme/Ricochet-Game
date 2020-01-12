@@ -37,6 +37,7 @@ public class GameObject {
 
  // TODO DO STUFF THAT LETS ME FLAG WETHER OR NOT TO ADD AS BODY, AND ADD FUNCTION THAT ENABLES REINSTATING PHYSICAL PROPERTIES!!!
     public GameObject(ObjectId objectId, Vec2 pos, float width, float height, BodyType bodyType, Scene whichScene) {
+        this.name = "dynamicObject";
         this.position = pos;
         this.objectId = objectId;
         bodyDef = new BodyDef();
@@ -61,6 +62,7 @@ public class GameObject {
     }
 
     public GameObject(ObjectId objectId, Vec2 pos, float width, float height, BodyType bodyType, float density, float restitution, Scene whichScene) {
+        this.name = "WallObject";
         this.objectId = objectId;
         this.position = pos;
         bodyDef = new BodyDef();
@@ -130,6 +132,18 @@ public class GameObject {
         }
         Vec2 sceneOffset = new Vec2(myScene.getLocation().x * GameWorld.covertedSize.x, myScene.getLocation().y * GameWorld.covertedSize.y);
         Vec2 bodyPosition = body.getPosition().sub(sceneOffset).mul(30);
+
+
+
+        if (this instanceof CompanionAI ){
+
+            ((CompanionAI) this).debugRay();
+            /*  glBegin(GL_LINES);
+            glVertex2f( 0 ,0 );
+            Vec2 colPoint =  ((CompanionAI) this).collisionPoint.sub(sceneOffset).mul(30);
+            glVertex2f(colPoint.x ,colPoint.y  );
+            glEnd();*/
+        }
         glTranslatef(bodyPosition.x, bodyPosition.y, 0);
         glRotated(Math.toDegrees(body.getAngle()), 0, 0, 1);
         glRectf(-width * 30, -height * 30, width * 30, height * 30);
