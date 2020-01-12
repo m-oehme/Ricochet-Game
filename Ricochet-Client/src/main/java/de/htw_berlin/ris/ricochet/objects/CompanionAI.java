@@ -29,7 +29,7 @@ import static org.lwjgl.opengl.GL11.*;
 public class CompanionAI extends EnemyCompanionAI implements Runnable {
     protected Player guardianPlayer;
     private boolean isAlive = true;
-    protected Vec2 collisionPoint = new Vec2(0, 0);
+    protected ArrayList<Vec2> collisionPoints = new ArrayList<>();
     Fixture closestFixture;
     boolean hitShit;
 
@@ -141,21 +141,25 @@ public class CompanionAI extends EnemyCompanionAI implements Runnable {
     }
 
     public void debugRay (){
-        Vec2 sceneOffset = new Vec2(myScene.getLocation().x * GameWorld.covertedSize.x, myScene.getLocation().y * GameWorld.covertedSize.y);
-        Vec2 myPosition = body.getPosition().sub(sceneOffset).mul(30);
-        Vec2 PlayerPos = guardianPlayer.body.getPosition().sub(sceneOffset).mul(30);
-        Vec2 castDir = PlayerPos.sub(myPosition);
-        castDir = castDir.mul(castDir.normalize()).add(myPosition);
-        glBegin(GL_LINES);
-        glVertex2f( myPosition.x ,myPosition.y );
-        Vec2 colPoint = collisionPoint.sub(sceneOffset).mul(30);
-        if (hitShit){
-            glVertex2f(colPoint.x ,colPoint.y  );
-        }else{
-            glVertex2f(castDir.x ,castDir.y  );
+        for (Vec2 collisionPoint:collisionPoints
+             ) {
+            Vec2 sceneOffset = new Vec2(myScene.getLocation().x * GameWorld.covertedSize.x, myScene.getLocation().y * GameWorld.covertedSize.y);
+            Vec2 myPosition = body.getPosition().sub(sceneOffset).mul(30);
+            Vec2 PlayerPos = guardianPlayer.body.getPosition().sub(sceneOffset).mul(30);
+            Vec2 castDir = PlayerPos.sub(myPosition);
+            castDir = castDir.mul(castDir.normalize()).add(myPosition);
+            glBegin(GL_LINES);
+            glVertex2f( myPosition.x ,myPosition.y );
+            Vec2 colPoint = collisionPoint.sub(sceneOffset).mul(30);
+            if (hitShit){
+                glVertex2f(colPoint.x ,colPoint.y  );
+            }else{
+                glVertex2f(castDir.x ,castDir.y  );
+            }
+
+            glEnd();
         }
 
-        glEnd();
     }
 
     boolean CastRay(Vec2 origin, Vec2 direction) {
@@ -172,7 +176,7 @@ public class CompanionAI extends EnemyCompanionAI implements Runnable {
                 //return fraction - to clip the raycast at current point
                 //return 1 - don't clip the ray and continue
                 if (fraction < 1.0f) {
-                    collisionPoint = point;
+                    collisionPoints.add(point) ;
                     closestFixture = fixture;
                     hit[0] = true;
                     return fraction;
