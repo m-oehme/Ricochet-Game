@@ -24,9 +24,9 @@ public class EnemyCompanionAI extends GameObject {
     @Override
     protected void renderAtLocalPosition(Vec2 position) {
         ((CompanionAI) this).debugRay();
-        glTranslatef(position.x, position.y, 0);
-        glRotated(Math.toDegrees(body.getAngle()), 0, 0, 1);
+//        glTranslatef(position.x, position.y, 0);
+//        glRotated(Math.toDegrees(body.getAngle()), 0, 0, 1);
 
-        renderTriangle(-width/2 * 30,   width/2 *30,  height * 30);
+        renderSphere(position,   17f);
     }
 }

@@ -79,7 +79,7 @@ public class Bullet extends GameObject {
 
     @Override
     protected void renderAtLocalPosition(Vec2 position) {
-        renderSphere(position, 10f);
+        renderSphere(position, 6f);
     }
 
     public void shootInDirection(Vec2 shootDir) {
