@@ -25,6 +25,9 @@ import org.lwjgl.util.glu.GLU;
 import java.util.*;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.HashMap;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 import static org.lwjgl.opengl.GL11.*;
 /*
@@ -47,8 +50,8 @@ public class RicochetGameGUI {
     private static final String WINDOW_TITLE = "Ricochet!";
     public static final int[] WINDOW_DIMENSIONS = {1280, 960};
 
+    private final ExecutorService mainGUIThreadPool = Executors.newCachedThreadPool();
     private final ContactListener myListener = new ContactListener();
-    private ExecutorService mainThreadPool = Executors.newCachedThreadPool();
 
     private void render() {
         GameWorld.Instance.renderWorld();
@@ -207,8 +210,8 @@ public class RicochetGameGUI {
         cleanUp(false);
     }
 
-    public ExecutorService getMainThreadPool() {
-        return mainThreadPool;
+    public ExecutorService getMainGUIThreadPool() {
+        return mainGUIThreadPool;
     }
 }
 
