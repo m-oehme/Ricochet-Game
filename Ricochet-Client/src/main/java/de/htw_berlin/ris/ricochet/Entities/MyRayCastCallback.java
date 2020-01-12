@@ -10,24 +10,9 @@ import java.util.ArrayList;
 import java.util.HashMap;
 
 public class MyRayCastCallback implements RayCastCallback {
-    float  BOX_TO_WORLD =30; //As our box to world ratio is  1:100
-    Vec2 collisionPoint;
-    boolean isColliding;
-    ArrayList<Body> collisionBodies;
-
-    public MyRayCastCallback(ArrayList<Body> collisionBodies,Vec2 ep){
-        this.collisionBodies=collisionBodies;
-        collisionPoint=new Vec2(ep.x,ep.y).mul(BOX_TO_WORLD);
-        isColliding=false;
-    }
-
-    public Vec2 GetCollisionPoint(){
-        return collisionPoint;
-    }
-
-    public boolean DidRayCollide(){
-        return isColliding;
-    }
+    public Vec2 collisionPoint = new Vec2(0,0);
+    public boolean didHit;
+    public Vec2 direction;
 
     @Override
     public float reportFixture(Fixture fixture, Vec2 point, Vec2 normal, float fraction) {
@@ -35,10 +20,13 @@ public class MyRayCastCallback implements RayCastCallback {
         //return 0 - to terminate the raycast
         //return fraction - to clip the raycast at current point
         //return 1 - don't clip the ray and continue
-        isColliding=true;
-        collisionPoint.set(point).mul(BOX_TO_WORLD);
-        if(!collisionBodies.contains(fixture.getBody()))
-            collisionBodies.add(fixture.getBody());
-        return fraction;
+        if (fraction < 1.0f) {
+            collisionPoint.set(point) ;
+
+            didHit = true;
+            return fraction;
+        }
+
+        return 1;
     }
 }

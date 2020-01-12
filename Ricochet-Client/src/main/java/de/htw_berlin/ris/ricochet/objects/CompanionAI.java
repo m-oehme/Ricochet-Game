@@ -29,7 +29,7 @@ import static org.lwjgl.opengl.GL11.*;
 public class CompanionAI extends EnemyCompanionAI implements Runnable {
     protected Player guardianPlayer;
     private boolean isAlive = true;
-    protected ArrayList<Vec2> collisionPoints = new ArrayList<>();
+    protected ArrayList<MyRayCastCallback> rayCasts = new ArrayList<>();
     protected ArrayList<Vec2> rayDirs = new ArrayList<>();
     Fixture closestFixture;
     boolean hitShit;
@@ -115,10 +115,10 @@ public class CompanionAI extends EnemyCompanionAI implements Runnable {
         float radius = 5;
         float numRays = 12;
         rayDirs.clear();
-        collisionPoints.clear();
+        rayCasts.clear();
 
         ArrayList<Vec2> tempDir = new ArrayList<>();
-        ArrayList<Vec2> tempPoints = new ArrayList<>();
+        ArrayList<MyRayCastCallback> tempRays = new ArrayList<>();
 
         double angle = 0;
         double angleIncrement = 2 * Math.PI / numRays;
@@ -180,27 +180,35 @@ public class CompanionAI extends EnemyCompanionAI implements Runnable {
             glEnd();
         }*/
 
-
-        for (Vec2 rayDir :rayDirs
-        ) {
+       for (MyRayCastCallback ray:rayCasts ) {
             Vec2 sceneOffset = new Vec2(myScene.getLocation().x * GameWorld.covertedSize.x, myScene.getLocation().y * GameWorld.covertedSize.y);
             Vec2 myPosition = body.getPosition().sub(sceneOffset).mul(30);
-            Vec2 PlayerPos = guardianPlayer.body.getPosition().sub(sceneOffset).mul(30);
+
+            Vec2 colPoint = ray.collisionPoint.sub(sceneOffset).mul(30);
+            Vec2 finalDir = ray.direction.sub(sceneOffset).mul(30);
             glBegin(GL_LINES);
             glVertex2f( myPosition.x ,myPosition.y );
-            Vec2 finalDir = rayDir.sub(sceneOffset).mul(30);
-            glVertex2f(finalDir.x ,finalDir.y  );
+            if (ray.didHit){
+                glVertex2f(colPoint.x ,colPoint.y  );
+            }else{
+
+                glVertex2f(finalDir.x ,finalDir.y  );
+            }
+
             glEnd();
         }
+
+
 
     }
 
     boolean CastRay(Vec2 origin, Vec2 direction) {
 
         World b2dWorld = body.getWorld();
-        boolean[] hit = {false};
 
-        RayCastCallback rayCastCallback = new RayCastCallback() {
+        MyRayCastCallback rayCastCallback =  new MyRayCastCallback();
+
+      /*  RayCastCallback rayCastCallback = new RayCastCallback() {
 
             @Override
             public float reportFixture(Fixture fixture, Vec2 point, Vec2 normal, float fraction) {
@@ -217,13 +225,14 @@ public class CompanionAI extends EnemyCompanionAI implements Runnable {
 
                 return 1;
             }
-        };
+        };*/
 
 
         b2dWorld.raycast(rayCastCallback, origin, direction);
 
-
-        return hit[0];
+        rayCastCallback.direction = direction;
+        rayCasts.add(rayCastCallback);
+        return rayCastCallback.didHit;
     }
 
     @Override
