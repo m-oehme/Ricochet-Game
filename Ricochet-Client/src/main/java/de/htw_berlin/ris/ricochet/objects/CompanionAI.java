@@ -32,10 +32,11 @@ public class CompanionAI extends EnemyCompanionAI implements Runnable {
     private boolean isAlive = true;
     protected CopyOnWriteArrayList<MyRayCastCallback> rayCasts = new CopyOnWriteArrayList<>();
     boolean hitShit;
-    float speed = 10.0f;
-    private boolean traveling,waiting;
+    float speed = 15.0f;
+    private boolean traveling, waiting;
     Vec2 originalPos;
     float totalDist;
+
     public CompanionAI(ObjectId objectId, Vec2 pos, float width, float height, Scene whichScene, Player guardianPlayer) {
         super(objectId, pos, width, height, whichScene);
         this.guardianPlayer = guardianPlayer;
@@ -91,8 +92,8 @@ public class CompanionAI extends EnemyCompanionAI implements Runnable {
     protected void calculateAndCorrectCollision() {
 
         // Distance from Guardian Player
-        Vec2 weightGuardian = new Vec2(0,0);
-        if (!traveling && !waiting){
+        Vec2 weightGuardian = new Vec2(0, 0);
+        if (!traveling && !waiting) {
             originalPos = position;
             traveling = true;
         }
@@ -100,23 +101,23 @@ public class CompanionAI extends EnemyCompanionAI implements Runnable {
         Vec2 distance = guardianPlayer.position.sub(position);
         float playerDist = distance.length();
         distance.normalize();
-        if (traveling && ! waiting){
+        if (traveling && !waiting) {
 
-            float speedFac =  playerDist/totalDist;
+            float speedFac = playerDist / totalDist;
 
-            if (playerDist <= 3){
+            if (playerDist <= 3) {
 
-                 speedFac =  0.01f;
+                speedFac = 0.01f;
                 traveling = false;
                 waiting = true;
             }
-            weightGuardian  = distance.mul(speed*speedFac);
+            weightGuardian = distance.mul(speed * speedFac);
         }
 
-        if ( waiting ){
-           if( playerDist >= 5){
-               waiting = false;
-           }
+        if (waiting) {
+            if (playerDist >= 5) {
+                waiting = false;
+            }
         }
 
 
@@ -124,12 +125,10 @@ public class CompanionAI extends EnemyCompanionAI implements Runnable {
         Vec2 weightCollision = new Vec2(0, 0);
 
 
-        float radius = 5;
+        float radius = 2;
         float numRays = 12;
 
         rayCasts.clear();
-
-
 
 
         double angle = 0;
@@ -138,8 +137,8 @@ public class CompanionAI extends EnemyCompanionAI implements Runnable {
             angle = i * angleIncrement;
             double x = radius * Math.cos(angle);
             double y = radius * Math.sin(angle);
-            Vec2 castDir = new Vec2((float)(x + position.x), (float)(y + position.y));
-            hitShit =  CastRay(position, castDir);
+            Vec2 castDir = new Vec2((float) (x + position.x), (float) (y + position.y));
+            hitShit = CastRay(position, castDir);
         }
      /*   Vec2 castDir = PlayerPos.sub(myPosition);
         castDir = castDir.mul(castDir.normalize());*/
@@ -149,31 +148,31 @@ public class CompanionAI extends EnemyCompanionAI implements Runnable {
         castDir = castDir.mul(castDir.normalize());*/
 
 
-        for (MyRayCastCallback ray:rayCasts ) {
+        for (MyRayCastCallback ray : rayCasts) {
 
 
             if (ray.didHit) {
                 Vec2 distanceCollision = body.getPosition().sub(ray.collisionPoint);
-                float dist = distanceCollision.lengthSquared();
+                float dist = distanceCollision.length();
                 float weightFac = 0;
-                float weightFacCol = 1*( 1/dist);
-                if (distanceCollision.lengthSquared() < 2) {
+                float weightFacCol = 1 - (dist / radius);
+                if (dist < 1) {
                     System.out.println("too close");
-                //    weightGuardian = weightGuardian.mul(weightFac);
+                    weightGuardian = weightGuardian.mul(weightFac);
 
                 }
-                weightCollision =  weightCollision.add(distanceCollision.mul(weightFacCol));
+                weightCollision = weightCollision.add(distanceCollision.mul(speed/2 * weightFacCol));
             }
         }
 
-        Vec2 finalVel = weightGuardian;//.add(weightCollision);
+        Vec2 finalVel = weightGuardian.add(weightCollision);
         body.setLinearVelocity(finalVel);
 
         ClientNetManager.get().sentMessage(new ObjectMoveMessage(ClientNetManager.get().getClientId(), this.getObjectId(), myScene.getLocation(), this.position));
 
     }
 
-    public void debugRay (){
+    public void debugRay() {
        /*for (Vec2 collisionPoint:collisionPoints ) {
             Vec2 sceneOffset = new Vec2(myScene.getLocation().x * GameWorld.covertedSize.x, myScene.getLocation().y * GameWorld.covertedSize.y);
             Vec2 myPosition = body.getPosition().sub(sceneOffset).mul(30);
@@ -192,24 +191,23 @@ public class CompanionAI extends EnemyCompanionAI implements Runnable {
             glEnd();
         }*/
 
-       for (MyRayCastCallback ray:rayCasts ) {
+        for (MyRayCastCallback ray : rayCasts) {
             Vec2 sceneOffset = new Vec2(myScene.getLocation().x * GameWorld.covertedSize.x, myScene.getLocation().y * GameWorld.covertedSize.y);
             Vec2 myPosition = body.getPosition().sub(sceneOffset).mul(30);
 
             Vec2 colPoint = ray.collisionPoint.sub(sceneOffset).mul(30);
             Vec2 finalDir = ray.direction.sub(sceneOffset).mul(30);
             glBegin(GL_LINES);
-            glVertex2f( myPosition.x ,myPosition.y );
-            if (ray.didHit){
-                glVertex2f(colPoint.x ,colPoint.y  );
-            }else{
+            glVertex2f(myPosition.x, myPosition.y);
+            if (ray.didHit) {
+                glVertex2f(colPoint.x, colPoint.y);
+            } else {
 
-                glVertex2f(finalDir.x ,finalDir.y  );
+                glVertex2f(finalDir.x, finalDir.y);
             }
 
             glEnd();
         }
-
 
 
     }
@@ -218,7 +216,7 @@ public class CompanionAI extends EnemyCompanionAI implements Runnable {
 
         World b2dWorld = body.getWorld();
 
-        MyRayCastCallback rayCastCallback =  new MyRayCastCallback();
+        MyRayCastCallback rayCastCallback = new MyRayCastCallback();
 
       /*  RayCastCallback rayCastCallback = new RayCastCallback() {
 
