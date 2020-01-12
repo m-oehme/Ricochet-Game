@@ -79,22 +79,22 @@ public class Player extends EnemyPlayer {
 
     @Override
     public void switchScene(Vec2 position) {
-        Vec2 sceneOffset = new Vec2(myScene.getLocation().x * GameWorld.covertedSize.x, myScene.getLocation().y * GameWorld.covertedSize.y);
+        Vec2 convertedPos = GameWorld.getLocalCoordinates(position, myScene.getLocation());
 
-        if (position.sub(sceneOffset).x > GameWorld.covertedSize.x) {
+        if (convertedPos.x > GameWorld.covertedSize.x) {
             log.debug("Player Scene switch to RIGHT");
             GameWorld.Instance.switchScene(GameWorld.switchDirection.RIGHT);
         }
 
-        if (position.sub(sceneOffset).x < 0) {
+        if (convertedPos.x < 0) {
             log.debug("Player Scene switch to LEFT");
             GameWorld.Instance.switchScene(GameWorld.switchDirection.LEFT);
         }
-        if (position.sub(sceneOffset).y > GameWorld.covertedSize.y) {
+        if (convertedPos.y > GameWorld.covertedSize.y) {
             log.debug("Player Scene switch to UP");
             GameWorld.Instance.switchScene(GameWorld.switchDirection.UP);
         }
-        if (position.sub(sceneOffset).y < 0) {
+        if (convertedPos.y < 0) {
             log.debug("Player Scene switch to DOWN");
             GameWorld.Instance.switchScene(GameWorld.switchDirection.DOWN);
         }

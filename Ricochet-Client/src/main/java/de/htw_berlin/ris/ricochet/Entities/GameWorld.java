@@ -89,9 +89,12 @@ public class GameWorld {
         int indexer = 0;
         for (int y = -sizeY / 2; y < sizeY / 2; y++) {
             for (int x = -sizeX / 2; x < sizeX / 2; x++) {
-
-                Scene sceneCenter = new Scene(indexer, new Vec2(x, y));
-                worldScenes.put(sceneCenter.getLocation(), sceneCenter);
+                if (x == 0 && y == 0) {
+                    worldScenes.get(new Vec2(0,0)).setID(indexer);
+                } else {
+                    Scene sceneCenter = new Scene(indexer, new Vec2(x, y));
+                    worldScenes.put(sceneCenter.getLocation(), sceneCenter);
+                }
 
                 indexer++;
             }
@@ -252,5 +255,15 @@ public class GameWorld {
 
     public void addGameObject(GameObject gameObject) {
         createObjectQueue.offer(gameObject);
+    }
+
+    public static Vec2 getLocalCoordinates(Vec2 position, Vec2 scene) {
+        Vec2 sceneOffset = new Vec2(scene.x * GameWorld.covertedSize.x, scene.y * GameWorld.covertedSize.y);
+        return position.sub(sceneOffset);
+    }
+
+    public static Vec2 getGlobalCoordinates(Vec2 position, Vec2 scene) {
+        Vec2 sceneOffset = new Vec2(scene.x * GameWorld.covertedSize.x, scene.y * GameWorld.covertedSize.y);
+        return position.add(sceneOffset);
     }
 }

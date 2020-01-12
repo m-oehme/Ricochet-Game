@@ -16,9 +16,6 @@ public class WallPrefab {
         Vec2 Postion1 = new Vec2();
         Vec2 Postion2 = new Vec2();
 
-        Vec2 sceneOffset = new Vec2(whichScene.getLocation().x * GameWorld.covertedSize.x, whichScene.getLocation().y * GameWorld.covertedSize.y);
-
-
         boolean horizontal = false;
 
         switch (type) {
@@ -45,9 +42,10 @@ public class WallPrefab {
                         break;
                 }
 
+                Vec2 convertedPos = GameWorld.getGlobalCoordinates(Postion1, whichScene.getLocation());
                 GameObject Wall =  new GameObject(
                         null,
-                        Postion1.add(sceneOffset),
+                        convertedPos,
                         (horizontal) ? GameWorld.covertedSize.x/2:GameWorld.covertedSize.x/30,
                         (horizontal) ? GameWorld.covertedSize.y/30 : GameWorld.covertedSize.y/2,BodyType.STATIC,
                         1f,
@@ -82,8 +80,11 @@ public class WallPrefab {
                         horizontal = true;
                         break;
                 }
-                GameObject wallBottom =  new GameObject(null, Postion1.add(sceneOffset), (horizontal) ? GameWorld.covertedSize.x/6 :GameWorld.covertedSize.x/30,  (horizontal) ? GameWorld.covertedSize.y/30 : GameWorld.covertedSize.y/6,BodyType.STATIC, 1f, 0.5f,whichScene );
-                GameObject wallTop =  new GameObject(null, Postion2.add(sceneOffset), (horizontal) ? GameWorld.covertedSize.x/6:GameWorld.covertedSize.x/30,  (horizontal) ? GameWorld.covertedSize.y/30 : GameWorld.covertedSize.y/6,BodyType.STATIC, 1f, 0.5f,whichScene );
+                
+                Vec2 convertedPos1 = GameWorld.getGlobalCoordinates(Postion1, whichScene.getLocation());
+                Vec2 convertedPos2 = GameWorld.getGlobalCoordinates(Postion2, whichScene.getLocation());
+                GameObject wallBottom =  new GameObject(null, convertedPos1, (horizontal) ? GameWorld.covertedSize.x/6 :GameWorld.covertedSize.x/30,  (horizontal) ? GameWorld.covertedSize.y/30 : GameWorld.covertedSize.y/6,BodyType.STATIC, 1f, 0.5f,whichScene );
+                GameObject wallTop =  new GameObject(null, convertedPos2, (horizontal) ? GameWorld.covertedSize.x/6:GameWorld.covertedSize.x/30,  (horizontal) ? GameWorld.covertedSize.y/30 : GameWorld.covertedSize.y/6,BodyType.STATIC, 1f, 0.5f,whichScene );
                 break;
 
         }

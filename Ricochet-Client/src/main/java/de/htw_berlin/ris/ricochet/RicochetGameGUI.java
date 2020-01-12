@@ -83,7 +83,9 @@ public class RicochetGameGUI {
 
     public void setUpWorld(){
         GameWorld.Instance = new GameWorld(new Vec2(0, 0),WINDOW_DIMENSIONS);
-
+        GameWorld.Instance.generateInitWorld();
+        GameWorld.Instance.setCurrentScene(new Vec2(0,0));
+        GameWorld.Instance.getCurrentScene().init();
     }
 
     public void generateWorld(Vec2 worldSize, HashMap<ObjectId, SGameObject> gameObjectList) {
@@ -102,7 +104,13 @@ public class RicochetGameGUI {
     void setUpObjects() {
 
         Vec2 playerPos = new Vec2(GameWorld.covertedSize.x/2,  GameWorld.covertedSize.y/2);
-        ClientNetManager.get().sentMessage(new ObjectCreateMessage(ClientNetManager.get().getClientId(), null, new SPlayer(ClientNetManager.get().getClientId(), GameWorld.Instance.getCurrentScene().getLocation(), playerPos)));
+        Vec2 startingScene = GameWorld.Instance.getCurrentScene().getLocation();
+        Vec2 convertedPos = GameWorld.getGlobalCoordinates(playerPos, startingScene);
+        log.debug("Request Player Object at Scene: " + GameWorld.Instance.getCurrentScene().getLocation());
+        ClientNetManager.get().sentMessage(new ObjectCreateMessage(ClientNetManager.get().getClientId(), null, new SPlayer(
+                ClientNetManager.get().getClientId(),
+                startingScene,
+                convertedPos)));
     }
 
     private NetMessageObserver<ObjectMoveMessage> objectMoveObserver = objectMoveMessage -> {
@@ -118,11 +126,11 @@ public class RicochetGameGUI {
     };
 
     private NetMessageObserver<ObjectCreateMessage> objectCreateObserver = objectCreateMessage -> {
-        log.debug("Object Create - Type: " + objectCreateMessage.getSGameObject().getClass().getSimpleName() + " ID: " + objectCreateMessage.getObjectId());
         SGameObject sGameObject = objectCreateMessage.getSGameObject();
 
         if (sGameObject instanceof SPlayer) {
             if (GameWorld.Instance.getPlayer() == null) {
+                log.debug("Player object created at Scene: " + objectCreateMessage.getSGameObject().getScene());
                 Player playerObject = new Player(objectCreateMessage.getObjectId(), objectCreateMessage.getSGameObject().getPosition(), 0.5f, 0.5f, BodyType.DYNAMIC, GameWorld.Instance.getWorldScenes().get(objectCreateMessage.getSGameObject().getScene()));
                 GameWorld.Instance.setPlayer(playerObject);
 
@@ -132,12 +140,15 @@ public class RicochetGameGUI {
                         new SCompanionAI(playerObject.myScene.getLocation(), objectCreateMessage.getSGameObject().getPosition().add(new Vec2(5,5)), 0.5f, 0.5f, playerObject.getObjectId())
                         ));
             } else {
+                log.debug("EnemyPlayer object created at Scene: " + objectCreateMessage.getSGameObject().getScene());
                 EnemyPlayer playerObject = new EnemyPlayer(objectCreateMessage.getObjectId(), objectCreateMessage.getSGameObject().getPosition(), 0.5f, 0.5f, BodyType.DYNAMIC, GameWorld.Instance.getWorldScenes().get(objectCreateMessage.getSGameObject().getScene()));
             }
         } else if (sGameObject instanceof SCompanionAI) {
             if (((SCompanionAI) sGameObject).getGuardianPlayer().equals(GameWorld.Instance.getPlayer().getObjectId())){
+                log.debug("CompanionAI object created at Scene: " + objectCreateMessage.getSGameObject().getScene());
                 new CompanionAI(objectCreateMessage.getObjectId(), objectCreateMessage.getSGameObject().getPosition(), 1f, 1f, GameWorld.Instance.getWorldScenes().get(objectCreateMessage.getSGameObject().getScene()), GameWorld.Instance.getPlayer());
             } else {
+                log.debug("EnemyCompanionAI object created at Scene: " + objectCreateMessage.getSGameObject().getScene());
                 EnemyCompanionAI playerObject = new EnemyCompanionAI(objectCreateMessage.getObjectId(), objectCreateMessage.getSGameObject().getPosition(), 1f, 1f, GameWorld.Instance.getWorldScenes().get(objectCreateMessage.getSGameObject().getScene()));
             }
         }
@@ -181,9 +192,6 @@ public class RicochetGameGUI {
         setUpListeners();
     }
     public void Run() {
-        while (GameWorld.Instance.getCurrentScene() == null){
-
-        }
         enterGameLoop();
         cleanUp(false);
     }
