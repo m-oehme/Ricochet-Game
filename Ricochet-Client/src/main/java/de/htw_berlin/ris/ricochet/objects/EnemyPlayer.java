@@ -2,6 +2,9 @@ package de.htw_berlin.ris.ricochet.objects;
 
 import de.htw_berlin.ris.ricochet.Entities.GameWorld;
 import de.htw_berlin.ris.ricochet.Entities.Scene;
+import de.htw_berlin.ris.ricochet.net.handler.NetMessageObserver;
+import de.htw_berlin.ris.ricochet.net.manager.ClientNetManager;
+import de.htw_berlin.ris.ricochet.net.message.world.ObjectMoveMessage;
 import org.jbox2d.common.Vec2;
 import org.jbox2d.dynamics.BodyType;
 
@@ -15,5 +18,10 @@ public class EnemyPlayer extends GameObject {
         super.Init();
 
         body.setFixedRotation(true);
+
+        if (!(this instanceof Player)) {
+            ClientNetManager.get().getHandlerFor(ObjectMoveMessage.class).registerObserver(this);
+        }
     }
+
 }

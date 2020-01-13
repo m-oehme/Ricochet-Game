@@ -2,6 +2,7 @@ package de.htw_berlin.ris.ricochet.objects;
 
 import de.htw_berlin.ris.ricochet.Entities.GameWorld;
 import de.htw_berlin.ris.ricochet.Entities.Scene;
+import de.htw_berlin.ris.ricochet.net.handler.NetMessageObserver;
 import de.htw_berlin.ris.ricochet.net.manager.ClientNetManager;
 import de.htw_berlin.ris.ricochet.net.message.world.ObjectMoveMessage;
 import org.apache.logging.log4j.LogManager;
@@ -20,7 +21,7 @@ import static de.htw_berlin.ris.ricochet.Entities.GameWorld.covertedSize;
 import static org.lwjgl.opengl.GL11.*;
 import static org.lwjgl.opengl.GL11.glRectf;
 
-public class GameObject {
+public class GameObject implements NetMessageObserver<ObjectMoveMessage> {
     protected static Logger log = LogManager.getLogger();
 
     private ObjectId objectId;
@@ -318,10 +319,15 @@ public class GameObject {
     public void setPositionUpdate(Vec2 positionUpdate, Vec2 scene) {
         this.positionUpdate = positionUpdate;
 
-//        if (!scene.equals(myScene.getLocation())) {
-//            finalizeSceneSwitch(scene);
-//        }
+        if (!scene.equals(myScene.getLocation())) {
+            finalizeSceneSwitch(scene);
+        }
+    }
 
-//        switchScene(positionUpdate);
+    @Override
+    public void onNewMessage(ObjectMoveMessage objectMoveMessage) {
+        if (objectMoveMessage.getObjectId().equals(objectId)) {
+            this.setPositionUpdate(objectMoveMessage.getPosition(), objectMoveMessage.getScene());
+        }
     }
 }

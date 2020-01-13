@@ -95,7 +95,7 @@ public class RicochetGameGUI {
         GameWorld.Instance.generateWorldScenes((int) worldSize.x, (int) worldSize.y);
         ArrayList<Vec2> vec2Set = new ArrayList<>(GameWorld.Instance.getWorldScenes().keySet());
         int r  = (int) (Math.random() * vec2Set.size());
-        GameWorld.Instance.setCurrentScene(new Vec2(0,0));
+        GameWorld.Instance.setCurrentScene(vec2Set.get(r));
         GameWorld.Instance.getCurrentScene().init();
 
         GameWorld.Instance.addPlayersToWorld(playerList);
@@ -107,7 +107,6 @@ public class RicochetGameGUI {
 
     void setUpNetworking() {
         ClientNetManager.get().getHandlerFor(ObjectCreateMessage.class).registerObserver(objectCreateObserver);
-        ClientNetManager.get().getHandlerFor(ObjectMoveMessage.class).registerObserver(objectMoveObserver);
     }
 
     Vec2 setUpPlayerObject() {
@@ -123,18 +122,6 @@ public class RicochetGameGUI {
 
         return startingScene;
     }
-
-    private NetMessageObserver<ObjectMoveMessage> objectMoveObserver = objectMoveMessage -> {
-        if (GameWorld.Instance.getWorldScenes().containsKey(objectMoveMessage.getScene())) {
-            GameWorld.Instance.getWorldScenes().get(objectMoveMessage.getScene()).getSceneObjectsDynamic().stream()
-                    .filter(gameObject -> gameObject.getObjectId() != null)
-                    .filter(gameObject -> gameObject.getObjectId().equals(objectMoveMessage.getObjectId()))
-                    .findFirst()
-                    .ifPresent(gameObject -> {
-                        gameObject.setPositionUpdate(objectMoveMessage.getPosition(), objectMoveMessage.getScene());
-                    });
-        }
-    };
 
     private NetMessageObserver<ObjectCreateMessage> objectCreateObserver = objectCreateMessage -> {
         SGameObject sGameObject = objectCreateMessage.getSGameObject();
