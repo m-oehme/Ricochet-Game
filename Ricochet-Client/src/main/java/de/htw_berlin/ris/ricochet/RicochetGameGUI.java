@@ -135,7 +135,7 @@ public class RicochetGameGUI {
                 ClientNetManager.get().sentMessage(new ObjectCreateMessage(
                         ClientNetManager.get().getClientId(),
                         null,
-                        new SCompanionAI(playerObject.myScene.getLocation(), objectCreateMessage.getSGameObject().getPosition().add(new Vec2(5,5)), 0.5f, 0.5f, playerObject.getObjectId())
+                        new SCompanionAI(playerObject.myScene.getLocation(), objectCreateMessage.getSGameObject().getPosition(), 0.5f, 0.5f, playerObject.getObjectId())
                         ));
             } else {
                 log.debug("EnemyPlayer object created at Scene: " + objectCreateMessage.getSGameObject().getScene());
