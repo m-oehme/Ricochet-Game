@@ -6,6 +6,7 @@ import de.htw_berlin.ris.ricochet.net.handler.NetMessageObserver;
 import de.htw_berlin.ris.ricochet.net.manager.ClientNetManager;
 import de.htw_berlin.ris.ricochet.net.message.world.ObjectCreateMessage;
 import de.htw_berlin.ris.ricochet.objects.Bullet;
+import de.htw_berlin.ris.ricochet.objects.GameObject;
 import de.htw_berlin.ris.ricochet.objects.Player;
 import de.htw_berlin.ris.ricochet.objects.shared.SBullet;
 import org.jbox2d.common.Vec2;
@@ -19,7 +20,7 @@ public class Weapon {
 
     protected boolean reloading,coolDown;
     protected float shotSpeed = 1.0f;
-    protected Player player;
+    protected GameObject owner;
     protected int reloadTime;
     protected int magazineSize;
     protected int fireRate;
@@ -33,6 +34,31 @@ public class Weapon {
 
     // TODO :: GUI for bullets etc.
     public  void shoot(){
+        if (bulletsInMagazine<=0){
+            reloading = true;
+            t.schedule(new TimerTask() {
+
+                @Override
+                public void run() {
+                    completeReload();
+                }
+            }, reloadTime);
+        }else{
+            coolDown = true;
+            t.schedule(new TimerTask() {
+
+                @Override
+                public void run() {
+                    completeCoolDown();
+                }
+            }, fireRate);
+        }
+
+
+
+    }
+
+    public  void shoot(Vec2 shotDir){
         if (bulletsInMagazine<=0){
             reloading = true;
             t.schedule(new TimerTask() {

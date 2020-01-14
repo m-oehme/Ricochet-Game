@@ -30,6 +30,7 @@ public class Player extends EnemyPlayer implements Runnable{
     protected Weapon currentWeapon;
     protected boolean fire;
     public Color playerColor;
+    public GameObject nearestEnemy;
 
     private EnemyIndicator enemyDirection;
 
@@ -127,6 +128,7 @@ public class Player extends EnemyPlayer implements Runnable{
                     .ifPresent(gameObject -> {
                         Vec2 direction = gameObject.position.sub(position).mul(1 / gameObject.position.sub(position).normalize());
 
+                        nearestEnemy = gameObject;
                         enemyDirection.setPositionUpdate(position.add(direction.mul(2)));
                     });
         } else {

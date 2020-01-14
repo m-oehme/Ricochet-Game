@@ -22,6 +22,7 @@ public class Bullet extends GameObject {
 
     public Bullet(ObjectId objectId, Vec2 pos, float width, float height, BodyType bodyType, Scene whichScene) {
         super(objectId, pos, width, height, bodyType, whichScene);
+        didBounce = true;
     }
 
     @Override
@@ -51,11 +52,11 @@ public class Bullet extends GameObject {
         if (contact) {
             if (colObj == null ) return;
             if (colObj instanceof Player) {
-                Destroy();
                 if(didBounce){
                     ((Player) colObj).health--;
                     if (((Player) colObj).health <= 0)((Player) colObj).death();
                 }
+                Destroy();
             } else if (colObj instanceof EnemyPlayer) {
                 Destroy();
             } else {

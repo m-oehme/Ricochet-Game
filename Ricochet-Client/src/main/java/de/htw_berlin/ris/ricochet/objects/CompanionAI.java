@@ -4,6 +4,8 @@ import de.htw_berlin.ris.ricochet.Entities.GameWorld;
 import de.htw_berlin.ris.ricochet.Entities.MyRayCastCallback;
 import de.htw_berlin.ris.ricochet.Entities.Scene;
 import de.htw_berlin.ris.ricochet.RicochetGameGUI;
+import de.htw_berlin.ris.ricochet.items.Pistol;
+import de.htw_berlin.ris.ricochet.items.Weapon;
 import de.htw_berlin.ris.ricochet.net.manager.ClientNetManager;
 import de.htw_berlin.ris.ricochet.net.message.world.ObjectMoveMessage;
 import org.jbox2d.common.Vec2;
@@ -18,7 +20,9 @@ public class CompanionAI extends EnemyCompanionAI implements Runnable {
     private boolean isAlive = true;
     protected CopyOnWriteArrayList<MyRayCastCallback> rayCasts = new CopyOnWriteArrayList<>();
     boolean hitShit;
+    private Weapon currentWeap  = new Pistol(this,5000);
     float speed = 15.0f;
+    float range = 10;
     private boolean traveling, waiting;
     Vec2 originalPos;
     float totalDist;
@@ -40,10 +44,25 @@ public class CompanionAI extends EnemyCompanionAI implements Runnable {
     public void Update() {
         super.Update();
         calculateAndCorrectCollision();
+        handleAttack();
+
     }
 
     private float ConvertToBoxCoordinate(float x) {
         return x * 0.01f;
+    }
+
+
+    protected void handleAttack(){
+
+        if (guardianPlayer.nearestEnemy == null){
+            return;
+        }
+        Vec2 enemyDir = guardianPlayer.nearestEnemy.position.sub(position);
+        float dist = enemyDir.length();
+        if(dist < range){
+            currentWeap.shoot(enemyDir);
+        }
     }
 
 
@@ -97,14 +116,6 @@ public class CompanionAI extends EnemyCompanionAI implements Runnable {
             Vec2 castDir = new Vec2((float) (x + position.x), (float) (y + position.y));
             hitShit = CastRay(position, castDir);
         }
-     /*   Vec2 castDir = PlayerPos.sub(myPosition);
-        castDir = castDir.mul(castDir.normalize());*/
-
-
-       /* Vec2 castDir = PlayerPos.sub(myPosition);
-        castDir = castDir.mul(castDir.normalize());*/
-
-
         for (MyRayCastCallback ray : rayCasts) {
 
 

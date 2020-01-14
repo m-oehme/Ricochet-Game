@@ -14,9 +14,10 @@ public class MachineGun extends  Weapon {
     public MachineGun(Player player){
         fireRate = 100;
         magazineSize = 10;
+        bulletsInMagazine = magazineSize;
         reloadTime = 5000;
         shotSpeed = 10;
-        this.player = player;
+        this.owner = player;
 
     }
 
@@ -25,10 +26,10 @@ public class MachineGun extends  Weapon {
         if (reloading|| coolDown) return;
         super.shoot();
 
-        Vec2 playerPosition = new Vec2(player.body.getPosition().x, player.body.getPosition().y);
+        Vec2 playerPosition = new Vec2(owner.body.getPosition().x, owner.body.getPosition().y);
         Vec2 mousePosition = new Vec2(Mouse.getX(), Mouse.getY()).mul(1 / 30f);
 
-        Vec2 sceneOffset = new Vec2(player.myScene.getLocation().x * GameWorld.covertedSize.x, player.myScene.getLocation().y * GameWorld.covertedSize.y);
+        Vec2 sceneOffset = new Vec2(owner.myScene.getLocation().x * GameWorld.covertedSize.x, owner.myScene.getLocation().y * GameWorld.covertedSize.y);
         Vec2 shotDir = mousePosition.add(sceneOffset).sub(playerPosition);
         shotDir.normalize();
 
