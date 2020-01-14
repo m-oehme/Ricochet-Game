@@ -76,7 +76,13 @@ public class GameWorld {
 
         boolean collision = collisionObjects.entrySet().stream()
                 .filter(entry -> !entry.getKey().equals(objectId))
-                .anyMatch(entry -> this.collision.checkObjectCollision(getGameObject(objectId), position, entry.getValue()));
+                .anyMatch(entry -> {
+                    if (getGameObject(objectId) != null) {
+                        return this.collision.checkObjectCollision(getGameObject(objectId), position, entry.getValue());
+                    } else {
+                        return false;
+                    }
+                });
 
         if (collision) return false;
 

@@ -11,7 +11,7 @@ import de.htw_berlin.ris.ricochet.net.manager.ServerSocketListener;
 import de.htw_berlin.ris.ricochet.net.message.general.ChatMessage;
 import de.htw_berlin.ris.ricochet.net.message.general.LoginMessage;
 import de.htw_berlin.ris.ricochet.net.message.NetMessage;
-import de.htw_berlin.ris.ricochet.net.message.world.WorldMessage;
+import de.htw_berlin.ris.ricochet.net.message.world.*;
 import de.htw_berlin.ris.ricochet.world.GameWorldComponent;
 import javafx.collections.FXCollections;
 import javafx.collections.MapChangeListener;
@@ -83,9 +83,26 @@ public class ServerNetComponent implements ClientNetUpdate, NetworkEvent {
             chatMessageHandler.registerObserver(ServerChatComponent.get());
             change.getValueAdded().register(ChatMessage.class, chatMessageHandler);
 
-            CommonNetMessageHandler<WorldMessage> worldMessageCommonNetMessageHandler = new CommonNetMessageHandler<>();
+            CommonNetMessageHandler<WorldRequestMessage> worldMessageCommonNetMessageHandler = new CommonNetMessageHandler<>();
             worldMessageCommonNetMessageHandler.registerObserver(GameWorldComponent.get());
-            change.getValueAdded().register(WorldMessage.class, worldMessageCommonNetMessageHandler);
+            change.getValueAdded().register(WorldRequestMessage.class, worldMessageCommonNetMessageHandler);
+
+
+            CommonNetMessageHandler<ObjectMoveMessage> objectMoveMessageCommonNetMessageHandler = new CommonNetMessageHandler<>();
+            objectMoveMessageCommonNetMessageHandler.registerObserver(GameWorldComponent.get().onMoveObject);
+            change.getValueAdded().register(ObjectMoveMessage.class, objectMoveMessageCommonNetMessageHandler);
+
+            CommonNetMessageHandler<WorldRequestScenesMessage> worldRequestScenesMessageCommonNetMessageHandler = new CommonNetMessageHandler<>();
+            worldRequestScenesMessageCommonNetMessageHandler.registerObserver(GameWorldComponent.get().onRequestWorldScenes);
+            change.getValueAdded().register(WorldRequestScenesMessage.class, worldRequestScenesMessageCommonNetMessageHandler);
+
+            CommonNetMessageHandler<ObjectCreateMessage> objectCreateMessageCommonNetMessageHandler = new CommonNetMessageHandler<>();
+            objectCreateMessageCommonNetMessageHandler.registerObserver(GameWorldComponent.get().onCreateObject);
+            change.getValueAdded().register(ObjectCreateMessage.class, objectCreateMessageCommonNetMessageHandler);
+
+            CommonNetMessageHandler<ObjectDestroyMessage> objectDestroyMessageCommonNetMessageHandler = new CommonNetMessageHandler<>();
+            objectDestroyMessageCommonNetMessageHandler.registerObserver(GameWorldComponent.get().onDestroyObject);
+            change.getValueAdded().register(ObjectDestroyMessage.class, objectDestroyMessageCommonNetMessageHandler);
         }
     };
 

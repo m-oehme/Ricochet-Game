@@ -105,6 +105,7 @@ public class GameWorld {
             }
         }
 
+        log.debug("Requesting Scenes: " + sceneList.toString());
         ClientNetManager.get().sentMessage(new WorldRequestScenesMessage(
                 ClientNetManager.get().getClientId(),
                 sceneList

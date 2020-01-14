@@ -13,16 +13,19 @@ import java.net.UnknownHostException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-class RicochetServerApplication {
+public class RicochetServerApplication {
     private static Logger log = LogManager.getLogger();
 
     private static RicochetServerApplication INSTANCE = null;
+    private final int worldWidth;
+    private final int worldHeight;
+
     public static RicochetServerApplication get() {
         return INSTANCE;
     }
-    public static RicochetServerApplication initialize() {
+    public static RicochetServerApplication initialize(int worldWidth, int worldHeight) {
         if( INSTANCE == null ) {
-            INSTANCE = new RicochetServerApplication();
+            INSTANCE = new RicochetServerApplication(worldWidth, worldHeight);
         }
         return INSTANCE;
     }
@@ -30,7 +33,9 @@ class RicochetServerApplication {
     private ExecutorService mainThreadPool = Executors.newCachedThreadPool();
     private ClientManager clientManager = new ClientManager();
 
-    public RicochetServerApplication() {
+    public RicochetServerApplication(int worldWidth, int worldHeight) {
+        this.worldWidth = worldWidth;
+        this.worldHeight = worldHeight;
         onInitialize();
         onStarted();
     }
@@ -52,4 +57,11 @@ class RicochetServerApplication {
         mainThreadPool.execute(GameWorldComponent.create(clientManager));
     }
 
+    public int getWorldWidth() {
+        return worldWidth;
+    }
+
+    public int getWorldHeight() {
+        return worldHeight;
+    }
 }

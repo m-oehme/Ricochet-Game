@@ -1,5 +1,7 @@
 package de.htw_berlin.ris.ricochet.world;
 
+import de.htw_berlin.ris.ricochet.RicochetServerApplication;
+import de.htw_berlin.ris.ricochet.RicochetServerMain;
 import de.htw_berlin.ris.ricochet.client.ClientManager;
 import de.htw_berlin.ris.ricochet.net.handler.NetMessageObserver;
 import de.htw_berlin.ris.ricochet.net.manager.ClientId;
@@ -19,7 +21,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.stream.Collectors;
 
-public class GameWorldComponent implements Runnable, NetMessageObserver<WorldMessage> {
+public class GameWorldComponent implements Runnable, NetMessageObserver<WorldRequestMessage> {
     private static Logger log = LogManager.getLogger();
 
     private static GameWorldComponent INSTANCE = null;
@@ -32,37 +34,16 @@ public class GameWorldComponent implements Runnable, NetMessageObserver<WorldMes
         }
         return INSTANCE;
     }
-    private GameWorldComponent(ClientManager clientManager) { this.clientManager = clientManager; }
+    private GameWorldComponent(ClientManager clientManager) {
+        this.clientManager = clientManager;
+    }
 
     private ClientManager clientManager;
-
-    private boolean isRunning = true;
-    private LinkedBlockingQueue<WorldMessage> worldMessageQueue = new LinkedBlockingQueue<>();
-
     private GameWorld gameWorld = new GameWorld();
 
     @Override
     public void run() {
         initialize();
-        while (isRunning) {
-            try {
-                WorldMessage msg = worldMessageQueue.take();
-
-                if (msg instanceof WorldRequestMessage) {
-                    onRequestWorld((WorldRequestMessage) msg);
-                } else if (msg instanceof WorldRequestScenesMessage) {
-                    onRequestWorldScenes((WorldRequestScenesMessage) msg);
-                } else if (msg instanceof ObjectCreateMessage) {
-                    onCreateObject((ObjectCreateMessage) msg);
-                } else if (msg instanceof ObjectMoveMessage) {
-                    onMoveObject((ObjectMoveMessage) msg);
-                } else if (msg instanceof ObjectDestroyMessage) {
-                    onDestroyObject((ObjectDestroyMessage) msg);
-                }
-            } catch (InterruptedException e) {
-                log.error(e.getMessage(), e);
-            }
-        }
     }
 
     private void initialize() {
@@ -71,11 +52,7 @@ public class GameWorldComponent implements Runnable, NetMessageObserver<WorldMes
     }
 
     @Override
-    public void onNewMessage(WorldMessage message) {
-        worldMessageQueue.offer(message);
-    }
-
-    private void onRequestWorld(WorldRequestMessage worldRequestMessage) {
+    public void onNewMessage(WorldRequestMessage worldRequestMessage) {
         Map<ObjectId, SPlayer> playerMap = gameWorld.getPlayerObjects().entrySet().stream()
                 .filter(map -> !worldRequestMessage.getClientId().equals(map.getValue().getClientId()))
                 .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
@@ -87,7 +64,7 @@ public class GameWorldComponent implements Runnable, NetMessageObserver<WorldMes
         clientManager.sendMessageToClients(worldRequestMessage);
     }
 
-    private void onRequestWorldScenes(WorldRequestScenesMessage worldRequestScenesMessage) {
+    public final NetMessageObserver<WorldRequestScenesMessage> onRequestWorldScenes = worldRequestScenesMessage -> {
         HashMap<ObjectId, SGameObject> gameObjectHashMap = new HashMap<>();
         worldRequestScenesMessage.getSceneList().forEach(vec2 -> {
             gameObjectHashMap.putAll(gameWorld.getGameObjectsForScene(vec2));
@@ -99,10 +76,9 @@ public class GameWorldComponent implements Runnable, NetMessageObserver<WorldMes
 
         log.debug("Sending World " + worldRequestScenesMessage.getSceneList().size() + "Scenes");
         clientManager.sendMessageToClients(worldRequestScenesMessage);
-    }
+    };
 
-    private void onCreateObject(ObjectCreateMessage objectCreateMessage) {
-
+    public final NetMessageObserver<ObjectCreateMessage> onCreateObject = objectCreateMessage -> {
         SGameObject sGameObject = objectCreateMessage.getSGameObject();
 
         ObjectId objectId = gameWorld.addGameObject(sGameObject);
@@ -112,9 +88,9 @@ public class GameWorldComponent implements Runnable, NetMessageObserver<WorldMes
 
         log.debug("New Object - Type: " + sGameObject.getClass().getSimpleName() + " ID: " + objectId);
         log.debug("New Object - Position: " + sGameObject.getPosition());
-    }
+    };
 
-    private void onMoveObject(ObjectMoveMessage objectMoveMessage) {
+    public final NetMessageObserver<ObjectMoveMessage> onMoveObject = objectMoveMessage -> {
         boolean isMoveOk = gameWorld.updateGameObjectPosition(objectMoveMessage.getObjectId(), objectMoveMessage.getScene(), objectMoveMessage.getPosition());
 
         if (isMoveOk) {
@@ -125,15 +101,14 @@ public class GameWorldComponent implements Runnable, NetMessageObserver<WorldMes
             collisionMessage.setMessageScope(MessageScope.EVERYONE);
             clientManager.sendMessageToClients(collisionMessage);
         }
+    };
 
-    }
-
-    private void onDestroyObject(ObjectDestroyMessage objectDestroyMessage) {
+    public final NetMessageObserver<ObjectDestroyMessage> onDestroyObject = objectDestroyMessage -> {
         gameWorld.removeGameObject(objectDestroyMessage.getObjectId());
 
         clientManager.sendMessageToClients(objectDestroyMessage);
         log.debug(String.format("Object Destroyed: %s", objectDestroyMessage.getObjectId()));
-    }
+    };
 
     public void removeAllObjectsForPlayer(ClientId clientId) {
         ObjectId objectId = gameWorld.removePlayerObject(clientId);
