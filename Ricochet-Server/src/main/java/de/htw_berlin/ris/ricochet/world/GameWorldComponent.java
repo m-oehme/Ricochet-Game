@@ -3,6 +3,7 @@ package de.htw_berlin.ris.ricochet.world;
 import de.htw_berlin.ris.ricochet.client.ClientManager;
 import de.htw_berlin.ris.ricochet.net.handler.NetMessageObserver;
 import de.htw_berlin.ris.ricochet.net.manager.ClientId;
+import de.htw_berlin.ris.ricochet.net.message.MessageScope;
 import de.htw_berlin.ris.ricochet.net.message.world.*;
 import de.htw_berlin.ris.ricochet.objects.ObjectId;
 import de.htw_berlin.ris.ricochet.objects.shared.SCompanionAI;
@@ -59,7 +60,7 @@ public class GameWorldComponent implements Runnable, NetMessageObserver<WorldMes
                     onDestroyObject((ObjectDestroyMessage) msg);
                 }
             } catch (InterruptedException e) {
-                e.printStackTrace();
+                log.error(e.getMessage(), e);
             }
         }
     }
@@ -114,9 +115,17 @@ public class GameWorldComponent implements Runnable, NetMessageObserver<WorldMes
     }
 
     private void onMoveObject(ObjectMoveMessage objectMoveMessage) {
-        gameWorld.updateGameObjectPosition(objectMoveMessage.getObjectId(), objectMoveMessage.getScene(), objectMoveMessage.getPosition());
+        boolean isMoveOk = gameWorld.updateGameObjectPosition(objectMoveMessage.getObjectId(), objectMoveMessage.getScene(), objectMoveMessage.getPosition());
 
-        clientManager.sendMessageToClients(objectMoveMessage);
+        if (isMoveOk) {
+            clientManager.sendMessageToClients(objectMoveMessage);
+        } else {
+            SGameObject gameObject = gameWorld.getGameObject(objectMoveMessage.getObjectId());
+            ObjectMoveMessage collisionMessage = new ObjectMoveMessage(objectMoveMessage.getClientId(), objectMoveMessage.getObjectId(), gameObject.getScene(), gameObject.getPosition());
+            collisionMessage.setMessageScope(MessageScope.EVERYONE);
+            clientManager.sendMessageToClients(collisionMessage);
+        }
+
     }
 
     private void onDestroyObject(ObjectDestroyMessage objectDestroyMessage) {

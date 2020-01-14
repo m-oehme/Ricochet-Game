@@ -5,6 +5,7 @@ import de.htw_berlin.ris.ricochet.Entities.Scene;
 import de.htw_berlin.ris.ricochet.RicochetGameGUI;
 import de.htw_berlin.ris.ricochet.items.MachineGun;
 import de.htw_berlin.ris.ricochet.items.Weapon;
+import de.htw_berlin.ris.ricochet.math.Conversion;
 import de.htw_berlin.ris.ricochet.net.manager.ClientNetManager;
 import de.htw_berlin.ris.ricochet.net.message.world.ObjectMoveMessage;
 import org.jbox2d.common.Vec2;
@@ -69,6 +70,8 @@ public class Player extends EnemyPlayer implements Runnable{
         super.Init();
 
         setEnemyIndicatorAlive();
+
+        ClientNetManager.get().getHandlerFor(ObjectMoveMessage.class).registerObserver(this);
     }
 
     @Override
@@ -138,7 +141,7 @@ public class Player extends EnemyPlayer implements Runnable{
 
     @Override
     public void switchScene(Vec2 position) {
-        Vec2 convertedPos = GameWorld.getLocalCoordinates(position, myScene.getLocation());
+        Vec2 convertedPos = Conversion.getLocalCoordinates(position, myScene.getLocation());
 
         if (convertedPos.x > GameWorld.covertedSize.x) {
             log.debug("Player Scene switch to RIGHT");

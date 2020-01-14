@@ -4,6 +4,11 @@ import de.htw_berlin.ris.ricochet.net.manager.ClientId;
 import de.htw_berlin.ris.ricochet.objects.shared.SGameObject;
 import de.htw_berlin.ris.ricochet.objects.ObjectId;
 import de.htw_berlin.ris.ricochet.objects.shared.SPlayer;
+import de.htw_berlin.ris.ricochet.world.collision.Collision;
+import de.htw_berlin.ris.ricochet.world.collision.SimpleObjectCollision;
+import de.htw_berlin.ris.ricochet.world.generation.MazeWorldGenerator;
+import de.htw_berlin.ris.ricochet.world.generation.SimpleWorldGenerator;
+import de.htw_berlin.ris.ricochet.world.generation.WorldGenerator;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.jbox2d.common.Vec2;
@@ -19,6 +24,7 @@ public class GameWorld {
     private static Logger log = LogManager.getLogger();
 
     private WorldGenerator worldGenerator = new MazeWorldGenerator();
+    private Collision collision = new SimpleObjectCollision();
     private ConcurrentHashMap<ObjectId, SPlayer> playerObjects = new ConcurrentHashMap<>();
     private ConcurrentHashMap<ObjectId, SGameObject> dynamicGameObjects = new ConcurrentHashMap<>();
     private ConcurrentHashMap<ObjectId, SGameObject> staticGameObjects = new ConcurrentHashMap<>();
@@ -65,6 +71,18 @@ public class GameWorld {
     }
 
     public boolean updateGameObjectPosition(ObjectId objectId, Vec2 scene, Vec2 position) {
+        HashMap<ObjectId, SGameObject> collisionObjects = new HashMap<>(dynamicGameObjects);
+        collisionObjects.putAll(staticGameObjects);
+
+        boolean collision = collisionObjects.entrySet().stream()
+                .filter(entry -> !entry.getKey().equals(objectId))
+                .anyMatch(entry -> this.collision.checkObjectCollision(getGameObject(objectId), entry.getValue()));
+
+        if (collision) {
+            log.debug("Collision");
+            return false;
+        }
+
         if (playerObjects.containsKey(objectId)) {
             playerObjects.get(objectId).setPosition(position);
             playerObjects.get(objectId).setScene(scene);
@@ -77,6 +95,16 @@ public class GameWorld {
 
         return false;
     }
+
+    public SGameObject getGameObject(ObjectId objectId) {
+        if (playerObjects.containsKey(objectId)) {
+            return playerObjects.get(objectId);
+        } else if (dynamicGameObjects.containsKey(objectId)) {
+            return dynamicGameObjects.get(objectId);
+        } else {
+            return staticGameObjects.get(objectId);
+        }
+    };
 
     public ConcurrentHashMap<ObjectId, SPlayer> getPlayerObjects() {
         return playerObjects;

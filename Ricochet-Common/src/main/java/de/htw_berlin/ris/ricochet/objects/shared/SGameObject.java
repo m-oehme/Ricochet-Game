@@ -9,12 +9,7 @@ public class SGameObject implements Serializable {
     private Vec2 position;
     private float width, height;
 
-    public SGameObject(Vec2 scene, Vec2 position) {
-        this.scene = scene;
-        this.position = position;
-    }
-
-    public SGameObject(Vec2 scene, Vec2 position,float width, float height) {
+    public SGameObject(Vec2 scene, Vec2 position, float width, float height) {
         this.scene = scene;
         this.position = position;
         this.width = width;

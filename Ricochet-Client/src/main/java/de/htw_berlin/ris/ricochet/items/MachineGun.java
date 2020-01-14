@@ -37,7 +37,12 @@ public class MachineGun extends  Weapon {
         ClientNetManager.get().sentMessage(new ObjectCreateMessage(
                 ClientNetManager.get().getClientId(),
                 null,
-                new SBullet(GameWorld.Instance.getCurrentScene().getLocation(), playerPosition, shotDir))
+                new SBullet(
+                        GameWorld.Instance.getCurrentScene().getLocation(),
+                        playerPosition,
+                        shotDir,
+                        0.25f,
+                        0.25f))
         );
 
 

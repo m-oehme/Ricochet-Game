@@ -2,6 +2,7 @@ package de.htw_berlin.ris.ricochet.objects;
 
 import de.htw_berlin.ris.ricochet.Entities.GameWorld;
 import de.htw_berlin.ris.ricochet.Entities.Scene;
+import de.htw_berlin.ris.ricochet.math.Conversion;
 import de.htw_berlin.ris.ricochet.net.handler.NetMessageObserver;
 import de.htw_berlin.ris.ricochet.net.manager.ClientNetManager;
 import de.htw_berlin.ris.ricochet.net.message.world.ObjectMoveMessage;
@@ -204,7 +205,7 @@ public class GameObject implements NetMessageObserver<ObjectMoveMessage> {
             objectColor.getRGBColorComponents(rgbVal);
             glColor3f(rgbVal[0], rgbVal[1], rgbVal[3]);
         }
-        Vec2 bodyPosition = GameWorld.getLocalCoordinates(position, myScene.getLocation()).mul(30);
+        Vec2 bodyPosition = Conversion.getLocalCoordinates(position, myScene.getLocation()).mul(30);
         renderAtLocalPosition(bodyPosition);
     }
 
@@ -275,7 +276,7 @@ public class GameObject implements NetMessageObserver<ObjectMoveMessage> {
     }
 
     public void switchScene(Vec2 position) {
-        Vec2 convertedPos = GameWorld.getLocalCoordinates(position, myScene.getLocation());
+        Vec2 convertedPos = Conversion.getLocalCoordinates(position, myScene.getLocation());
 
         if (convertedPos.x > covertedSize.x) {
 //            log.debug("Scene switch to RIGHT");

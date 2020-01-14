@@ -103,8 +103,8 @@ public class Weapon {
                 Bullet Bullet = new Bullet(
                         objectCreateMessage.getObjectId(),
                         sBullet.getPosition().add((sBullet.getShootDirection().mul(1.5f))),
-                        0.25f,
-                        0.25f,
+                        sBullet.getWidth(),
+                        sBullet.getHeight(),
                         BodyType.DYNAMIC,
                         scene);
                 Vec2 shotDir = sBullet.getShootDirection().mul(shotSpeed * 10);

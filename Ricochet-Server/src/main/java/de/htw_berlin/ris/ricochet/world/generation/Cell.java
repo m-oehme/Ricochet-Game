@@ -1,4 +1,4 @@
-package de.htw_berlin.ris.ricochet.world;
+package de.htw_berlin.ris.ricochet.world.generation;
 
 import de.htw_berlin.ris.ricochet.objects.shared.SGameObject;
 import org.jbox2d.common.Vec2;

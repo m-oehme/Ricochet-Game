@@ -3,6 +3,7 @@ package de.htw_berlin.ris.ricochet;
 import de.htw_berlin.ris.ricochet.Entities.ContactListener;
 import de.htw_berlin.ris.ricochet.Entities.GameWorld;
 import de.htw_berlin.ris.ricochet.Entities.Scene;
+import de.htw_berlin.ris.ricochet.math.Conversion;
 import de.htw_berlin.ris.ricochet.math.Vector2;
 import de.htw_berlin.ris.ricochet.net.handler.NetMessageObserver;
 import de.htw_berlin.ris.ricochet.net.manager.ClientNetManager;
@@ -113,12 +114,13 @@ public class RicochetGameGUI {
 
         Vec2 playerPos = new Vec2(GameWorld.covertedSize.x/2,  GameWorld.covertedSize.y/2);
         Vec2 startingScene = GameWorld.Instance.getCurrentScene().getLocation();
-        Vec2 convertedPos = GameWorld.getGlobalCoordinates(playerPos, startingScene);
+        Vec2 convertedPos = Conversion.getGlobalCoordinates(playerPos, startingScene);
         log.debug("Request Player Object at Scene: " + GameWorld.Instance.getCurrentScene().getLocation());
         ClientNetManager.get().sentMessage(new ObjectCreateMessage(ClientNetManager.get().getClientId(), null, new SPlayer(
                 ClientNetManager.get().getClientId(),
                 startingScene,
-                convertedPos)));
+                convertedPos,
+                0.5f, 0.5f)));
 
         return startingScene;
     }
@@ -129,7 +131,7 @@ public class RicochetGameGUI {
         if (sGameObject instanceof SPlayer) {
             if (GameWorld.Instance.getPlayer() == null) {
                 log.debug("Player object created at Scene: " + objectCreateMessage.getSGameObject().getScene());
-                Player playerObject = new Player(objectCreateMessage.getObjectId(), objectCreateMessage.getSGameObject().getPosition(), 0.5f, 0.5f, BodyType.DYNAMIC, GameWorld.Instance.getWorldScenes().get(objectCreateMessage.getSGameObject().getScene()));
+                Player playerObject = new Player(objectCreateMessage.getObjectId(), objectCreateMessage.getSGameObject().getPosition(), objectCreateMessage.getSGameObject().getWidth(), objectCreateMessage.getSGameObject().getHeight(), BodyType.DYNAMIC, GameWorld.Instance.getWorldScenes().get(objectCreateMessage.getSGameObject().getScene()));
                 GameWorld.Instance.setPlayer(playerObject);
 
                 ClientNetManager.get().sentMessage(new ObjectCreateMessage(

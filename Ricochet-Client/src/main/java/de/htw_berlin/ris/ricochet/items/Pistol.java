@@ -45,7 +45,12 @@ public class Pistol extends Weapon {
         Vec2 shotDir = mousePosition.add(sceneOffset).sub(playerPosition);
         shotDir.normalize();
 
-        ClientNetManager.get().sentMessage(new ObjectCreateMessage(ClientNetManager.get().getClientId(), null, new SBullet(GameWorld.Instance.getCurrentScene().getLocation(), playerPosition, shotDir)));
+        ClientNetManager.get().sentMessage(new ObjectCreateMessage(ClientNetManager.get().getClientId(), null, new SBullet(
+                GameWorld.Instance.getCurrentScene().getLocation(),
+                playerPosition,
+                shotDir,
+                0.25f,
+                0.25f)));
 
 
     }
@@ -57,7 +62,12 @@ public class Pistol extends Weapon {
         Vec2 shotDir = Dir;
         shotDir.normalize();
         Vec2 playerPosition = new Vec2(owner.body.getPosition().x, owner.body.getPosition().y);
-        ClientNetManager.get().sentMessage(new ObjectCreateMessage(ClientNetManager.get().getClientId(), null, new SBullet(GameWorld.Instance.getCurrentScene().getLocation(), playerPosition, shotDir)));
+        ClientNetManager.get().sentMessage(new ObjectCreateMessage(ClientNetManager.get().getClientId(), null, new SBullet(
+                GameWorld.Instance.getCurrentScene().getLocation(),
+                playerPosition,
+                shotDir,
+                0.25f,
+                0.25f)));
 
 
     }

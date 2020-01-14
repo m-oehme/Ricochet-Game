@@ -1,5 +1,6 @@
 package de.htw_berlin.ris.ricochet.Entities;
 
+import de.htw_berlin.ris.ricochet.math.Conversion;
 import de.htw_berlin.ris.ricochet.math.Vector2;
 import de.htw_berlin.ris.ricochet.net.handler.NetMessageObserver;
 import de.htw_berlin.ris.ricochet.net.manager.ClientNetManager;
@@ -60,6 +61,8 @@ public class GameWorld {
         physicsWorld = new World(new Vec2(0, 0), true);
         worldScenes = new ConcurrentHashMap<>();
         covertedSize = new Vec2(WINDOW_DIMENSIONS[0] * unitConversion, WINDOW_DIMENSIONS[1] * unitConversion);
+
+        Conversion.convertedSize = covertedSize;
 
         ClientNetManager.get().getHandlerFor(ObjectDestroyMessage.class).registerObserver(objectDestroyObserver);
         ClientNetManager.get().getHandlerFor(WorldRequestScenesMessage.class).registerObserver(worldRequestScenesObserver);
@@ -158,7 +161,7 @@ public class GameWorld {
             Scene scene = worldScenes.get(sGameObject.getScene());
 
             if (sGameObject instanceof SPlayer) {
-                EnemyPlayer playerObject = new EnemyPlayer(objectId, GameWorld.getGlobalCoordinates(sGameObject.getPosition(), scene.getLocation()), 0.5f, 0.5f, BodyType.DYNAMIC, scene);
+                EnemyPlayer playerObject = new EnemyPlayer(objectId, Conversion.getGlobalCoordinates(sGameObject.getPosition(), scene.getLocation()), 0.5f, 0.5f, BodyType.DYNAMIC, scene);
             }
         });
     }
@@ -168,12 +171,15 @@ public class GameWorld {
             Scene scene = worldScenes.get(sGameObject.getScene());
 
             if (sGameObject instanceof SCompanionAI) {
-                EnemyCompanionAI playerObject = new EnemyCompanionAI(objectId, GameWorld.getGlobalCoordinates(sGameObject.getPosition(), scene.getLocation()), 0.5f, 0.5f, scene);
+                EnemyCompanionAI playerObject = new EnemyCompanionAI(objectId, Conversion.getGlobalCoordinates(sGameObject.getPosition(), scene.getLocation()), 0.5f, 0.5f, scene);
             } else if (sGameObject instanceof SWallPrefab) {
                 SWallPrefab sWallPrefab = (SWallPrefab) sGameObject;
-                WallPrefab wall = new WallPrefab(sWallPrefab.getPrefabType(), sWallPrefab.getPrefabPosition(), scene);
-            } else {
-                GameObject cellWall = WallPrefab.simpleWall(WallPrefabConfig.PrefabType.CellWall, GameWorld.getGlobalCoordinates(sGameObject.getPosition(), scene.getLocation()), sGameObject.getWidth(), sGameObject.getHeight(), scene);
+
+                if (sWallPrefab.getPrefabType() == WallPrefabConfig.PrefabType.CellWall) {
+                    GameObject cellWall = WallPrefab.simpleWall(objectId,WallPrefabConfig.PrefabType.CellWall, sWallPrefab.getPosition(), sWallPrefab.getWidth(), sWallPrefab.getHeight(), scene);
+                } else {
+                    GameObject wall = WallPrefab.simpleBorderWall(objectId, sWallPrefab, scene);
+                }
             }
         });
     }
@@ -212,7 +218,7 @@ public class GameWorld {
 
         Vec2 newPosition = new Vec2(GameWorld.covertedSize.x / 2, GameWorld.covertedSize.y / 2);
 
-        player.setPositionUpdate(GameWorld.getGlobalCoordinates(newPosition, currentScene.getLocation()), currentScene.getLocation());
+        player.setPositionUpdate(Conversion.getGlobalCoordinates(newPosition, currentScene.getLocation()), currentScene.getLocation());
         player.setEnemyIndicatorAlive();
         loadSceneChunk(currentScene.getLocation());
         gameOver = false;
@@ -316,16 +322,6 @@ public class GameWorld {
 
     public void addGameObject(GameObject gameObject) {
         createObjectQueue.offer(gameObject);
-    }
-
-    public static Vec2 getLocalCoordinates(Vec2 position, Vec2 scene) {
-        Vec2 sceneOffset = new Vec2(scene.x * GameWorld.covertedSize.x, scene.y * GameWorld.covertedSize.y);
-        return position.sub(sceneOffset);
-    }
-
-    public static Vec2 getGlobalCoordinates(Vec2 position, Vec2 scene) {
-        Vec2 sceneOffset = new Vec2(scene.x * GameWorld.covertedSize.x, scene.y * GameWorld.covertedSize.y);
-        return position.add(sceneOffset);
     }
 
     public ArrayList<Vec2> getLoadedScenes() {
