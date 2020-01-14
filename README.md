@@ -17,5 +17,5 @@ Server
 ```
 // Program Paramter
 // Worldwidth Worldheight
-10 10
+10 10 (Only even numbers)
 ```
