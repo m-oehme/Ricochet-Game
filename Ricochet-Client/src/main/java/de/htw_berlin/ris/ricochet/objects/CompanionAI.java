@@ -180,26 +180,6 @@ public class CompanionAI extends EnemyCompanionAI implements Runnable {
 
         MyRayCastCallback rayCastCallback = new MyRayCastCallback();
 
-      /*  RayCastCallback rayCastCallback = new RayCastCallback() {
-
-            @Override
-            public float reportFixture(Fixture fixture, Vec2 point, Vec2 normal, float fraction) {
-                //return -1 - to ignore the current fixture
-                //return 0 - to terminate the raycast
-                //return fraction - to clip the raycast at current point
-                //return 1 - don't clip the ray and continue
-                if (fraction < 1.0f) {
-                    collisionPoints.add(point) ;
-                    closestFixture = fixture;
-                    hit[0] = true;
-                    return fraction;
-                }
-
-                return 1;
-            }
-        };*/
-
-
         b2dWorld.raycast(rayCastCallback, origin, direction);
 
         rayCastCallback.direction = direction;
