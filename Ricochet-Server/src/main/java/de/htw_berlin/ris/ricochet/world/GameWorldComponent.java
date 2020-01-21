@@ -47,7 +47,7 @@ public class GameWorldComponent implements Runnable, NetMessageObserver<WorldReq
     }
 
     private void initialize() {
-        gameWorld.generateStaticWorld(4,4);
+        gameWorld.generateStaticWorld(RicochetServerApplication.get().getWorldWidth(),RicochetServerApplication.get().getWorldHeight());
         log.info("New World of size "+ gameWorld.getWorldSize() +" generated!");
     }
 
