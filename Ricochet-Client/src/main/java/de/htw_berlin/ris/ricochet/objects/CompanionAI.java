@@ -123,13 +123,16 @@ public class CompanionAI extends EnemyCompanionAI implements Runnable {
                 Vec2 distanceCollision = body.getPosition().sub(ray.collisionPoint);
                 float dist = distanceCollision.length();
                 float weightFac = 0;
-                float weightFacCol = 1 - (dist / radius);
+                float weightFacCol =(radius /dist ) ;//Math.max(0,1 -(radius /dist ));
+                distanceCollision.normalize();
+                System.out.println(weightFacCol);
+
                 if (dist < 1) {
-                   // System.out.println("too close");
+
                     weightGuardian = weightGuardian.mul(weightFac);
 
                 }
-                weightCollision = weightCollision.add(distanceCollision.mul(speed/2 * weightFacCol));
+                weightCollision = weightCollision.add(distanceCollision.mul(speed/rayCasts.size() * weightFacCol));
             }
         }
 
